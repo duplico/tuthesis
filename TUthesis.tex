@@ -97,7 +97,7 @@
 \RequirePackage{setspace}
 \RequirePackage{TUthesis}
 
-%\includeonly{Chapter1,Chapter2,Chapter3,Chapter4,Chapter5,Conclusion,Appendices}
+\includeonly{Chapter1,Chapter2,Chapter3,Chapter4,Chapter5,Chapter6}
 
 \begin{document}
 
@@ -109,9 +109,9 @@
 % Enter the information for the title page,
 % signature page and abstract.
 %
-\titleoneline{Modeling Cyber-Physical Attacks With Hybrid Attack Graphs}
-\title{Modeling Cyber-Physical Attacks \\ Using Hybrid Attack Graphs}
-   % The title with line breaks for the front pages.
+\titleoneline{Hybrid Attack Graphs: A Tool For Modeling Cyber Physical Systems Security}
+% The title with line breaks for the front pages:
+\title{Hybrid Attack Graphs: A Tool For Modeling Cyber Physical Systems Security}
 \author{George Robert Louthan IV}
 \degreename{Master of Science}
 \dept{Computer Science}
@@ -171,7 +171,6 @@
 Look, it's an abstract!
 
 
-
 \acknowledgementsp
 %
 % Place the text of your acknowledgements page here
@@ -195,7 +194,12 @@ endorsements, either expressed or implied, or DARPA or the U.S. Government.
 % Main Body of Document
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Amazing thesis!
+\include{chapter1}
+\include{chapter2}
+\include{chapter3}
+\include{chapter4}
+\include{chapter5}
+\include{chapter6}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIBLIOGRAPHY
