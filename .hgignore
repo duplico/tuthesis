@@ -1,2 +1,2 @@
 relre:.*\.aux
-relre:.*\.[(lof)(log)(lot)(toc)]
+relre:.*\.(lof|log|lot|toc)
