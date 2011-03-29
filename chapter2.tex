@@ -271,8 +271,10 @@ given topology permits communication between two hosts~\cite{ingols2009modeling}
 is favored, for example, in the work of MIT Lincoln Laboratory and the University of California, Davis.
 \subsubsection{Generation}
 Methods of attack graph generation, the process of chaining exploits to enumerate the
-attack space~\cite{} using preconditions and postconditions share a common
-general architecture, pictured in Fig. \ref{fig:generation}. The attack graph generation
+attack space~\cite{campbell2002modeling}~\cite{phillips1998graph}~\cite{sheyner2002automated},
+share a common general architecture among the modern
+methods that use preconditions and postconditions in exploit definitions,
+pictured in Fig. \ref{fig:generation}. The attack graph generation
 process combines network state and exploit patterns as input, applying exploit postconditions
 back onto the network state to generate its output of successor states.
 
@@ -291,7 +293,6 @@ digraph G {
 \caption{Attack graph generation process}
 \label{fig:generation}
 \end{figure}
-\subsubsection{Analysis}
 \subsubsection{Research Directions}
 Research in attack graphs is spread throughout a variety of pathways. Many of these include
 evaluating a network's security~\cite{ammann2002scalable}, specification of formal languages
@@ -301,3 +302,5 @@ and reachability analysis between hosts in a single network state~\cite{ingols20
 For a thorough literature review up to 2005 and more detailed discussion of popular research directions, 
 refer to the work of Lippmann and Ingols~\cite{lippmann2005annotated}.
 \section{Case Studies}
+% Blunderdome \cite{louthan2010blunderdome}
+% Power draining attack for active RFID similar to that described by~\cite{buennemeyer2006battery}
