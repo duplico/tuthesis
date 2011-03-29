@@ -3,6 +3,55 @@
 \subsection{Hybrid Systems}
 A system with both continuous (frequently physical) components and discrete (frequently digital)
 components is said to be a \emph{hybrid system}, named for its characteristic blending of the
-two domains. Examples of these systems abound in industrial controls, for example.
+two domains. Examples of hybrid computer systems abound in industrial controls, for example,
+although hybrid systems may also be fully physical (e.g., a bouncing ball experiences continuous
+behavior when rising and falling and discrete behavior when colliding with a surface).
+
+The term hybrid system is an older one that was coined as researchers began to study the newly
+pervasive reactive systems that arose as programmed control of the physical world became 
+widespread ~\cite{alur1993hybrid}. For several reasons it does not suffice to describe precisely
+the types of systems with which this work is concerned: a subset of hybrid
+systems that incorporate a significant computer and networking component.
+
+Nevertheless, the modeling of hybrid systems is well studied and provides a sufficient body
+of relevent knowledge from which to draw to warrant its inclusion. This chapter includes
+background on a particularly relevent modeling framework for hybrid systems called the
+hybrid automaton, which is used in this thesis as the standard benchmark against which to
+compare hybrid modeling techniques.
+\subsection{Cyber Physical Systems}
+\subsubsection{Definition}
+% Definition
+A newer, better term for the systems investigated in this thesis is \emph{cyber physical systems}.
+Put simply, a cyber physical system is a networked hybrid system: a networked computer system that is 
+tightly coupled to the physical world. 
+\subsubsection{Challenges}
+According to the 2008 Report of the Cyber-Physical Systems Summit, ``The principal barrier to 
+developing CPS is the lack of a theory that comprehends cyber and physical resources in a 
+single unified framework.''~\cite{summitreport2008}
+
+The summit further identified as part of the scientific and technological foundations of
+cyber physical systems both new modeling frameworks that ``explicitly address new observables'' and 
+studies of privacy, trust, and security including ``theories of cyber-physical inter-dependence''~\cite{summitreport2008},
+a major theme of this work.
+
+Crenshaw and Beyer enumerated four principal challenges in cyber physical systems testing that are
+equally apt for security:
+their concentration in safety critical domains, their frequent integration of third-party or
+otherwise unrelated systems, their dependence upon unreliable data collection, and their
+pervasity~\cite{crenshaw2010upbot}.
+\subsection{Hybrid Automata}
+\subsubsection{Definition}
+A valuable formalism for modeling hybrid systems in isolation and with limited composition
+is the hybrid automaton of Alur, et al.~\cite{alur1993hybrid}. This section introduces the
+version of the formalism described in 1996 by Henzinger~\cite{henzinger1996theory}, to which a
+reader interested in more than a superficial understanding is referred. 
+
+Formally,
+a hybrid automaton $H$ is made up of a set of real-valued state variables, their first derivatives,
+a set of operational modes and switches between the modes, and predicates attached to those modes and
+switches describing the operation of the system in those modes and the discrete transitions between
+them. 
+\subsubsection{Shortcomings}
+\subsubsection{Alternatives}
 \section{Attack Graphs}
 \section{Case Studies}
