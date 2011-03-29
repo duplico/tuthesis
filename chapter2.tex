@@ -70,7 +70,7 @@ the environment. When the temperature is strictly less than 19, the switch from 
 not mandatory until the off mode's invariant condition $x \geq 18$ ceases to be satisfied. The switch from
 on to off behaves similarly.
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
@@ -122,7 +122,7 @@ which prototypical ``hybrid link automata'' were developed to model explicit com
 An example of the cognitive scalability issues inherent with this design is given in Fig.~\ref{fig:linkmachine}.
 This strategy may have a place in modeling some systems but falls short of the goal of 
 modeling complex, interdependent networks of hybrid systems with more conventional computer networks.
-\begin{figure}[t]
+\begin{figure}
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
@@ -200,7 +200,7 @@ The attacker must start the car and drive away; this could be accomplished eithe
 in and hotwiring the car, or by stealing the owner's key and using it to subsequently steal the
 car. The root of the tree represents the final goal of the theft, with prerequisite goals
 flowing upward from the leaf nodes.
-\begin{figure}[t]
+\begin{figure}
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
@@ -278,16 +278,16 @@ pictured in Fig. \ref{fig:generation}. The attack graph generation
 process combines network state and exploit patterns as input, applying exploit postconditions
 back onto the network state to generate its output of successor states.
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
-    Generator [texlbl="Generation Engine"];
-    Exploits [texlbl="Exploit Rules (Generic transitions)"];
-	State [texlbl="Network State (Facts)"];
-	Exploits -> Generator [texlbl="1. Analyze rules and network state"];
+    Generator [texlbl="Generation \\ Engine", shape="Mcircle"];
+    Exploits [texlbl="Exploit Rules \\ (Generic transitions)", shape="folder"];
+	State [texlbl="Network State \\ (Facts)", shape="folder"];
+	Exploits -> Generator [texlbl="1. Analyze rules and network state" label=" "];
 	State -> Generator;
-	Generator -> State [texlbl="2. Apply new network state"];
+	Generator -> State [texlbl="2. Apply new network state", label=" "];
 }
 \end{dot2tex}
 \caption{Attack graph generation process}
@@ -302,5 +302,44 @@ and reachability analysis between hosts in a single network state~\cite{ingols20
 For a thorough literature review up to 2005 and more detailed discussion of popular research directions, 
 refer to the work of Lippmann and Ingols~\cite{lippmann2005annotated}.
 \section{Case Studies}
-% Blunderdome \cite{louthan2010blunderdome}
-% Power draining attack for active RFID similar to that described by~\cite{buennemeyer2006battery}
+Throughout this thesis, two examples of attacks are used to illustrate the models presented.
+The first is on a traditional information system, based upon an offensive educational exercise
+deployed at the University of Tulsa in 2008 involving several chained attacks. The second is the 
+denial of service through battery exhaustion of a simple
+cyber-physical system of active radio frequency identification (RFID) tags and readers.
+\subsection{Blunderdome}
+The first case study is an attack on a simulated educational network deployed as part of a
+security engineering course in 2008. Dubbed the Blunderdome, it featured a firewalled network of
+two hosts available per attacker. See Table \ref{table:blundertasks} for a listing of the stages and
+their preconditions and results. The attacker was required to log into a login server by cracking
+its weak SSH key (due to an operating system vulnerability), execute an elevation of privilege (due
+to a Linux kernel vulnerability), log into the web server, and execute a SQL injection attack to
+change a simulated grade. The architecture from the exercise is provided in 
+Fig.~\ref{fig:blunderarch}~\cite{louthan2010blunderdome}.
+
+\begin{figure}
+\centering
+\includegraphics{blunderarch}
+\caption{Blunderdome network architecture}
+\label{fig:blunderarch}
+\end{figure}
+
+\begin{table}
+\centering
+\begin{tabular}{p{1.5in}|p{1in}|p{1in}|p{1in}}
+Stage & Precondition	&	Attack	&	Postcondition \\ \hline \hline
+Gain remote user access & SSH public key available (given); weak public key 
+	& Break weak public key & User privileges on login server \\ \hline
+Gain root access & User-level access & Execute \texttt{vmsplice} privilege escalation 
+	& Root privileges on login server; access to web server credentials \\ \hline
+Change grade & Address and credentials for web service & Execute SQL injection & Altered grade in database
+\end{tabular}
+\caption{Stages of the Blunderdome attack}
+\label{table:blundertasks}
+\end{table}
+\subsection{RFID Denial of Sleep}
+The second case study used throughout this work is a denial of service attack
+on a powered RFID tag inventory system similar to those used by REFERENCE. The attack
+is similar to the ones described by Buennemeyer, \emph{et al.}~\cite{buennemeyer2006battery},
+and is of a newly distinguished class of attacks sometimes termed denial of sleep
+attacks~\cite{brownfield2005wireless}.

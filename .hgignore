@@ -1,2 +1,3 @@
-relre:.*\.aux
-relre:.*\.(lof|log|lot|toc)
+relre:\.aux
+relre:\.(lof|log|lot|toc|bbl|blg)
+relre:dot2tex
