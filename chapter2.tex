@@ -186,4 +186,118 @@ exclusion of messages is enforced.}
 \label{fig:linkmachine}
 \end{figure}
 \section{Attack Graphs}
+\subsection{Introduction}
+An attack graph is one of several related formalisms that utilize graph theory to
+model the state space of computer systems attacks. Perhaps they are best introduced
+when presented as an alternative to a similar model called an attack tree.
+\subsection{Attack Trees}
+An attack tree is a goal-oriented tree model of an abuse of a system~\cite{schneier1999modeling}.
+The root of the tree represents the attacker's goal, and the children of any given node represent
+the prerequisite activities required to reach that node. For example, consider the goal of
+stealing a car, which is modeled in a simple attack tree in Fig.~\ref{fig:attacktree}.
+
+The attacker must start the car and drive away; this could be accomplished either by breaking
+in and hotwiring the car, or by stealing the owner's key and using it to subsequently steal the
+car. The root of the tree represents the final goal of the theft, with prerequisite goals
+flowing upward from the leaf nodes.
+\begin{figure}[t]
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=TD;
+    StealCar [texlbl="Steal car"];
+    UseKey [texlbl="Start car with key"];
+	HotWire [texlbl="Hotwire car"];
+	StealKey [texlbl="Steal owner's key"];
+	OpenDoor [texlbl="Access car interior"];
+	CallLocksmith [texlbl="Impersonate owner to locksmith"];
+	BreakWindow [texlbl="Break in through window"];
+	StealCar <- UseKey;
+	StealCar <- HotWire;
+	UseKey <- StealKey;
+	HotWire <- OpenDoor;
+	OpenDoor <- CallLocksmith;
+	OpenDoor <- BreakWindow;
+}
+\end{dot2tex}
+\caption{Simple car theft attack tree}
+\label{fig:attacktree}
+\end{figure}
+
+There are a few features of this modeling method to note. It is goal oriented, meaning that
+the consequences of the attack are known, and the goal is to ennumerate and and analyze the
+means by which those consequences could be reached. It is, as an attack model, agnostic to the
+underlying system model which makes it difficult to generate automatically. Finally, and perhaps
+most significantly, it captures the ways in which an attacker's actions interact and 
+depend upon each other.
+
+This threat-centric model is not necessarily the most useful for system stakeholders. It
+requires, in a sense, that one work backward from the attack to the system state
+necessary to realize the attack. If, instead, an analyst desires to work from a system characterization
+and explore the attack space permitted by that system characterization, the attack tree framework
+must be in some sense turned upside down. 
+Attack graphs do exactly that.
+\subsection{Attack Graphs}
+\subsubsection{Introduction}
+In contrast to attack trees, attack graphs permit a topology-aware exploratory analysis of
+the state space of a system. It is a graph theoretic model in which vertices represent individual
+system states, and edges represent state transitions caused by an adversary. The concept as
+introduced in 1998 included notions of generalized attack patterns to be bound to state transitions;
+network elements and their individual configurations; network topology (three characteristics common
+to all current attack graph iterations); a notion of the attacker's capabilities, and edge weights
+representing likelihood~\cite{phillips1998graph}. A similar structure called a privilege graph was
+introduced in 1994~\cite{dacier1994privilege}.
+
+Most approaches to attack graph modeling represent exploits (attack patterns) as using
+preconditions and postconditions~\cite{lippmann2005annotated} since this was suggested in about 2000~\cite{templeton2001requires}. Exploits are chained together by matching preconditions in a state node's
+underlying system model and applying their postconditions to generate a successor state.
+\subsubsection{Model Types}
+The modeling substrates of attack graphs can be broadly separated into two schools of
+thought, separated by the philosophy that guides the representation of the underlying
+network model over which network states and transitions are computer.
+
+A specification of an underlying network model may be done with only very loose
+restrictions, allowing arbitrary keywords as named qualities and topoligies of network objects.
+This thesis employs this method. It is also favored in the work of George Mason 
+University~\cite{ammann2002scalable}~\cite{wang2006minimum}. It has the advantage of
+permitting more straightforward adaptation into the continuous domain, which is the reason
+it is favored by this work. 
+
+An alternate specification method is much more restricted, confining the modeler to
+certain sets of terms imposing explicit computer networking comcepts onto the model~\{templeton2001requires}.
+This permits generation and analysis to take advantage of networking concepts to perform a
+more nuanced analysis of a network state, including reachability analysis to determine whether a
+given topology permits communication between two hosts~\cite{ingols2009modeling}. This approach
+is favored, for example, in the work of MIT Lincoln Laboratory and the University of California, Davis.
+\subsubsection{Generation}
+Methods of attack graph generation, the process of chaining exploits to enumerate the
+attack space~\cite{} using preconditions and postconditions share a common
+general architecture, pictured in Fig. \ref{fig:generation}. The attack graph generation
+process combines network state and exploit patterns as input, applying exploit postconditions
+back onto the network state to generate its output of successor states.
+
+\begin{figure}[t]
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    Generator [texlbl="Generation Engine"];
+    Exploits [texlbl="Exploit Rules (Generic transitions)"];
+	State [texlbl="Network State (Facts)"];
+	Exploits -> Generator [texlbl="1. Analyze rules and network state"];
+	State -> Generator;
+	Generator -> State [texlbl="2. Apply new network state"];
+}
+\end{dot2tex}
+\caption{Attack graph generation process}
+\label{fig:generation}
+\end{figure}
+\subsubsection{Analysis}
+\subsubsection{Research Directions}
+Research in attack graphs is spread throughout a variety of pathways. Many of these include
+evaluating a network's security~\cite{ammann2002scalable}, specification of formal languages
+to represent attack graphs~\cite{templeton2001requires}, intrusion detection system 
+integration~\cite{tidwell2001modeling}, automatic generation of security recommendations~\cite{wang2006minimum},
+and reachability analysis between hosts in a single network state~\cite{ingols2009modeling}. 
+For a thorough literature review up to 2005 and more detailed discussion of popular research directions, 
+refer to the work of Lippmann and Ingols~\cite{lippmann2005annotated}.
 \section{Case Studies}
