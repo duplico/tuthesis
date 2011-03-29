@@ -38,7 +38,7 @@ Crenshaw and Beyer enumerated four principal challenges in cyber physical system
 equally apt for security:
 their concentration in safety critical domains, their frequent integration of third-party or
 otherwise unrelated systems, their dependence upon unreliable data collection, and their
-pervasity~\cite{crenshaw2010upbot}.
+pervasiveness~\cite{crenshaw2010upbot}.
 \subsection{Hybrid Automata}
 \subsubsection{Definition}
 A valuable formalism for modeling hybrid systems in isolation and with limited composition
@@ -50,8 +50,59 @@ Formally,
 a hybrid automaton $H$ is made up of a set of real-valued state variables, their first derivatives,
 a set of operational modes and switches between the modes, and predicates attached to those modes and
 switches describing the operation of the system in those modes and the discrete transitions between
-them. 
+them. One can think of a hybrid automaton as a pairing of a finite state machine whose states (called
+modes) and transitions (called switches) denote the discrete-domain behavior of the hybrid system, with
+a set of differential equations attached to each mode, which govern its continuous-domain behavior. Switches
+may also be labeled in order to permit synchronization across composed hybrid automata.
+
+Modes may be decorated with invariant conditions (which state whether the system is allowed to be in that mode),
+flow conditions (which state how the continuous domain state variables are permitted to evolve while in that
+mode), and initial conditions (which state under which, if any, conditions the automaton may begin its operation
+with that mode). Switches are decorated with jump conditions, which serve as guards on the switch determining
+both (1) when the switch is allowed to be taken, and (2) the discrete changes in state variables due to that
+switch's activation.
+
+A simple example of a hybrid automaton is given in Fig.~\ref{fig:thermostat}, which models a simple
+heater thermostat. The nodes in the automaton represent its operating modes, and the edges represent
+switches. In the ``Off'' mode, the temperature (given by $x$) must be greater than or equal to 18, and
+its first derivative with respect to time (denoted $\dot{x}$) is $-0.1x$, which represents a cooling of
+the environment. When the temperature is strictly less than 19, the switch from off to on is available (but
+not mandatory until the off mode's invariant condition $x \geq 18$ ceases to be satisfied. The switch from
+on to off behaves similarly.
+
+\begin{figure}[t]
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    
+    Off [texlbl="$\begin{matrix} \text{Off} \\ \
+    \dot{x} = -0.1x \\ \
+    x \geq 18 \\ \
+    \end{matrix}$"];
+    
+    On [texlbl="$\begin{matrix} \text{On} \\ \
+    \dot{x} = 5 - 0.1x \\ \
+    x \leq 22 \\ \
+    \end{matrix}$"];
+        
+    Off -> On [label=" " texlbl="$x < 19$"];
+    
+    On -> Off [label=" " texlbl="$x>21$"];
+}
+\end{dot2tex}
+\caption{Thermostat hybrid automaton~\cite{henzinger1996theory}}
+\label{fig:thermostat}
+\end{figure}
+
+The hybrid automaton model is sufficiently rich to capture many hybrid systems. 
 \subsubsection{Shortcomings}
+There are some problems with the hybrid automaton model. A hybrid automaton is not guaranteed to
+have a valid execution, and computing whether it does or not is non-trivial~\cite{lygeros1999existence}.
+Model checking has been developed for only some subclasses of 
+automata~\cite{henzinger1997hytech}~\cite{frehse2005phaver}, and many desirable
+properties of them are undecidable~\cite{henzinger1998s}.
 \subsubsection{Alternatives}
+% input/output variables 
 \section{Attack Graphs}
 \section{Case Studies}

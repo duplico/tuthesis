@@ -1,3 +1,4 @@
+%& --shell-escape --enable-write18
 %
 % The University of Tulsa TeX Template
 %
@@ -94,8 +95,16 @@
 \testboxfalse 
 %\testboxtrue
 
+% These should conventionally be usepackage macros, 
+% since this is not a .sty or .cls file. But I'm not going to change it. -GL
 \RequirePackage{setspace}
 \RequirePackage{TUthesis}
+
+% Local package imports
+\usepackage{amsmath}
+\usepackage{dot2texi}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
 
 \includeonly{chapter1,chapter2,chapter3,chapter4,chapter5,chapter6}
 
