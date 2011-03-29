@@ -102,7 +102,88 @@ have a valid execution, and computing whether it does or not is non-trivial~\cit
 Model checking has been developed for only some subclasses of 
 automata~\cite{henzinger1997hytech}~\cite{frehse2005phaver}, and many desirable
 properties of them are undecidable~\cite{henzinger1998s}.
+
+However, there are even more nagging problems when considering hybrid automata or their variants
+for the study of cyber physical systems. One of the hallmarks of cyber physical systems is a
+distributed and highly networked nature. While they provide a
+natural model for the discrete-continuous boundary, hybrid automata have only a rudimentary
+notion of communication, no clear means for specifying message passing, and when used in large
+topologies have significant scaling problems, both computationally and cognitively.
 \subsubsection{Alternatives}
-% input/output variables 
+Some attempts have been made to solve the problem of the hybrid automaton's unsatisfactory
+capability for modeling networks and communication. Particularly, the designation of shared
+actions and shared variables as ``input'' or ``output'' is a popular tactic, used in the
+powerful hybrid I/O automaton~\cite{lynch1996hybrid}~\cite{lynch2001hybrid}, its descendent the
+timed I/O automaton~\cite{kaynar2010theory}, and also in the PHAVer model 
+checker~\cite{frehse2005phaver}.
+
+The work of this thesis is also something of an outgrowth from an instance of this strategy in
+which prototypical ``hybrid link automata'' were developed to model explicit communication channels.
+An example of the cognitive scalability issues inherent with this design is given in Fig.~\ref{fig:linkmachine}.
+This strategy may have a place in modeling some systems but falls short of the goal of 
+modeling complex, interdependent networks of hybrid systems with more conventional computer networks.
+\begin{figure}[t]
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    idle [shape=circle, texlbl= \
+    "$ \begin{matrix} \lambda : \mu : \text{Idle} \\ \
+    \dot{C}_{\lambda \mu} = 0 \\ \
+    C_{\lambda \mu} = 0 \end{matrix} $"];
+    
+    transmit [shape=circle, texlbl= \
+    "$ \begin{matrix} \lambda : \mu : \text{Transmit} \\ \
+    \dot{C}_{\lambda \mu} = 1 \\ \
+    C_{\lambda \mu} < l \wedge w_{\lambda}=1  \end{matrix}$"];
+    
+    wait [shape=circle, texlbl= \
+    "$\begin{matrix} \lambda : \mu : \text{Wait} \\ \
+    w_{\lambda}=1 \\ \
+    \end{matrix}$"];
+    
+    transmit -> idle [label= " " \
+    texlbl="$\begin{matrix} \lambda : D : \mu \\ \
+    C_{\lambda \mu} < l \\ \
+    C_{\lambda \mu} := 0 \wedge w_{\lambda}:=0 \
+    \end{matrix}$"];
+    
+    idle -> transmit [label= " ", \
+    texlbl= "$\begin{matrix} S : \lambda : \mu \\ \
+    w_{\lambda}=0 \\ \
+    w_{\lambda}:=1 \\ \
+    \end{matrix}$"];
+    
+    idle -> wait [label= " ", \
+    texlbl= "$\begin{matrix} S : \lambda : \mu \\ \
+    w_{\lambda}=1 \\ \
+    \end{matrix}$"];
+    
+    wait -> transmit [label= " ", \
+    texlbl= "$\begin{matrix} \
+    w_{\lambda}=0 \\ \
+    w_{\lambda}:=1 \\ \
+    \end{matrix}$"];
+    
+    wait -> wait [label= " ", \
+    texlbl= "$\begin{matrix} S : \lambda : \mu \\ \
+    \end{matrix}$"];
+    
+    idle -> idle [label= " ", \
+    texlbl="$\lambda : D : \mu$"];
+    
+    idle -> transmit;
+    
+    transmit -> idle;
+    idle -> idle [label= " ", \
+    texlbl="$S : \lambda : \mu$"];
+    
+}
+\end{dot2tex}
+\caption{An example of a considered ``hybrid link automaton'' prototype modeling
+a link on which messages may be dropped, injected, or delayed, and on which mutual
+exclusion of messages is enforced.}
+\label{fig:linkmachine}
+\end{figure}
 \section{Attack Graphs}
 \section{Case Studies}
