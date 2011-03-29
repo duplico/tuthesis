@@ -204,14 +204,14 @@ flowing upward from the leaf nodes.
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
-    rankdir=TD;
-    StealCar [texlbl="Steal car"];
-    UseKey [texlbl="Start car with key"];
-	HotWire [texlbl="Hotwire car"];
-	StealKey [texlbl="Steal owner's key"];
-	OpenDoor [texlbl="Access car interior"];
-	CallLocksmith [texlbl="Impersonate owner to locksmith"];
-	BreakWindow [texlbl="Break in through window"];
+    rankdir=BU;
+    StealCar [label="Steal car"];
+    UseKey [label="Start car with key"];
+	HotWire [label="Hotwire car"];
+	StealKey [label="Steal owner's key"];
+	OpenDoor [label="Access car interior"];
+	CallLocksmith [label="Impersonate owner to locksmith"];
+	BreakWindow [label="Break in through window"];
 	UseKey -> StealCar;
 	HotWire -> StealCar;
 	StealKey -> UseKey;
@@ -282,12 +282,13 @@ back onto the network state to generate its output of successor states.
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
-    Generator [texlbl="Generation \\ Engine", shape="Mcircle"];
-    Exploits [texlbl="Exploit Rules \\ (Generic transitions)", shape="folder"];
-	State [texlbl="Network State \\ (Facts)", shape="folder"];
-	Exploits -> Generator [texlbl="1. Analyze rules and network state" label=" "];
-	State -> Generator;
-	Generator -> State [texlbl="2. Apply new network state", label=" "];
+	rankdir=TD;
+    Generator [texlbl="Generation Engine", shape="rectangle"];
+    Exploits [texlbl="\begin{tabular}{c}Exploit Rules\\ (Generic transitions)\end{tabular}", shape="ellipse"];
+	State [texlbl="\begin{tabular}{c}Network State\\ (Facts)\end{tabular}", shape="ellipse"];
+	Exploits -> Generator [texlbl="\begin{tabular}{c}1a. Read exploit \\ preconditions\end{tabular}" label=" "];
+	State -> Generator [texlbl="\begin{tabular}{c}1b. Match preconditions \\ with network state\end{tabular}" label=" "];;
+	Generator -> State [texlbl="\begin{tabular}{c}2. Apply new\\ network state\end{tabular}" label=" "];
 }
 \end{dot2tex}
 \caption{Attack graph generation process}
@@ -319,7 +320,7 @@ Fig.~\ref{fig:blunderarch}~\cite{louthan2010blunderdome}.
 
 \begin{figure}
 \centering
-\includegraphics{blunderarch}
+\includegraphics[width=3in]{blunderarch}
 \caption{Blunderdome network architecture}
 \label{fig:blunderarch}
 \end{figure}
@@ -343,3 +344,85 @@ on a powered RFID tag inventory system similar to those used by REFERENCE. The a
 is similar to the ones described by Buennemeyer, \emph{et al.}~\cite{buennemeyer2006battery},
 and is of a newly distinguished class of attacks sometimes termed denial of sleep
 attacks~\cite{brownfield2005wireless}.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    idle [shape=circle, texlbl= "Reading"];    
+	idle -> idle [label="Command"];
+	idle -> idle [label="WakeUp"];
+}
+\end{dot2tex}
+\caption{Hybrid automata model of the RFID reader}
+\label{fig:readerha}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    awake [shape=circle, texlbl= \
+    "$ \begin{matrix} \text{Awake} \\ \
+    \dot{c}_{\lambda \mu} = -1 \wedge \dot{B}=-5 \\ \
+    c>0 \wedge B>0 \end{matrix} $"];
+    
+    asleep [shape=circle, texlbl= \
+    "$ \begin{matrix} \text{Asleep} \\ \
+    \dot{c} = 1 \wedge \dot{B} = -1 \\ \
+    B>0  \end{matrix}$"];
+    
+    dead [shape=circle, texlbl= \
+    "$ \begin{matrix} \text{Asleep} \\ \
+    \dot{c} = 0 \wedge \dot{B} = 0 \\ \
+    B=0  \end{matrix}$"];
+	
+    awake -> awake [label= " " \
+    texlbl="$\begin{matrix} \text{Command} \\ \
+    c := 30 \
+    \end{matrix}$"];
+	
+	awake -> awake [label= " " \
+    texlbl="$\begin{matrix} \text{WakeUp} \\ \
+    c := 30 \
+    \end{matrix}$"];
+	
+	awake -> asleep [label= " " \
+    texlbl="$\begin{matrix} \text{Timeout} \\ \
+	c=0 \
+    \end{matrix}$"];
+	
+	awake -> dead [label= " " \
+    texlbl="$\begin{matrix} \text{Die} \\ \
+	B=0 \
+    \end{matrix}$"];
+	
+	asleep -> asleep [label= " " \
+    texlbl="$\begin{matrix} \text{Command} \
+    \end{matrix}$"];
+	
+	asleep -> awake [label= " " \
+    texlbl="$\begin{matrix} \text{WakeUp} \\ \
+    c := 30 \
+    \end{matrix}$"];
+    
+	asleep -> dead [label= " " \
+    texlbl="$\begin{matrix} \text{Die} \\ \
+	B=0 \
+    \end{matrix}$"];
+    
+	dead -> dead [label= " " \
+    texlbl="$\begin{matrix} \text{Command} \
+    \end{matrix}$"];
+	
+	dead -> dead [label= " " \
+    texlbl="$\begin{matrix} \text{WakeUp} \
+    \end{matrix}$"];
+	
+}
+\end{dot2tex}
+\caption{Hybrid automaton model of the case study active RFID tags}
+\label{fig:tagha}
+\end{figure}
