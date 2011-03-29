@@ -212,12 +212,12 @@ digraph G {
 	OpenDoor [texlbl="Access car interior"];
 	CallLocksmith [texlbl="Impersonate owner to locksmith"];
 	BreakWindow [texlbl="Break in through window"];
-	StealCar <- UseKey;
-	StealCar <- HotWire;
-	UseKey <- StealKey;
-	HotWire <- OpenDoor;
-	OpenDoor <- CallLocksmith;
-	OpenDoor <- BreakWindow;
+	UseKey -> StealCar;
+	HotWire -> StealCar;
+	StealKey -> UseKey;
+	OpenDoor -> HotWire;
+	CallLocksmith -> OpenDoor;
+	BreakWindow -> OpenDoor;
 }
 \end{dot2tex}
 \caption{Simple car theft attack tree}
@@ -264,7 +264,7 @@ permitting more straightforward adaptation into the continuous domain, which is 
 it is favored by this work. 
 
 An alternate specification method is much more restricted, confining the modeler to
-certain sets of terms imposing explicit computer networking comcepts onto the model~\{templeton2001requires}.
+certain sets of terms imposing explicit computer networking comcepts onto the model~\cite{templeton2001requires}.
 This permits generation and analysis to take advantage of networking concepts to perform a
 more nuanced analysis of a network state, including reachability analysis to determine whether a
 given topology permits communication between two hosts~\cite{ingols2009modeling}. This approach
