@@ -345,10 +345,51 @@ Change grade & Address and credentials for web service & Execute SQL injection &
 \end{table}
 \subsection{RFID Denial of Sleep}
 The second case study used throughout this work is a denial of service attack
-on a powered RFID tag inventory system similar to those used by REFERENCE. The attack
+on the ISO 18000-7 RFID tag inventory system similar to those used by the United States
+Department of Defense for shipping tracking and the Department of Energy for tracking spent
+fuel containers~\cite{chen2009radiofrequency}. The attack
 is similar to the ones described by Buennemeyer, \emph{et al.}~\cite{buennemeyer2006battery},
 and is of a newly distinguished class of attacks sometimes termed denial of sleep
-attacks~\cite{brownfield2005wireless}.
+attacks~\cite{brownfield2005wireless}~\cite{raymond2009effects}.
+
+These ISO 18000-7 RFID tags are active and battery powered; they are used for inventory and
+shipment tracking. In particular, they are used by the Department of Energy to monitor
+the location and seal status of
+radioactive material containers, greatly reducing workers' radiation exposure. 
+The batteries on the tags should last as long as
+possible in order to limit radiation exposure to maintenance workers, and
+the loss of power to these devices has severe safety and security consequences.
+An energy draining attack to deplete the tags' batteries could significantly
+speed this loss of power.
+
+The ISO 18000-7 tags have two modes: an active mode, and a sleep mode in which their
+power consumption is significantly reduced. The active mode has a 30 second timeout,
+which will cause them to sleep unless the timer is reset by the receipt of a valid
+command from the reader or a wake-up signal. In sleep mode, the tags will only respond to a
+wake-up command, which causes them to enter active mode.
+A denial of sleep attack occurs when the tag is not permitted to enter sleep mode or is
+awoken more frequently than normal.
+
+This attack can be realized in two ways. The first is that a second, rogue 
+RFID reader is placed by the attacker within range of some or all of the active tags. The
+second is for the attacker to compromise an existing reader by hacking into a computer
+system connected to it via a network. This presupposes that the reader is connected
+to the Internet or some private network into which the attacker can intrude.
+
+Hybrid automata serve to represent the behavior of the devices themselves quite well.
+Fig.~\ref{fig:readerha} represents the reader (legitimate or rogue), which does nothing but 
+transmit commands and
+wake-up signals, which can come at any time with no restrictions. Under ordinary operating
+conditions this might be a few times per day over the course of several years before the
+batteries in the tags are drained~\cite{chen2009radiofrequency}.
+
+Fig.~\ref{fig:tagha} depicts a model of the tags. For simplicity, they are shown as starting in
+the active mode. It has two state variables: $c$, which represents the active mode timeout
+clock, and $B$ represents the capacity of the battery. In active mode, the battery drains at
+a rate of -50 per second, a rate chosen arbitrarily for illustrative purposes only. In sleep mode,
+the battery drains at a rate of -1 per second. No restrictions are placed on the starting condition
+of the battery. The two automata are composed using two shared actions: \emph{WakeUp} and \emph{Command}, which
+synchronize the switches they decorate between the automata.
 
 \begin{figure}
 \centering
@@ -360,7 +401,7 @@ digraph G {
 	idle -> idle [label="WakeUp"];
 }
 \end{dot2tex}
-\caption{Hybrid automata model of the RFID reader}
+\caption{Hybrid automaton model of the RFID reader}
 \label{fig:readerha}
 \end{figure}
 
@@ -368,10 +409,10 @@ digraph G {
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
-    rankdir=LR;
+    rankdir=TD;
     awake [shape=circle, texlbl= \
     "$ \begin{matrix} \text{Awake} \\ \
-    \dot{c}_{\lambda \mu} = -1 \wedge \dot{B}=-5 \\ \
+    \dot{c}_{\lambda \mu} = -1 \wedge \dot{B}=-50 \\ \
     c>0 \wedge B>0 \end{matrix} $"];
     
     asleep [shape=circle, texlbl= \
@@ -380,9 +421,15 @@ digraph G {
     B>0  \end{matrix}$"];
     
     dead [shape=circle, texlbl= \
-    "$ \begin{matrix} \text{Asleep} \\ \
+    "$ \begin{matrix} \text{Dead} \\ \
     \dot{c} = 0 \wedge \dot{B} = 0 \\ \
     B=0  \end{matrix}$"];
+	
+	init [shape=none, label=""];
+	
+	init -> awake [label= " " \
+    texlbl="$\begin{matrix} c=30 \
+    \end{matrix}$"];
 	
     awake -> awake [label= " " \
     texlbl="$\begin{matrix} \text{Command} \\ \
