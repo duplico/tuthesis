@@ -1,3 +1,4 @@
 relre:\.aux
 relre:\.(lof|log|lot|toc|bbl|blg)
 relre:dot2tex
+relre:waf
