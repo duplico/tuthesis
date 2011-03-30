@@ -82,7 +82,51 @@ For the purposes of this work, an attack graph is comprised of the following com
 		generate a new network state.
 \end{description}
 \TUsubsection{Formal}
-\TUsubsection{Execution model}
+\TUsubsubsection{Primitive Domains}
+In order to provide a more formal description of the attack graph modeling framework,
+it is necessary to fix first the domains of note. The primitive domains are the most basic 
+domains that describe the atomic units of
+the formalism: assets, properties (qualities), values (qualities), relationships (topologies),
+vulnerabilities (exploit pattern identifiers), and parameters (free asset variables in the attack
+patterns), and operations (used in postconditions representing insert or delete actions):
+\begin{align}
+    \mathcal{A} &: assets \\
+    \mathcal{P} &: properties (quality names) \\
+    \mathcal{V} &: values (property values) \\
+    \mathcal{R} &: relationships (topology names) \\
+    \mathcal{W} &: vulnerabilities (exploit pattern names) \\
+    \mathcal{I} &: parameters (free asset names)
+    \text{Op} &= \left{\text{ins}, \text{del} \right}
+\end{align}
+
+\TUsubsubsection{Compound Domains}
+Compound domains comprise the fundamental concepts that are composed of combinations
+of members of the primitive domains. These form the level of abstraction that it is
+most convenient to discuss in the articulation of the execution model and in the
+preceding intuitive definition, for instance.
+\begin{description}
+    \item[Qualities] Qualities bind an asset to a property to a value; therefore their
+        domain is the cartesian product of those domains. The $n$ subscripts denote that
+        these are bound qualities of a network state, rather than free qualities in
+        exploit preconditions and postconditions:
+        \begin{align}
+            \mathcal{Q}_n &: \mathcal{A} \times \mathcal{P} \times \mathcal{V}
+        \end{align}
+    \item[Qualities] Topologies bind an asset to another asset through a relationship; therefore their
+        domain is the cartesian product of those domains:
+        \begin{align}
+            \mathcal{T}_n&: \mathcal{A} \times \mathcal{A} \times \mathcal{R}
+        \end{align}
+    \item[Qualities] A network state, then, is denoted by a collection of assets, and a fact base
+        of qualities and topologies; the domain of a network state is the cartesian product
+        of the power sets of these domains:
+        \begin{align}
+            \mathcal{N}&: \mathbb{P}(\mathcal{A}) \times \mathbb{P}(\mathcal{Q}_n) \times \mathbb{P}(\mathcal{T}_n)
+        \end{align}
+    \item[Exploit patterns]
+    \item[Attacks]
+\end{description}
+\TUsubsection{Execution Model}
 \TUsection{Working Lexicon}
 \TUsection{State Predicates}
 \TUsection{State Aggregation}
