@@ -1,5 +1,88 @@
 \TUchapter{Attack Graphs}
+\TUsection{Introduction}
+This chapter presents a version of the attack graph modeling framework specific
+to traditional information systems. The framework has a very permissive model that
+includes notions of assets, qualities, topologies. Assets represent potentially
+attackable system components; qualities assign an arbitrary string value to a named
+property of an asset, and topologies bind pairs of assets together with a named
+connection between them. Exploit patterns with preconditions and postconditions attached
+to free variables that can be bound at generation time to assets serve to describe potential
+state transitions. The next section contains a more formal definition of the basic
+framework.
+
+Because of the extremely permissive model for naming properties and topologies in this
+scheme, the modeler must fix a lexicon of terms and their meanings in order to proceed
+systematically. Section 3 of this chapter presents a preliminary version of such a lexicon,
+fixing enough terminology to proceed with the case studies.
+
+Research into attack graphs can be split into four broad categories:
+\begin{description}
+\item[Modeling] Attack graph modeling concerns the development of the underlying representation
+	and use of that representation to model systems. Terminology belongs here, as do efforts to
+	automatically generate network models from real networks and exploit patterns from vulnerability
+	databases.
+\item[Generation] Attack graph generation is the process of building a graph out of a model by
+	closing the state space over its exploits. This is where most performance work is concentrated.
+	A good portion of the work that enables a representation of time to be included in attack graphs
+	belongs here as well. Constraints (such as monotonicity) on the way that state transitions are 
+	allowed to progres also fall under the generation category.
+\item[Analysis] Analysis of attack graphs focuses on drawing conclusions about a system based upon
+	the attack graph generated from its model. Work here includes integration with intrusion detection
+	systems, automatic delivery of mitigation recommendations, and the identification of security
+	consequences with particular states.
+\item[Visualization] Visualization of attack graphs seeks to reduce or eliminate their
+	known cognitive scalability issues; the goal is to deliver the results of the other three
+	steps in a meaningful fashion.
+\end{description}
+This thesis is mainly concerned with the modeling stage, its goal being to introduce an
+architecture for modeling hybrid systems with attack graphs. However, some amount of work is
+included in the generation stage, particularly some thoughts on dealing with the progression
+of time; consideration is also given to analysis, particularly on identifying failure states and
+on aggregating sufficiently similar states (which also touches visualization).
+
+Sections 4 and 5 introduce two analysis tools for attack graphs: state predicates and state
+aggregation. State predicates are logical predicates concerning a network state that could
+be used to specify particular failure cases, nominal system behavior, operating modes,
+or similarity conditions that permit states to be visually grouped due to some shared characteristics.
+This concept is necessary to allow the following chapter's introduction of time to be tractable.
 \TUsection{Definition}
+\TUsubsection{Intuitive}
+For the purposes of this work, an attack graph is comprised of the following components.
+\begin{description}
+	\item[Assets] Assets are the subjects in the attack graph formalism, mainly representing
+		attackable system components. For example, in a model of the RFID denial of sleep
+		attack, the assets are the RFID tags, the reader, the possible rogue reader,
+		and any hosts connected over the network with the RFID reader. Assets are specified
+		with unique names, and they are decorated with \emph{qualities} and \emph{topologies}.
+		Assets can also be used to model users and adversaries if it is necessary to give them
+		explicit properties. A model's collection of assets is fixed at definition time and
+		is not changed by state transitions.
+	\item[Qualities] Qualities represent properties of an asset, such as a software package or
+		version that is installed, whether it is in sleep mode or not, and so on. Qualities are
+		can be considered a key/value pair, where both the key and the value are string tokens. For
+		example, the \texttt{host1} asset may have the quality \texttt{power} and the value \texttt{on}.
+		Together with topologies, qualities make up the collection of facts.
+	\item[Topologies] Topologies represent relationships between two assets. These can be physical such
+		as denoting that a printer is plugged into a computer, logical such as denoting that one
+		host is accessible from another on an adjacent network, or more abstract such as a particular
+		trust relationship or level of access that a subject has on another. Topologies are directed and
+		named with string tokens. For example, \texttt{host1} might be accessible over the network via the
+		web by \texttt{host2}, so a directed topology from \texttt{host2} to \texttt{host1} called
+		\texttt{network_remote_web} might be used. Together with qualities, topologies make up the
+		network state's collection of facts.
+	\item[State] A network or system state is comprised of all of the facts about the system's asset
+		collection. A network model's state is fully described by the asset collection and the fact base;
+		given the constant asset collection, a state is uniquely described by its fact base. The fact
+		base is all the qualities and topologies that are valid for that state.
+	\item[Exploit patterns] Exploit patterns are generalized templates for how the actions of the attacker
+		can alter the system state by inserting and removing qualities and topologies (but not assets).
+		They are written as functions that take a number of parameters corresponding to assets, mapping
+		a set of preconditions (facts about the free asset parameters) to a set of postconditions:
+		insert and delete actions on qualities and topologies to update the fact base and therefore
+		generate a new network state.
+\end{description}
+\TUsubsection{Formal}
+\TUsubsection{Execution model}
 \TUsection{Working Lexicon}
 \TUsection{State Predicates}
 \TUsection{State Aggregation}
