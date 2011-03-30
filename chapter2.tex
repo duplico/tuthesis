@@ -1,6 +1,6 @@
-\chapter{Background}
-\section{Cyber Physical Systems}
-\subsection{Hybrid Systems}
+\TUchapter{Background}
+\TUsection{Cyber Physical Systems}
+\TUsubsection{Hybrid Systems}
 A system with both continuous (frequently physical) components and discrete (frequently digital)
 components is said to be a \emph{hybrid system}, named for its characteristic blending of the
 two domains. Examples of hybrid computer systems abound in industrial controls, for example,
@@ -18,13 +18,13 @@ of relevent work from which to draw to warrant its inclusion. This chapter inclu
 background on a particularly relevent modeling framework for hybrid systems called the
 hybrid automaton, which is used in this thesis as the standard benchmark against which to
 compare hybrid modeling techniques.
-\subsection{Definition}
+\TUsubsection{Definition}
 % Definition
 A newer, better term for the systems investigated in this thesis is \emph{cyber physical systems}.
 Put simply, a cyber physical system is a networked hybrid system: a networked computer system that is 
 tightly coupled to the physical world. 
 % TODO Add a bit more here?
-\subsection{Challenges}
+\TUsubsection{Challenges}
 According to the 2008 Report of the Cyber-Physical Systems Summit, ``The principal barrier to 
 developing CPS is the lack of a theory that comprehends cyber and physical resources in a 
 single unified framework.''~\cite{summitreport2008}
@@ -40,8 +40,8 @@ their concentration in safety critical domains, their frequent integration of th
 otherwise unrelated systems, their dependence upon unreliable data collection, and their
 pervasiveness~\cite{crenshaw2010upbot}.
 % TODO Add more here.
-\subsection{Hybrid Automata}
-\subsubsection{Definition}
+\TUsubsection{Hybrid Automata}
+\TUsubsubsection{Definition}
 A valuable formalism for modeling hybrid systems in isolation and with limited composition
 is the hybrid automaton of Alur, et al.~\cite{alur1993hybrid}. This section introduces the
 version of the formalism described in 1996 by Henzinger~\cite{henzinger1996theory}, to which a
@@ -98,7 +98,7 @@ digraph G {
 \end{figure}
 
 The hybrid automaton model is sufficiently rich to capture many hybrid systems. 
-\subsubsection{Shortcomings}
+\TUsubsubsection{Shortcomings}
 There are some problems with the hybrid automaton model. A hybrid automaton is not guaranteed to
 have a valid execution, and computing whether it does or not is non-trivial~\cite{lygeros1999existence}.
 Model checking has been developed for only some subclasses of 
@@ -111,7 +111,7 @@ distributed and highly networked nature. While they provide a
 natural model for the discrete-continuous boundary, hybrid automata have only a rudimentary
 notion of communication, no clear means for specifying message passing, and when used in large
 topologies have significant scaling problems, both computationally and cognitively.
-\subsubsection{Alternatives}
+\TUsubsubsection{Alternatives}
 Some attempts have been made to solve the problem of the hybrid automaton's unsatisfactory
 capability for modeling networks and communication. Particularly, the designation of shared
 actions and shared variables as ``input'' or ``output'' is a popular tactic, used in the
@@ -189,12 +189,12 @@ digraph G {
 \caption{Example hybrid link automaton}
 \label{fig:linkmachine}
 \end{figure}
-\section{Attack Graphs}
-\subsection{Introduction}
+\TUsection{Attack Graphs}
+\TUsubsection{Introduction}
 An attack graph is one of several related formalisms that utilize graph theory to
 model the state space of computer systems attacks. Perhaps they are best introduced
 when presented as an alternative to a similar model called an attack tree.
-\subsection{Attack Trees}
+\TUsubsection{Attack Trees}
 An attack tree is a goal-oriented tree model of an abuse of a system~\cite{schneier1999modeling}.
 The root of the tree represents the attacker's goal, and the children of any given node represent
 the prerequisite activities required to reach that node. For example, consider the goal of
@@ -241,8 +241,8 @@ necessary to realize the attack. If, instead, an analyst desires to work from a 
 and explore the attack space permitted by that system characterization, the attack tree framework
 must be in some sense turned upside down. 
 Attack graphs do exactly that.
-\subsection{Attack Graphs}
-\subsubsection{Introduction}
+\TUsubsection{Attack Graphs}
+\TUsubsubsection{Introduction}
 In contrast to attack trees, attack graphs permit a topology-aware exploratory analysis of
 the state space of a system. It is a graph theoretic model in which vertices represent individual
 system states, and edges represent state transitions caused by an adversary. The concept as
@@ -255,7 +255,7 @@ introduced in 1994~\cite{dacier1994privilege}.
 Most approaches to attack graph modeling represent exploits (attack patterns) as using
 preconditions and postconditions~\cite{lippmann2005annotated} since this was suggested in about 2000~\cite{templeton2001requires}. Exploits are chained together by matching preconditions in a state node's
 underlying system model and applying their postconditions to generate a successor state.
-\subsubsection{Model Types}
+\TUsubsubsection{Model Types}
 The modeling substrates of attack graphs can be broadly separated into two schools of
 thought, separated by the philosophy that guides the representation of the underlying
 network model over which network states and transitions are computer.
@@ -274,7 +274,7 @@ This permits generation and analysis to take a
 more nuanced view of a network state, including reachability analysis to determine whether a
 given topology permits communication between two hosts~\cite{ingols2009modeling}. This approach
 is favored in the work of MIT Lincoln Laboratory and the University of California, Davis.
-\subsubsection{Generation}
+\TUsubsubsection{Generation}
 Attack graph generation is the process of chaining exploits to enumerate the
 attack space~\cite{campbell2002modeling}~\cite{phillips1998graph}~\cite{sheyner2002automated}.
 Methods for generating attack graphs
@@ -299,7 +299,7 @@ digraph G {
 \caption{Attack graph generation process}
 \label{fig:generation}
 \end{figure}
-\subsubsection{Research Directions}
+\TUsubsubsection{Research Directions}
 Research in attack graphs is spread throughout a variety of pathways. These include
 evaluating a network's security~\cite{ammann2002scalable}, specification of formal languages
 to represent attack graphs~\cite{templeton2001requires}, intrusion detection system 
@@ -307,13 +307,13 @@ integration~\cite{tidwell2001modeling}, automatic generation of security recomme
 and reachability analysis between hosts in a single network state~\cite{ingols2009modeling}. 
 For a thorough literature review up to 2005 and more detailed discussion of popular research directions, 
 refer to the work of Lippmann and Ingols~\cite{lippmann2005annotated}.
-\section{Case Studies}
+\TUsection{Case Studies}
 Throughout this thesis, two examples of attacks are used to illustrate the models presented.
 The first is on a traditional information system, based upon an offensive educational exercise
 deployed at the University of Tulsa in 2008 involving several chained attacks. The second is the 
 denial of service through battery exhaustion of a simple
 cyber-physical system of active radio frequency identification (RFID) tags and readers.
-\subsection{Blunderdome}
+\TUsubsection{Blunderdome}
 The first case study is an attack on a simulated educational network deployed as part of a
 security engineering course in 2008. Dubbed the Blunderdome, it featured a firewalled network of
 two hosts available per attacker. See Table \ref{table:blundertasks} for a listing of the stages and
@@ -343,7 +343,7 @@ Change grade & Address and credentials for web service & Execute SQL injection &
 \caption{Stages of the Blunderdome attack}
 \label{table:blundertasks}
 \end{table}
-\subsection{RFID Denial of Sleep}
+\TUsubsection{RFID Denial of Sleep}
 The second case study used throughout this work is a denial of service attack
 on the ISO 18000-7 RFID tag inventory system similar to those used by the United States
 Department of Defense for shipping tracking and the Department of Energy for tracking spent
