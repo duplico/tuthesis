@@ -4,7 +4,7 @@
 A system with both continuous (frequently physical) components and discrete (frequently digital)
 components is said to be a \emph{hybrid system}, named for its characteristic blending of the
 two domains. Examples of hybrid computer systems abound in industrial controls, for example,
-although hybrid systems may also be fully physical (e.g., a bouncing ball experiences continuous
+although hybrid systems may also be fully physical (e.g., a bouncing ball that experiences continuous
 behavior when rising and falling and discrete behavior when colliding with a surface).
 
 The term hybrid system is an older one that was coined as researchers began to study the newly
@@ -14,31 +14,32 @@ the types of systems with which this work is concerned: a subset of hybrid
 systems that incorporate a significant computer and networking component.
 
 Nevertheless, the modeling of hybrid systems is well studied and provides a sufficient body
-of relevent knowledge from which to draw to warrant its inclusion. This chapter includes
+of relevent work from which to draw to warrant its inclusion. This chapter includes
 background on a particularly relevent modeling framework for hybrid systems called the
 hybrid automaton, which is used in this thesis as the standard benchmark against which to
 compare hybrid modeling techniques.
-\subsection{Cyber Physical Systems}
-\subsubsection{Definition}
+\subsection{Definition}
 % Definition
 A newer, better term for the systems investigated in this thesis is \emph{cyber physical systems}.
 Put simply, a cyber physical system is a networked hybrid system: a networked computer system that is 
 tightly coupled to the physical world. 
-\subsubsection{Challenges}
+% TODO Add a bit more here?
+\subsection{Challenges}
 According to the 2008 Report of the Cyber-Physical Systems Summit, ``The principal barrier to 
 developing CPS is the lack of a theory that comprehends cyber and physical resources in a 
 single unified framework.''~\cite{summitreport2008}
 
-The summit further identified as part of the scientific and technological foundations of
-cyber physical systems both new modeling frameworks that ``explicitly address new observables'' and 
+The summit further identified as part of the necessary scientific and technological foundations of
+cyber physical systems both (1) new modeling frameworks that ``explicitly address new observables'' and (2)
 studies of privacy, trust, and security including ``theories of cyber-physical inter-dependence''~\cite{summitreport2008},
 a major theme of this work.
 
-Crenshaw and Beyer enumerated four principal challenges in cyber physical systems testing that are
+Crenshaw and Beyer recently enumerated four principal challenges in cyber physical systems testing that are
 equally apt for security:
 their concentration in safety critical domains, their frequent integration of third-party or
 otherwise unrelated systems, their dependence upon unreliable data collection, and their
 pervasiveness~\cite{crenshaw2010upbot}.
+% TODO Add more here.
 \subsection{Hybrid Automata}
 \subsubsection{Definition}
 A valuable formalism for modeling hybrid systems in isolation and with limited composition
@@ -63,11 +64,12 @@ both (1) when the switch is allowed to be taken, and (2) the discrete changes in
 switch's activation.
 
 A simple example of a hybrid automaton is given in Fig.~\ref{fig:thermostat}, which models a simple
-heater thermostat. The nodes in the automaton represent its operating modes, and the edges represent
+heater thermostat~\cite{henzinger1996theory}. The vertices in the automaton represent 
+its operating modes, and the edges represent its control
 switches. In the ``Off'' mode, the temperature (given by $x$) must be greater than or equal to 18, and
 its first derivative with respect to time (denoted $\dot{x}$) is $-0.1x$, which represents a cooling of
 the environment. When the temperature is strictly less than 19, the switch from off to on is available (but
-not mandatory until the off mode's invariant condition $x \geq 18$ ceases to be satisfied. The switch from
+not mandatory until the off mode's invariant condition $x \geq 18$ ceases to be satisfied.) The switch from
 on to off behaves similarly.
 
 \begin{figure}
@@ -91,7 +93,7 @@ digraph G {
     On -> Off [label=" " texlbl="$x>21$"];
 }
 \end{dot2tex}
-\caption{Thermostat hybrid automaton~\cite{henzinger1996theory}}
+\caption{Thermostat hybrid automaton}
 \label{fig:thermostat}
 \end{figure}
 
@@ -119,11 +121,15 @@ checker~\cite{frehse2005phaver}.
 
 The work of this thesis is also something of an outgrowth from an instance of this strategy in
 which prototypical ``hybrid link automata'' were developed to model explicit communication channels.
-An example of the cognitive scalability issues inherent with this design is given in Fig.~\ref{fig:linkmachine}.
+An example of the cognitive scalability issues inherent with this design is given in Fig.~\ref{fig:linkmachine},
+a considered ``hybrid link automaton'' prototype modeling
+a link on which messages may be dropped, injected, or delayed, and on which rudimentary mutual
+exclusion of messages is enforced.
 This strategy may have a place in modeling some systems but falls short of the goal of 
 modeling complex, interdependent networks of hybrid systems with more conventional computer networks.
 \begin{figure}
 \centering
+% TODO Shrink:
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
     rankdir=LR;
@@ -180,9 +186,7 @@ digraph G {
     
 }
 \end{dot2tex}
-\caption{An example of a considered ``hybrid link automaton'' prototype modeling
-a link on which messages may be dropped, injected, or delayed, and on which mutual
-exclusion of messages is enforced.}
+\caption{Example hybrid link automaton}
 \label{fig:linkmachine}
 \end{figure}
 \section{Attack Graphs}
@@ -205,13 +209,13 @@ flowing upward from the leaf nodes.
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
     rankdir=BU;
-    StealCar [label="Steal car"];
-    UseKey [label="Start car with key"];
-	HotWire [label="Hotwire car"];
-	StealKey [label="Steal owner's key"];
-	OpenDoor [label="Access car interior"];
-	CallLocksmith [label="Impersonate owner to locksmith"];
-	BreakWindow [label="Break in through window"];
+    StealCar [texlbl="Steal car" shape=rectangle];
+    UseKey [texlbl="Start car with key" shape=rectangle];
+	HotWire [texlbl="Hotwire car" shape=rectangle];
+	StealKey [texlbl="Steal owner's key" shape=rectangle];
+	OpenDoor [texlbl="Access car interior" shape=rectangle];
+	CallLocksmith [texlbl="\begin{tabular}{c}Impersonate owner \\to locksmith\end{tabular}" shape=rectangle];
+	BreakWindow [texlbl="\begin{tabular}{c}Break in \\through window\end{tabular}" shape=rectangle];
 	UseKey -> StealCar;
 	HotWire -> StealCar;
 	StealKey -> UseKey;
@@ -264,14 +268,16 @@ permitting more straightforward adaptation into the continuous domain, which is 
 it is favored by this work. 
 
 An alternate specification method is much more restricted, confining the modeler to
-certain sets of terms imposing explicit computer networking comcepts onto the model~\cite{templeton2001requires}.
-This permits generation and analysis to take advantage of networking concepts to perform a
-more nuanced analysis of a network state, including reachability analysis to determine whether a
+certain sets of terms that may, for example, impose explicit computer networking 
+comcepts onto the model~\cite{templeton2001requires}.
+This permits generation and analysis to take a
+more nuanced view of a network state, including reachability analysis to determine whether a
 given topology permits communication between two hosts~\cite{ingols2009modeling}. This approach
-is favored, for example, in the work of MIT Lincoln Laboratory and the University of California, Davis.
+is favored in the work of MIT Lincoln Laboratory and the University of California, Davis.
 \subsubsection{Generation}
-Methods of attack graph generation, the process of chaining exploits to enumerate the
-attack space~\cite{campbell2002modeling}~\cite{phillips1998graph}~\cite{sheyner2002automated},
+Attack graph generation is the process of chaining exploits to enumerate the
+attack space~\cite{campbell2002modeling}~\cite{phillips1998graph}~\cite{sheyner2002automated}.
+Methods for generating attack graphs
 share a common general architecture among the modern
 methods that use preconditions and postconditions in exploit definitions,
 pictured in Fig. \ref{fig:generation}. The attack graph generation
@@ -282,20 +288,19 @@ back onto the network state to generate its output of successor states.
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
-	rankdir=TD;
     Generator [texlbl="Generation Engine", shape="rectangle"];
     Exploits [texlbl="\begin{tabular}{c}Exploit Rules\\ (Generic transitions)\end{tabular}", shape="ellipse"];
 	State [texlbl="\begin{tabular}{c}Network State\\ (Facts)\end{tabular}", shape="ellipse"];
-	Exploits -> Generator [texlbl="\begin{tabular}{c}1a. Read exploit \\ preconditions\end{tabular}" label=" "];
-	State -> Generator [texlbl="\begin{tabular}{c}1b. Match preconditions \\ with network state\end{tabular}" label=" "];;
-	Generator -> State [texlbl="\begin{tabular}{c}2. Apply new\\ network state\end{tabular}" label=" "];
+	Exploits -> Generator [texlbl="\begin{tabular}{c}1a. Read exploit \\ preconditions\end{tabular}", label=" "];
+	State -> Generator [texlbl="\begin{tabular}{c}1b. Match preconditions \\ with network state\end{tabular}", label=" "];
+	Generator -> State [texlbl="\begin{tabular}{c}2. Apply new\\ network state\end{tabular}", label=" "];
 }
 \end{dot2tex}
 \caption{Attack graph generation process}
 \label{fig:generation}
 \end{figure}
 \subsubsection{Research Directions}
-Research in attack graphs is spread throughout a variety of pathways. Many of these include
+Research in attack graphs is spread throughout a variety of pathways. These include
 evaluating a network's security~\cite{ammann2002scalable}, specification of formal languages
 to represent attack graphs~\cite{templeton2001requires}, intrusion detection system 
 integration~\cite{tidwell2001modeling}, automatic generation of security recommendations~\cite{wang2006minimum},

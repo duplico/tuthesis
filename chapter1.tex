@@ -6,12 +6,13 @@ physical world and with each other.
 
 Systems that include both continuous and discrete components are termed \emph{hybrid systems}.
 When linked together with a significant network component, these systems are sometimes called
-\emph{cyber physical systems}, which have been targeted as a key area of research. Such systems
-are becoming pervasive in safety-critical domains such as medical, critical infrastructure, 
-automotive, and others. This thesis is concerned with modeling the security of these systems and
+\emph{cyber physical systems}. They have been targeted as a key area of research by the National
+Science Foundation because they
+are becoming pervasive in safety-critical domains such as medical, critical infrastructure, and
+automotive equipment. This thesis is concerned with modeling the security of these systems and
 their interactions with each other and the physical world.
 \section{Modeling Frameworks}
-An excellent argument that touches on the need for new research directions in modeling cyber physical systems
+An excellent argument for the need for new research in modeling cyber physical systems
 is due to Lee in a 2006 position paper in the National Science Foundation Workshop on Cyber-Physical Systems,
 a prelude to the NSF's research initiative on cyber physical systems:
 \begin{quote}
@@ -23,23 +24,24 @@ and concurrency is intrinsic. Neither of these properties is present in today's
 computing and networking abstractions. ~\cite{lee2006cyber}
 \end{quote}
 
-Existing frameworks for modeling and analysis of computer networks are inappropriate for use in
+Existing frameworks for modeling and analysis of purely discrete computer networks are inappropriate for use in
 these systems because of their inability to capture the continuous domain; they
 also lack a robust, let alone ``inexorable'' notion of time. Likewise, existing
-methods for studying hybrid systems fall short when it comes to modeling the sometimes complex
-networks that are hallmarks of cyber physical systems.
+methods for studying hybrid systems fall short when it comes to modeling the complex distributed
+networks that are often the hallmarks of cyber physical systems.
 \section{Scope}
-This thesis presents an extension of the attack graph modeling framework, typically used for studying
-network security, into the continuous domain to enable it to be used for studying cyber
-physical systems. The goal is to combine the best of both worlds: hybrid systems
+This thesis presents an extension of the attack graph modeling framework, 
+a discrete domain formalism for studying network security, into the 
+continuous domain to enable it to model cyber
+physical systems. The goal is to combine aspects of both hybrid systems
 modeling frameworks, particularly hybrid automata, which best describe systems in 
 relative isolation; and computer network security modeling frameworks, particularly attack graphs,
-which excel at capturing the complex interrelationships and interdependencies between assets and
+which excel at capturing the complex interrelationships and interdependencies among assets and
 attacks.
 
 The remainder of this thesis is structured as follows. Chapter 2 provides background in hybrid systems
 and their modeling methods, introduces past work in attack graphs, and presents a set of case studies
 in both the hybrid and discrete domains to be used throughout this work. Chapter 3 introduces in detail
-the basic attack graph framework to be used as the basis for the hybrid extensions. Chapter 4
+the attack graph framework to be used as the basis for the hybrid extensions. Chapter 4
 introduces the extensions themselves. Chapter 5 delivers some results from this modeling methodology,
 and Chapter 6 draws conclusions and suggests further work.
