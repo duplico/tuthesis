@@ -68,7 +68,7 @@ For the purposes of this work, an attack graph is comprised of the following com
 		trust relationship or level of access that a subject has on another. Topologies are directed and
 		named with string tokens. For example, \texttt{host1} might be accessible over the network via the
 		web by \texttt{host2}, so a directed topology from \texttt{host2} to \texttt{host1} called
-		\texttt{network_remote_web} might be used. Together with qualities, topologies make up the
+		\texttt{network\_remote\_web} might be used. Together with qualities, topologies make up the
 		network state's collection of facts.
 	\item[State] A network or system state is comprised of all of the facts about the system's asset
 		collection. A network model's state is fully described by the asset collection and the fact base;
@@ -89,15 +89,15 @@ domains that describe the atomic units of
 the formalism: assets, properties (qualities), values (qualities), relationships (topologies),
 vulnerabilities (exploit pattern identifiers), and parameters (free asset variables in the attack
 patterns), and operations (used in postconditions representing insert or delete actions):
-\begin{align}
-    \mathcal{A} &: assets \\
-    \mathcal{P} &: properties (quality names) \\
-    \mathcal{V} &: values (property values) \\
-    \mathcal{R} &: relationships (topology names) \\
-    \mathcal{W} &: vulnerabilities (exploit pattern names) \\
-    \mathcal{I} &: parameters (free asset names)
-    \text{Op} &= \left{\text{ins}, \text{del} \right}
-\end{align}
+\begin{align*}
+    \mathcal{A} :& \text{assets} \\
+    \mathcal{P} :& \text{properties (quality names)} \\
+    \mathcal{V} :& \text{values (property values)} \\
+    \mathcal{R} :& \text{relationships (topology names)} \\
+    \mathcal{W} :& \text{vulnerabilities (exploit pattern names)} \\
+    \mathcal{I} :& \text{parameters (free asset names)} \\
+    \text{Op} =& \left\{\text{ins}, \text{del} \right\}
+\end{align*}
 
 \TUsubsubsection{Compound Domains}
 Compound domains comprise the fundamental concepts that are composed of combinations
@@ -109,24 +109,59 @@ preceding intuitive definition, for instance.
         domain is the cartesian product of those domains. The $n$ subscripts denote that
         these are bound qualities of a network state, rather than free qualities in
         exploit preconditions and postconditions:
-        \begin{align}
+        \begin{align*}
             \mathcal{Q}_n &: \mathcal{A} \times \mathcal{P} \times \mathcal{V}
-        \end{align}
-    \item[Qualities] Topologies bind an asset to another asset through a relationship; therefore their
+        \end{align*}
+    \item[Topologies] Topologies bind an asset to another asset through a relationship; therefore their
         domain is the cartesian product of those domains:
-        \begin{align}
+        \begin{align*}
             \mathcal{T}_n&: \mathcal{A} \times \mathcal{A} \times \mathcal{R}
-        \end{align}
-    \item[Qualities] A network state, then, is denoted by a collection of assets, and a fact base
+        \end{align*}
+    \item[Network states] A network state, then, is denoted by a collection of assets, and a fact base
         of qualities and topologies; the domain of a network state is the cartesian product
         of the power sets of these domains:
-        \begin{align}
+        \begin{align*}
             \mathcal{N}&: \mathbb{P}(\mathcal{A}) \times \mathbb{P}(\mathcal{Q}_n) \times \mathbb{P}(\mathcal{T}_n)
-        \end{align}
-    \item[Exploit patterns]
-    \item[Attacks]
+        \end{align*}
+    \item[Exploit patterns] Exploit patterns, taken from the domain $\mathcal{E}$ 
+		depend upon free versions of qualities and topologies,
+		which are parameterized by members of $\mathcal{I}$ rather than $\mathcal{A}$, which are used in
+		preconditions and, when combined with an operator, postconditions:
+        \begin{align*}
+			\mathcal{Q}_e&: \mathcal{I} \times \mathcal{P} \times \mathcal{V} \\
+			\mathcal{T}_e&: \mathcal{I} \times \mathcal{I} \times \mathcal{R} \\
+			\text{Preconditions } \mathcal{P}rc_e &: \mathbb{P}(\mathcal{Q}_e) \times \mathbb{P}(\mathcal{T}_e) \\
+			\text{Postconditions } \mathcal{P}oc_e&: \mathbb{P}((Op,\mathcal{Q}_e)) \times \mathbb{P}((Op,\mathcal{T}_e)) \\
+			\mathcal{E}&: \mathcal{W} \times \vec{\mathcal{I}} \times  \mathcal{P}rc \times \mathcal{P}oc
+        \end{align*}
+    \item[Attacks] An exploit pattern whose parameters have been bound to assets is referred to as an
+		attack. It takes a similar appearance:
+		\begin{align*}
+			\text{Preconditions } \mathcal{P}rc_n &: \mathbb{P}(\mathcal{Q}_n) \times \mathbb{P}(\mathcal{T}_n) \\
+			\text{Postconditions } \mathcal{P}oc_n&: \mathbb{P}((Op,\mathcal{Q}_n)) \times \mathbb{P}((Op,\mathcal{T}_n)) \\
+			\mathcal{X}&: \mathcal{W} \times \vec{\mathcal{I}} \times  \mathcal{P}rc \times \mathcal{P}oc
+        \end{align*}
 \end{description}
-\TUsubsection{Execution Model}
+% TODO - fill in the rest of this.
+\TUsection{Execution Model}
+\TUsubsection{Introduction}
+The reference implementation of this thesis's attack graph execution model does not use this
+formal notation to represent system elements, instead favoring a more user friendly specification
+language. % Todo: name it? :)
+\TUsubsection{Network Model Specification}
+\TUsubsection{Exploit Specification}
+\TUsubsection{Generation Process}
+\TUsubsection{Output}
 \TUsection{Working Lexicon}
+\TUsubsection{Introduction}
+\TUsubsection{National Vulnerability Database}
+\TUsubsubsection{Access vector}
+\TUsubsubsection{Status}
+\TUsubsubsection{Type}
+\TUsubsection{Qualities}
+\TUsubsection{Topologies}
+\TUsection{Examples}
+\TUsubsection{Blunderdome}
+\TUsubsection{Denial of Sleep}
 \TUsection{State Predicates}
 \TUsection{State Aggregation}
