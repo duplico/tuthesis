@@ -147,8 +147,28 @@ preceding intuitive definition, for instance.
 \TUsubsection{Introduction}
 The reference implementation of this thesis's attack graph execution model does not use this
 formal notation to represent system elements, instead favoring a more user friendly specification
-language. % Todo: name it? :)
+language. This section describes that specification language and the generation process. % Todo: name it? :)
 \TUsubsection{Network Model Specification}
+A network model specification consists of a list of assets and an initial fact base 
+(list of qualities and topologies). It begins with the phrase \texttt{network model}, followed
+by the \texttt{=} symbol. The asset list is a semicolon separated list of the names of network
+assets preceded by the word \texttt{assets} and a colon. Following the asset list, the initial
+fact base is specified as a semicolon separated list of facts.
+\begin{lstlisting}
+network model = 
+assets :
+attacker;
+webserver;
+printer;
+	
+facts :
+	quality:webserver,MoinMoin,vuln_stack_overflow;
+	quality:printer,access,open;
+	quality:printer,ready_message,READY;
+	topology:attacker,webserver,connected_web;
+	topology:webserver,printer,connected;
+.
+\end{lstlisting}
 \TUsubsection{Exploit Specification}
 \TUsubsection{Generation Process}
 \TUsubsection{Output}
