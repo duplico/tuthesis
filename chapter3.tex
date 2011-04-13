@@ -391,15 +391,139 @@ digraph G {
 }
 \end{dot2tex}
 \caption{State 2 of the illustrative discrete example}
+\label{fig:ill_topology_2}
+\end{figure}
 
 For the next execution of the generation function, the successor state list becomes
 the new analysis state list, consisting now only of State 2, and the 
-remaining allowed ``depth'' is decremented to 2. NUM_BER attacks are possible from State 2:
+remaining allowed ``depth'' is decremented to 2. 6 attacks are possible from State 2:
+\verb|exploit_2(asset_1, asset_2)|, \verb|exploit_2(asset_2, asset_1)|, 
+\verb|exploit_2(asset_1, asset_3)|, \verb|exploit_2(asset_3, asset_1)|,
+\verb|exploit_2(asset_2, asset_3)|, and \verb|exploit_2(asset_3, asset_2)|. The process
+iterates through these attacks, generating new states and, if they are new, adding them
+to the list of successor states. \verb|exploit_2(asset_1, asset_2)| results in a new
+state, State 3 (see Fig.~\ref{fig:ill_topology_3}), which is added to the list of
+successor states. \verb|exploit_2(asset_2, asset_1)| also results in State 3, which
+already exists and is therefore not added to the list of successor states. 
+\verb|exploit_2(asset_1, asset_3)| generates a new state, State 4 
+(see Fig.~\ref{fig:ill_topology_4}), which is added to the list of successor states.
+\verb|exploit_2(asset_3, asset_1)| also generates State 4.
+\verb|exploit_2(asset_2, asset_3)| and \verb|exploit_2(asset_3, asset_2)|
+both result in State 2, which exists and is not added to the successor states.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+    asset_2 <-> asset_3 [label=" ", texlbl="2"];
+    asset_1 <-> asset_2 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 3 of the illustrative discrete example}
+\label{fig:ill_topology_3}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+    asset_2 <-> asset_3 [label=" ", texlbl="2"];
+    asset_1 <-> asset_3 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 4 of the illustrative discrete example}
+\label{fig:ill_topology_4}
+\end{figure}
+
+The next iteration finds the remaining allowed depth at 1 and the list of
+analysis states to contain State 3 and State 4. From State 3, the
+possible attacks are the same as the possible attacks in State 2:
 \verb|exploit_2(asset_1, asset_2)|, \verb|exploit_2(asset_2, asset_1)|, 
 \verb|exploit_2(asset_1, asset_3)|, \verb|exploit_2(asset_3, asset_1)|,
 \verb|exploit_2(asset_2, asset_3)|, and \verb|exploit_2(asset_3, asset_2)|.
-\label{fig:ill_topology_1}
+Only the middle two, \verb|exploit_2(asset_1, asset_3)|, \verb|exploit_2(asset_3, asset_1)|,
+generate a state that is not State 3 itself: State 5 (see Fig.~\ref{fig:ill_topology_5}),
+which is added to the list of successor states. The rest simply create new reflexive
+edges on State 3. The list of possible attacks on State 4 is the same, with only
+\verb|exploit_2(asset_1, asset_2)| and \verb|exploit_2(asset_2, asset_1)| generating
+a state other than State 4 itself. Both of those attacks generate State 5 again, which
+already exists and therefore is not added to the list of successor states.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+    asset_1 <-> asset_2 [label=" ", texlbl="2"];
+    asset_2 <-> asset_3 [label=" ", texlbl="2"];
+    asset_3 <-> asset_1 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 5 of the illustrative discrete example}
+\label{fig:ill_topology_5}
 \end{figure}
+
+The next iteration finds the list of analysis states to contain only State 5, and
+the remaining allowed depth is 0. Because the depth limit is reached, generation
+ceases. However, even if the depth limit had not been reached, execution would have
+soon terminated. All 6 possible attacks from State 5 would have generated State 5 itself.
+Therefore the list of successor states would be empty, and the next iteration's list of
+analysis states would be empty, which would also cause generation to cease. A representation
+of the resulting attack graph (with execution halting after 3 iterations) is provided
+in Fig.~\ref{fig:ill_attack_graph}.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    state_1 [shape=circle, texlbl="State 1"];
+    state_2 [shape=circle, texlbl="State 2"];
+    state_3 [shape=circle, texlbl="State 3"];
+    state_4 [shape=circle, texlbl="State 4"];
+    state_5 [shape=circle, texlbl="State 5"];
+    
+    state_1 -> state_1;
+    state_1 -> state_1;
+    state_1 -> state_2;
+    
+    state_2 -> state_2;
+    state_2 -> state_2;
+    state_2 -> state_3;
+    state_2 -> state_3;
+    state_2 -> state_4;
+    state_2 -> state_4;
+    
+    state_3 -> state_3;
+    state_3 -> state_3;
+    state_3 -> state_3;
+    state_3 -> state_3;
+    state_3 -> state_5;
+    state_3 -> state_5;
+    
+    state_4 -> state_4;
+    state_4 -> state_4;
+    state_4 -> state_4;
+    state_4 -> state_4;
+    state_4 -> state_5;
+    state_4 -> state_5;
+}
+\end{dot2tex}
+\caption{The illustrative example's attack graph to depth 3}
+\label{fig:ill_topology_5}
+\end{figure}
+
 \TUsection{Working Lexicon}
 \TUsubsection{Introduction}
 \TUsubsection{National Vulnerability Database}
