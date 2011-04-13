@@ -151,27 +151,255 @@ language. This section describes that specification language and the generation 
 \TUsubsection{Network Model Specification}
 A network model specification consists of a list of assets and an initial fact base 
 (list of qualities and topologies). It begins with the phrase \texttt{network model}, followed
-by the \texttt{=} symbol. The asset list is a semicolon separated list of the names of network
-assets preceded by the word \texttt{assets} and a colon. Following the asset list, the initial
-fact base is specified as a semicolon separated list of facts.
+by the~\texttt{=} symbol. 
+
+The first component of the specification itself is an asset list.
+The asset list is a semicolon separated list of the names of network
+assets preceded by the word \texttt{assets} and a colon. For example:
 \begin{lstlisting}
 network model = 
 assets :
-attacker;
-webserver;
-printer;
-	
+asset_1;
+asset_2;
+asset_3;
+\end{lstlisting}
+
+Following the asset list, the initial
+fact base is specified as a semicolon separated list of facts freceded by the word
+\texttt{facts} and a colon. Facts may occur in any order. Qualities are specified by the
+word \texttt{quality}, followed by a colon, followed by the asset in question, a comma,
+then the name of the quality, then the~\texttt{=} symbol, then the value of the quality.
+Topologies are specified by the word~\texttt{topology}, followed by a colon, followed by the names
+of the assets in question separated by a directionality symbol:~\texttt{->} to represent a one-way
+topology from the left asset to the right asset, or~\texttt{<->} to represent a two-way topology.
+This is followed by a comma, then the name of the topology. The fact listing, and thus the
+network model specification, is concluded with a period. For example:
+\begin{lstlisting}
 facts :
-	quality:webserver,MoinMoin,vuln_stack_overflow;
-	quality:printer,access,open;
-	quality:printer,ready_message,READY;
-	topology:attacker,webserver,connected_web;
-	topology:webserver,printer,connected;
+	quality:asset_1,quality_1=value_1;
+	quality:asset_2,quality_1=value_2;
+	topology:asset_1->asset_2,topology_1;
+	topology:asset_2<->asset_3,topology_2;
+.
+\end{lstlisting}
+
+The completed version of this network model specification would be as follows.
+\begin{lstlisting}
+network model = 
+    assets :
+    asset_1;
+    asset_2;
+    asset_3;
+
+    facts :
+        quality:asset_1,quality_1=value_1;
+        quality:asset_2,quality_1=value_2;
+        topology:asset_1->asset_2,topology_1;
+        topology:asset_2<->asset_3,topology_2;
 .
 \end{lstlisting}
 \TUsubsection{Exploit Specification}
+Exploits are specified using a related scheme. An exploit pattern resembles a function
+and contains four parts: a header or signature, preconditions, postconditions, and a
+terminating period symbol.
+
+An exploit specification begins with the word \texttt{exploit} followed by a
+unique identifier to name the exploit pattern, an opening parenthesis, a comma separated
+list of parameter names (which are to be bound to assets), a closing parenthesis, and 
+the~\texttt{=} symbol. For example:
+\begin{lstlisting}
+exploit exploit_1(asset_param_1,asset_param_2)=
+\end{lstlisting}
+
+The preconditions list follows. It begins with the word \texttt{preconditions}, followed
+by a colon, followed by a semicolon separated sequence of facts, which adhere to the
+same grammar as the facts for network model specification. For example:
+\begin{lstlisting}
+preconditions:
+    quality:asset_param_1,quality_1=value_1;
+    topology:asset_param_1->asset_param_2,topology_1;
+\end{lstlisting}
+
+The postconditions list follows this. It begins with the word \texttt{postconditions},
+followed by a colon, followed by a semicolon separated sequence of operations. Operations
+consist of the word \texttt{insert} or \texttt{delete}, followed by a space, followed by
+a fact. For example:
+\begin{lstlisting}
+postconditions:
+    delete topology:asset_param_1->asset_param_2,topology_1;
+    insert quality:asset_param_1,quality_1=value_2;
+\end{lstlisting}
+
+The exploit pattern is terminated with a period character. The full example from this
+subsection would appear as follows.
+\begin{lstlisting}
+exploit exploit_1(asset_param_1,asset_param_2)=
+    preconditions:
+        quality:asset_param_1,quality_1=value_1;
+        topology:asset_param_1->asset_param_2,topology_1;
+    postconditions:
+        delete topology:asset_param_1->asset_param_2,topology_1;
+        insert quality:asset_param_1,quality_1=value_2;
+.
+\end{lstlisting}
+
+Before continuing, a few words on the semantics of exploit processing may reduce
+the chance of confusion. The \texttt{insert} operation inserts a new rule in the
+fact base, which has the effect of replacing any previous rule with which it
+conflicts. For example, the insertion of \texttt{value_2} as the value of the quality
+\texttt{quality_1} in the example exploit \texttt{exploit_1} would replace the
+existing value of \texttt{value_1} specified in the preconditions; no ambiguity
+is introduced. The same is true of topologies.
+
+Furthermore, the model has no innate distinction between one-way and two-way
+topologies except the \texttt{<->} shorthand for specifying symmetric topologies.
+That is to say, a bidirectional topology fact is actually implemented as
+two unidirectional topology facts. Therefore, for example, if a bidirectional
+topology exists in the fact base, one of its component directional topologies may
+be removed by the realization of an exploit.
 \TUsubsection{Generation Process}
+This thesis is primarily concerned with modeling attack graphs, but it is worth
+giving some consideration to the attack graph generation process used in its
+reference implementation.
+
+Currently attack graph generation proceeds according to a straightforward process
+depending upon a monotonicity assumption: the attacker never moves ``backwards''.
+That is, once an exploit is realized, even though the attacker may have the capability
+of undoing it, he does not do so. The implementation used for this thesis is written
+in Erlang and makes extensive use of Erlang's built-in \texttt{digraph} (its directed 
+graph module),
+used to represent the attack graph itself, and \texttt{ets} (Erlang term storage, which
+provides constant-time table lookups) to associate graph vertices with network state data.
+
+A maximum attack graph ``depth'' (really maximum permitted shortest path length from the
+node representing the initial state)
+is selected before generation begins. Then the program initializes a graph with a single
+node (the starting state), and places the starting state and the node identifier in a
+lookup table. Then it begins to recurse using the depth value, which is initialized to
+the value selected by the user; and a list of available 
+states (nodes), which is initialized to contain a single entry: the starting state.
+
+The generation process is as follows. For each available state, a list of all valid 
+attacks (or bound exploit patterns) is generated. 
+Every permutation of every possible exploit realization from the state according to
+the pattern preconditions is included in this attack list. The attacks' postcondition
+operations are applied to the network state in order to generate (or load from memory, if
+the new fact base has already been generated by another attack on this or another state)
+successor states and add directed edges from the state in question to its successor state.
+If the successor state is newly generated, it is added to a successor state list.
+The generation function is called again, with the depth value decremented and the successor
+state list passed as the new list of available states. Execution ceases when the depth
+value reaches zero or the list of available states is empty.
+% TODO: figure/flowchart?
 \TUsubsection{Output}
+In order to aid understanding the generation process, this section expands on the
+illustrative example introduced in the preceding sections and demonstrates a
+sample attack graph generation process using the example. The reader is warned to
+avoid searching for meaning or design in the selection of these assets, qualities,
+and topologies; they are intended to be illustrative only, and any relation to 
+real world network, problem, attacks, or situations is purely coincidental.
+This section will use the following network model specification.
+\begin{lstlisting}
+network model = 
+    assets :
+    asset_1;
+    asset_2;
+    asset_3;
+
+    facts :
+        quality:asset_1,quality_1=value_1;
+        quality:asset_2,quality_1=value_2;        
+        quality:asset_3,quality_1=value_2;
+        topology:asset_1->asset_2,topology_1;
+        topology:asset_2<->asset_3,topology_2;
+.
+\end{lstlisting}
+
+The following exploit pattern specifications are used in this section.
+\begin{lstlisting}
+exploit exploit_1(asset_param_1,asset_param_2)=
+    preconditions:
+        quality:asset_param_1,quality_1=value_1;
+        topology:asset_param_1->asset_param_2,topology_1;
+    postconditions:
+        delete topology:asset_param_1->asset_param_2,topology_1;
+        insert quality:asset_param_1,quality_1=value_2;
+.
+
+exploit exploit_2(asset_param_1,asset_param_2)=
+    preconditions:
+        quality:asset_param_1,quality_1=value_2;
+        quality:asset_param_2,quality_1=value_2;
+    postconditions:
+        insert topology:asset_param_1<->asset_param_2,topology_2;
+.
+\end{lstlisting}
+
+Fig.~\ref{fig:ill_topology_1} represents the initial network state 
+(denoted State 1) specified
+in this example. Note that Fig.~\ref{fig:ill_topology_1} is \emph{not} an attack
+graph, merely a convenient graph based representation of the example network
+in use here. Since there is only one quality in use in the entire example, its
+name is not included in this graph representation; instead, each asset is labeled
+with its identifier and the value of \texttt{quality\_1} with the prefixing 
+\texttt{value\_} removed for brevity. Likewise, the edges that represent topologies
+are labeled with the topology name they represent with the prefixing \texttt{topology\_}
+removed.
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $1$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+	asset_1 -> asset_2 [label=" ", texlbl="1"];
+    asset_2 <-> asset_3 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 1 (initial network state) of the illustrative discrete example}
+\label{fig:ill_topology_1}
+\end{figure}
+
+Execution of the generation process begins by specifying a maximum ``depth''
+of generation, which will be 3 for the purposes of this exercise (although,
+as this attack graph converges with maximum shortest path of 3 from the
+initial state, this limitation is unnecessary), and by creating an initial list
+of states for analysis, which contains only State 1.
+
+Generation of the next set of states begins by creating a list of all valid
+attacks on State 1; that is, selecting all valid bindings of assets given State 1's
+fact base to exploit pattern parameters given their preconditions. Three such bindings
+are possible from State 1: \verb|exploit_1(asset_1, asset_2)|; \verb|exploit2(asset_2, asset_3)|; and
+\verb|exploit2(asset_2, asset_3)|. The latter two insert a topology into the fact base
+that already exists, therefore generating State 1, so State 1 has itself as a successor state
+twice. As State 1 already exists, these edges are added, and no further processing due to
+those transitions is done. The first attack, \verb|exploit_1(asset_1, asset_2)|, results in
+a new state, designated State 2. It is generated by performing the operations on State 1's
+fact base and creating a new state based on the results. State 2 is the only state added to
+the list of successor states.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+    asset_2 <-> asset_3 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 2 of the illustrative discrete example}
+
+For the next execution of the generation function, the successor state list becomes
+the new analysis state list, consisting now only of State 2, and the 
+remaining allowed ``depth'' is decremented to 2. NUM_BER attacks are possible from State 2:
+\verb|exploit_2(asset_1, asset_2)|, \verb|exploit_2(asset_2, asset_1)|, 
+\verb|exploit_2(asset_1, asset_3)|, \verb|exploit_2(asset_3, asset_1)|,
+\verb|exploit_2(asset_2, asset_3)|, and \verb|exploit_2(asset_3, asset_2)|.
+\label{fig:ill_topology_1}
+\end{figure}
 \TUsection{Working Lexicon}
 \TUsubsection{Introduction}
 \TUsubsection{National Vulnerability Database}
