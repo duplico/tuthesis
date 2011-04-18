@@ -621,8 +621,23 @@ underscore, then the lower case version of the standard abbreviation for the pro
 (e.g. \texttt{connected\_network\_http} for web or \texttt{connected\_network\_ssh} for
 secure shell).
 
-Connections are one-way: the source of the connection topology is 
+Connections are one-way: the source of the connection topology is considered to be the
+``client'' in the relationship, and the destination of the connection is considered
+the ``server'', where such distinctions are meaningful.
 \TUsubsubsection{Access Topologies}
+Access topologies refer to trust relationships and distinguish what kind of access one
+asset (possibly a program, individual, attacker, user, or other security principal) has
+to another. Much like the subcategories of the Security Protection impact type,
+there are three basic types of access topology (plus the lack of a topology, which
+signifies a lack of any noteworthy trust or access relationship): user access,
+root access, and other access.
+
+They are named using the word \texttt{access}, followed by an underscore, followed
+by the lowercase name of the access type, then, if the access type is \texttt{other},
+an optional underscore delimited description of the access type (perhaps the name
+of the application whose access level is in question). Examples include
+\texttt{access_user}, \texttt{access_root}, \texttt{access_other_apache}, or
+\texttt{access_other_vsftpd}.
 \TUsubsection{Qualities}
 \TUsection{Examples}
 \TUsubsection{Blunderdome}
