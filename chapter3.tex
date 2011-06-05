@@ -140,6 +140,36 @@ of the application whose access level is in question). Examples include
 \texttt{access\_other\_vsftpd}.
 \TUsubsection{Qualities}
 Although qualities are used in a more \emph{ad hoc} fashion to describe entity-specific
-asset properties, there is still a role for a 
-\TUsection{Platforms}
-\TUsection{State Predicate Analysis}
+asset properties, there is still a role for a few standard quality structures in the
+lexicon. The first is a simple ``status'' type of property to be used in determining
+whether an asset is enabled or disabled. The second is a preliminary notation for
+platform and application specification.
+\TUsubsubsection{Status}
+The status property is simple but powerful. Each asset that represents a host has a
+quality named \texttt{status}. It may take the value \texttt{up} or \texttt{down}.
+This allows exploits against or involving the host in question to require that it
+be online as a precondition, and it provides a simple mechanism of action for
+denial of service attacks to be modeled -- they simple have the postcondition of
+a \texttt{status = down} quality fact.
+
+Later in this chapter, a simple preprocessor combined with a dash of syntactic sugar
+is introduced to automate most of the status modeling process across both exploits
+and the network model.
+\TUsubsubsection{Platforms}
+Platform properties are modeled on the specification used by MITRE's Common Platform
+Enumeration (CPE). % TODO: cite
+They can include operating systems, applications, and hardware. The
+quality name is based upon the CPE name, vendor, and part components. The quality value
+is based upon the version number.
+
+A quality name based upon a CPE name begins with the word \texttt{cpe}, a colon, then a
+slash, then the part type (\texttt{o} for operating system, \texttt{a} for
+application, or \texttt{h} for hardware), then a colon, then the CPE vendor abbreviation,
+then a colon, then the CPE product abbreviation.
+
+The value is the remaining portion of the CPE name: the version, a colon, the update, a colon, 
+the edition, a colon, then the language. Version is required, but the rest is optional.
+
+For example, to specify that a host is running Adobe Reader version 8.1, a quality fact named
+\texttt{cpe:/a:adobe:reader} with value \texttt{8.1} would be used.
+\TUsection{Status Preprocessing}

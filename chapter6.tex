@@ -1,14 +1,31 @@
 \TUchapter{Conclusions and Future Work}
 \TUsection{Conclusions}
-\TUsection{Future Work}
-\TUsubsection{First Person vs. Third Person}
+\TUsubsection{Summary}
+\TUsubsection{Shortcomings}
+\TUsection{Related and Future Work}
+\TUsubsection{Network Model}
 % Hybrid first and third person strategy -- local and adjacent access 
 % are topologies; network connection is a quality and therefore assumed
 % topology.
 \TUsubsection{STRIDE and DREAD}
+% qualities as a BAG of CPEs (prefix property)
+
+% SAND/p0f/similar acquisition
+\TUsubsection{Exploit Model}
 % STRIDE integration
 \TUsubsection{Exploit Pattern Enhancement}
-% regex/wildcard exploits
+% regex/wildcard exploits: prefix property for CPEs, 
+% general CPE matching: e.g.: cpe:/o:redhat:enterprise_linux:4:ga
+%                             cpe:/o:redhat:enterprise_linux:4:.* for any edition
+% allows a general 
 \TUsubsection{Hybrid System Equivalence}
 \TUsubsection{Model Checking}
 \TUsubsection{Analysis and Visualization}
+% "proxy anything over ssh" exploit pattern instead of one for each proxied protocol;
+% also allow connected_network to suffice for anything, e.g.: 
+% connected_(local|adjacent|network(^|_ssh))
+
+% NVD
+\TUsubsection{Generation}
+% Parallelization/performance
+\TUsubsection{Analysis}
