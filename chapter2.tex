@@ -19,11 +19,9 @@ background on a particularly relevent modeling framework for hybrid systems call
 hybrid automaton, which is used in this thesis as the standard benchmark against which to
 compare hybrid modeling techniques.
 \TUsubsection{Definition}
-% Definition
 A newer, better term for the systems investigated in this thesis is \emph{cyber physical systems}.
 Put simply, a cyber physical system is a networked hybrid system: a networked computer system that is 
-tightly coupled to the physical world. 
-% TODO Add a bit more here?
+tightly coupled to the physical world.
 \TUsubsection{Challenges}
 According to the 2008 Report of the Cyber-Physical Systems Summit, ``The principal barrier to 
 developing CPS is the lack of a theory that comprehends cyber and physical resources in a 
@@ -349,8 +347,7 @@ property of an asset, and topologies bind pairs of assets together with a named
 connection between them. Exploit patterns with preconditions and postconditions attached
 to free variables that can be bound at generation time to assets serve to describe potential
 state transitions.
-\TUsubsection{Definition}
-\TUsubsection{Intuitive}
+\TUsubsection{Intuitive Definition}
 For the purposes of this work, an attack graph is comprised of the following components.
 \begin{description}
 	\item[Assets] Assets are the subjects in the attack graph formalism, mainly representing
@@ -385,7 +382,7 @@ For the purposes of this work, an attack graph is comprised of the following com
 		insert and delete actions on qualities and topologies to update the fact base and therefore
 		generate a new network state.
 \end{description}
-\TUsubsection{Formal}
+\TUsubsection{Formal Definition}
 \TUsubsubsection{Primitive Domains}
 To further clarify the data types in use by the attack graph formalism,
 this section provides a more formal definition of their domains.
@@ -587,7 +584,8 @@ If the successor state is newly generated, it is added to a successor state list
 The generation function is called again, with the depth value decremented and the successor
 state list passed as the new list of available states. Execution ceases when the depth
 value reaches zero or the list of available states is empty.
-% TODO: figure/flowchart?
+
+\TUsubsection{Generation Algorithm}
 \TUsubsection{Output}
 In order to aid understanding the generation process, this section expands on the
 illustrative example introduced in the preceding sections and demonstrates a
@@ -1010,6 +1008,3 @@ digraph G {
 \caption{Hybrid automaton model of the case study active RFID tags}
 \label{fig:tagha}
 \end{figure}
-\TUsection{STRIDE and DREAD}
-% TODO
-% TODO - SAND????
