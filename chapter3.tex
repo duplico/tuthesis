@@ -11,30 +11,12 @@ of entirely discrete elements. Their inclusion produces a transitional
 attack graph formalism that is not yet appropriate for hybrid modeling but that
 contains a number of enhancements suitable for discrete system modeling.
 
-This chapter introduces these enhancements, which include some syntactic
-changes to ease the modeling of information systems; a working lexicon of
+This chapter introduces these enhancements, which include a working lexicon of
 standard terms for topologies and qualities based upon the Common Vulnerability
-Enumeration and National Vulnerability Database; a scheme for integrating with
+Enumeration and National Vulnerability Database; some syntactic
+changes to ease the modeling of information systems; a scheme for integrating with
 the Common Platform Enumeration; and some state predicate analysis tools.
 
-\TUsection{Syntactic Sugar}
-\TUsubsection{Directional Topologies}
-%%% Directionality:
-% Topologies are specified by the 
-% word~\texttt{topology}, followed by a colon, followed by the names of the 
-% assets in question separated by a directionality symbol:~\texttt{->} to 
-% represent a one-way topology from the left asset to the right asset, 
-% or~\texttt{<->} to represent a two-way topology.
-%%%
-% Furthermore, the model has no innate distinction between one-way and two-way
-% topologies except the \texttt{<->} shorthand for specifying symmetric topologies.
-% That is to say, a bidirectional topology fact is actually implemented as
-% two unidirectional topology facts. Therefore, for example, if a bidirectional
-% topology exists in the fact base, one of its component directional topologies may
-% be removed by the realization of an exploit.
-\TUsubsection{Value Assignment}
-\TUsubsection{Host Denotation}
-\TUsubsection{Platform Properties}
 \TUsection{Working Lexicon}
 \TUsubsection{Introduction}
 Because of the unrestricted nature of the terms available to a modeler
@@ -141,35 +123,119 @@ of the application whose access level is in question). Examples include
 \TUsubsection{Qualities}
 Although qualities are used in a more \emph{ad hoc} fashion to describe entity-specific
 asset properties, there is still a role for a few standard quality structures in the
-lexicon. The first is a simple ``status'' type of property to be used in determining
-whether an asset is enabled or disabled. The second is a preliminary notation for
-platform and application specification.
+lexicon, namely a simple ``status'' type of property to be used in determining
+whether an asset is enabled or disabled.
 \TUsubsubsection{Status}
 The status property is simple but powerful. Each asset that represents a host has a
 quality named \texttt{status}. It may take the value \texttt{up} or \texttt{down}.
 This allows exploits against or involving the host in question to require that it
 be online as a precondition, and it provides a simple mechanism of action for
-denial of service attacks to be modeled -- they simple have the postcondition of
+denial of service attacks to be modeled -- they simply have the postcondition of
 a \texttt{status = down} quality fact.
 
 Later in this chapter, a simple preprocessor combined with a dash of syntactic sugar
 is introduced to automate most of the status modeling process across both exploits
 and the network model.
-\TUsubsubsection{Platforms}
-Platform properties are modeled on the specification used by MITRE's Common Platform
-Enumeration (CPE). % TODO: cite
-They can include operating systems, applications, and hardware. The
-quality name is based upon the CPE name, vendor, and part components. The quality value
-is based upon the version number.
 
-A quality name based upon a CPE name begins with the word \texttt{cpe}, a colon, then a
-slash, then the part type (\texttt{o} for operating system, \texttt{a} for
+\TUsection{Syntactic Sugar}
+\TUsubsection{Directional Topologies}
+This section introduces a new notation for specification of topologies. As it
+is common to model bidirectional topologies, an additional convenience syntax
+is now permitted to specify the directionality of a topology. As before, 
+topologies are specified by the word~\texttt{topology}, followed by a colon, 
+followed by the names of the assets in question; however, in the new syntax,
+they are separated not by a comma but by a directionality symbol:~\texttt{->} to 
+represent a one-way topology from the left asset to the right asset,
+or~\texttt{<->} to represent a two-way topology. To promote readability, there
+is no~\texttt{<-} directionality permitted.
+
+Furthermore, the model has no innate distinction between one-way and two-way
+topologies except the \texttt{<->} shorthand for specifying symmetric topologies.
+That is to say, a bidirectional topology fact is actually implemented as
+two unidirectional topology facts. Therefore, for example, if a bidirectional
+topology exists in the fact base, one of its component directional topologies may
+be removed by the realization of an exploit without affecting its reverse.
+\TUsubsection{Value Assignment}
+In preparation for the introduction of real-valued facts, the existing discrete
+type of qualities, henceforth called ``token valued'', are given a special
+assignment operator. Simply put, token values are assigned with the~\texttt{=}
+operator and tested with the~\texttt{=} and~\texttt{!=} operators.
+\TUsubsection{Host Denotation and Status Proprocessing}
+To support the use of status properties of host assets, a set of shorthand
+syntax is now provided for denoting which assets represent hosts. In practice,
+this has been observed to be the majority of modeled assets, so the shorthand
+is highly convenient for modelers. Host denotation and status processing is 
+done in two places: in the declaration of assets, and in the parameter list of 
+exploits.
+
+In the asset list declaration, up hosts are denoted by prefixing their name with
+the symbol~\texttt{@}, a signal to the host preprocessor to automatically add
+the \texttt{quality:hostname,status=up} fact; and down hosts are denoted with
+the~\texttt{!@} symbol, automatically adding the down host quality fact.
+
+Similarly, in exploit parameter lists, asset parameters that must have the
+up status precondition are declared by prefixing their names with the up host 
+symbol~\texttt{@}; likewise with the down symbol~\texttt{!@}. If no host
+status preconditions are required, no symbol is needed. The host status
+preprocessor automatically adds the required preconditions; if a host status
+postcondition is necessary, for example in the case of a denial of service
+attack bringing a host offline, the status property must be manually specified;
+this is not a significant burden, as this case arises considerably less
+frequently.
+\TUsubsection{Platform Properties}
+Platform facts are new types of facts introduced by this work. They use the
+specification used by MITRE's Common Platform Enumeration (CPE), a component
+of the Security Content Automation Protocol (SCAP). (TODO: CITE)
+They can specify operating systems, applications, and hardware.
+
+A CPE platform fact simply a valid CPE URI tied to an asset. The CPE URI is
+comprised of the word \texttt{cpe}, a 
+colon, then a slash, then the part type (\texttt{o} for operating system, \texttt{a} for
 application, or \texttt{h} for hardware), then a colon, then the CPE vendor abbreviation,
-then a colon, then the CPE product abbreviation.
-
-The value is the remaining portion of the CPE name: the version, a colon, the update, a colon, 
+then a colon, then the CPE product abbreviation, a colon, the version, a colon, the update, a colon, 
 the edition, a colon, then the language. Version is required, but the rest is optional.
 
-For example, to specify that a host is running Adobe Reader version 8.1, a quality fact named
-\texttt{cpe:/a:adobe:reader} with value \texttt{8.1} would be used.
-\TUsection{Status Preprocessing}
+For example, to specify that a host is running Adobe Reader version 8.1, a 
+platform fact named \texttt{cpe:/a:adobe:reader:8.1} would be used. Platforms
+are matched according to the algorithms provided in the CPE specification,
+permitting blank (wildcard) fields and the prefix property.
+\TUsection{Examples}
+\TUsubsection{Illustrative}
+\begin{lstlisting}
+network model = 
+    assets :
+        @asset_1;
+        @asset_2;
+        @asset_3;
+
+    facts :
+        quality:asset_1,quality_1=value_1;
+        quality:asset_2,quality_1=value_2;        
+        quality:asset_3,quality_1=value_2;
+        topology:asset_1->asset_2,topology_1;
+        topology:asset_2<->asset_3,topology_2;
+.
+\end{lstlisting}
+
+\begin{lstlisting}
+exploit exploit_1(@asset_param_1,@asset_param_2)=
+    preconditions:
+        quality:asset_param_1,quality_1=value_1;
+        topology:asset_param_1->asset_param_2,topology_1;
+    postconditions:
+        delete topology:asset_param_1->asset_param_2,topology_1;
+        insert quality:asset_param_1,quality_1=value_2;
+.
+
+exploit exploit_2(@asset_param_1,@asset_param_2)=
+    preconditions:
+        quality:asset_param_1,quality_1=value_2;
+        quality:asset_param_2,quality_1=value_2;
+    postconditions:
+        insert topology:asset_param_1<->asset_param_2,topology_2;
+.
+\end{lstlisting}
+\TUsubsection{Blunderdome}
+\TUsubsection{Denial of Sleep}
+\TUsubsubsection{Insufficiencies}
+\TUsection{Analysis}
