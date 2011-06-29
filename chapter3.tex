@@ -1,13 +1,15 @@
-
-\TUsubsection{Generation Algorithm}
-\TUsubsection{Output}
-In order to aid understanding the generation process, this section expands on the
-illustrative example introduced in the preceding sections and demonstrates a
-sample attack graph generation process using the example. The reader is warned to
+\TUchapter{Attack Graph Generation}
+\TUsection{Generation Algorithm}
+\TUsection{Alternatives}
+\TUsection{Example}
+In order to aid understanding the generation process, this section  demonstrates a
+sample attack graph generation process using an example. The reader is warned to
 avoid searching for meaning or design in the selection of these assets, qualities,
 and topologies; they are intended to be illustrative only, and any relation to 
 real world networks, problems, attacks, or situations is purely coincidental.
-This section will use the following network model specification.
+This section will use the network model specification in Fig.~\ref{fig:ill_nm}
+and the exploit patterns in Fig.~\ref{fig:ill_xp}.
+\begin{figure}
 \begin{lstlisting}
 network model = 
     assets :
@@ -16,94 +18,82 @@ network model =
         asset_3;
 
     facts :
-        quality:asset_1,quality_1,value_1;
-        quality:asset_2,quality_1,value_2;        
-        quality:asset_3,quality_1,value_2;
-        topology:asset_1,asset_2,topology_1;
-        topology:asset_2,asset_3,topology_2;        
-        topology:asset_3,asset_2,topology_2;
+        quality:asset_1,quality_1=value_1;
+        quality:asset_2,quality_1=value_2;
+        quality:asset_3,quality_1=value_1;
+        topology:asset_1->asset_2,topology_1;
+        topology:asset_3->asset_2,topology_1;
 .
 \end{lstlisting}
+\label{fig:ill_nm}
+\end{figure}
 
-The following exploit pattern specifications are used in this section.
+\begin{figure}
 \begin{lstlisting}
 exploit exploit_1(asset_param_1,asset_param_2)=
     preconditions:
-        quality:asset_param_1,quality_1,value_1;
-        topology:asset_param_1,asset_param_2,topology_1;
+        quality:asset_param_1,quality_1=value_1;
+        topology:asset_param_1->asset_param_2,topology_1;
     postconditions:
-        delete topology:asset_param_1,asset_param_2,topology_1;
-        insert quality:asset_param_1,quality_1,value_2;
+        delete topology:asset_param_1->asset_param_2,topology_1;
+        insert topology:asset_param_2->asset_param_1,topology_1;
 .
 
 exploit exploit_2(asset_param_1,asset_param_2)=
     preconditions:
-        quality:asset_param_1,quality_1,value_2;
-        quality:asset_param_2,quality_1,value_2;
+        quality:asset_param_1,quality_1=value_2;
+        topology:asset_param_1->asset_param_2,topology_1;
     postconditions:
-        insert topology:asset_param_1,asset_param_2,topology_2;
-        insert topology:asset_param_2,asset_param_1,topology_2;
+        insert quality:asset_param_2,quality_1=value_2;
 .
 \end{lstlisting}
+\label{fig:ill_xp}
+\end{figure}
 
-Fig.~\ref{fig:ill_topology_1} represents the initial network state 
-(denoted State 1) specified
-in this example. Note that Fig.~\ref{fig:ill_topology_1} is \emph{not} an attack
+Fig.~\ref{fig:ill_topology_0} represents the initial network state 
+(denoted State 0) specified
+in this example. Note that Fig.~\ref{fig:ill_topology_0} is \emph{not} an attack
 graph, merely a convenient graph based representation of the example network
-in use here. Since there is only one quality in use in the entire example, its
-name is not included in this graph representation; instead, each asset is labeled
-with its identifier and the value of \texttt{quality\_1} with the prefixing 
-\texttt{value\_} removed for brevity. Likewise, the edges that represent topologies
-are labeled with the topology name they represent with the prefixing \texttt{topology\_}
-removed.
+in use here. Each node represents an asset in the network state; it is labeled
+first with the state number (in this case 0) and the asset name, then with a
+listing of its qualities (in this case, there is only one).
+Likewise, the edges that represent topologies
+are labeled with the topology name they represent.
+
 \begin{figure}
-\centering
-\begin{dot2tex}[options=-t raw --autosize]
-digraph G {
-    rankdir=LR;
-    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $1$ \end{tabular}"];
-    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
-    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
-	asset_1 -> asset_2 [label=" ", texlbl="1"];
-    asset_2 -> asset_3 [label=" ", texlbl="2"];
-    asset_3 -> asset_2 [label=" ", texlbl="2"];
-}
-\end{dot2tex}
-\caption{State 1 (initial network state) of the illustrative discrete example}
-\label{fig:ill_topology_1}
+\includegraphics[width=4in]{ag_illustrative_simple/nm_state0}
+\label{fig:ill_topology_0}
 \end{figure}
 
 Execution of the generation process begins by specifying a maximum ``depth''
-of generation, which will be 3 for the purposes of this exercise (although,
-as this attack graph converges with maximum shortest path of 3 from the
-initial state, this limitation is unnecessary), and by creating an initial list
-of states for analysis, which contains only State 1.
+of generation, which will be 2 for the purposes of this exercise, and by creating
+an initial list of states for analysis, which contains only State 0.
 
 Generation of the next set of states begins by creating a list of all valid
-attacks on State 1; that is, selecting all valid bindings of assets given State 1's
-fact base to exploit pattern parameters given their preconditions. Three such bindings
-are possible from State 1: \texttt{exploit\_1(asset\_1, asset\_2)}; \texttt{exploit2(asset\_2, asset\_3)}; and
-\texttt{exploit2(asset\_2, asset\_3)}. The latter two insert a topology into the fact base
-that already exists, therefore generating State 1, so State 1 has itself as a successor state
-twice. As State 1 already exists, these edges are added, and no further processing due to
-those transitions is done. The first attack, \texttt{exploit\_1(asset\_1, asset\_2)}, results in
-a new state, designated State 2. It is generated by performing the operations on State 1's
-fact base and creating a new state based on the results. State 2 is the only state added to
-the list of successor states.
+attacks on State 0; that is, selecting all valid bindings of assets given State 0's
+fact base to exploit pattern parameters given their preconditions. Two such bindings
+are possible from State 1: \texttt{exploit\_1(asset\_1, asset\_2)}; and 
+\texttt{exploit2(asset\_3, asset\_2)}. Both bindings result in new states:
+State 1 (Fig.~\ref{fig:ill_topology_1}) and State 2 (Fig.~\ref{fig:ill_topology_2}.
+This completes a single execution of the generation function; although the leaves
+are yet to be analyzed, a small attack graph is already the result 
+(Fig.~\ref{fig:ill_ag_depth1}).
 
 \begin{figure}
-\centering
-\begin{dot2tex}[options=-t raw --autosize]
-digraph G {
-    rankdir=LR;
-    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
-    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
-    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
-    asset_2 -> asset_3 [label=" ", texlbl="2"];
-    asset_3 -> asset_2 [label=" ", texlbl="2"];
-}
-\end{dot2tex}
+\includegraphics[width=4in]{ag_illustrative_simple/nm_state1}
+\caption{State 1 of the illustrative discrete example}
+\label{fig:ill_topology_1}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=4in]{ag_illustrative_simple/nm_state2}
 \caption{State 2 of the illustrative discrete example}
+\label{fig:ill_topology_2}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=4in]{ag_illustrative_simple/ag_depth1}
+\caption{Attack graph after first iteration}
 \label{fig:ill_topology_2}
 \end{figure}
 
