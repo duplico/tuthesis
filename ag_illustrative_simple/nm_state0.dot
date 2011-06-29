@@ -1,0 +1,7 @@
+digraph G {
+asset_2 [label="0.asset_2\ntoken:quality_1=value_2"];
+asset_3 [label="0.asset_3\ntoken:quality_1=value_1"];
+asset_1 [label="0.asset_1\ntoken:quality_1=value_1"];
+asset_3 -> asset_2  [key=0, label=topology_1];
+asset_1 -> asset_2  [key=0, label=topology_1];
+}
