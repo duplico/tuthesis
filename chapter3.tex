@@ -1,241 +1,252 @@
-% Add:
-%%%
-% New symbols for quality assignments
-%%%
-% platform properties
-\TUchapter{Discrete Extensions}
-\TUsection{Introduction}
-For various reasons, the adaptation of the attack graph formalism described in
-the preceding chapter for hybrid purposes depends upon the addition of a number
-of entirely discrete elements. Their inclusion produces a transitional
-attack graph formalism that is not yet appropriate for hybrid modeling but that
-contains a number of enhancements suitable for discrete system modeling.
 
-This chapter introduces these enhancements, which include a working lexicon of
-standard terms for topologies and qualities based upon the Common Vulnerability
-Enumeration and National Vulnerability Database; some syntactic
-changes to ease the modeling of information systems; a scheme for integrating with
-the Common Platform Enumeration; and some state predicate analysis tools.
-
-\TUsection{Working Lexicon}
-\TUsubsection{Introduction}
-Because of the unrestricted nature of the terms available to a modeler
-in this version of the attack graph framework, in order to proceed systematically
-some conventions must be established in the use of terms. This thesis recommends
-a set of conventions designed to ease the goal of automated exploit pattern extraction
-from the National Vulnerability Database (NVD) maintained by the 
-National Institute of Standards and Technology (NIST), which among other roles
-indexes MITRE's Common Vulnerability Enumeration (CVE). ``NVD includes 
-databases of security checklists, security related software flaws, 
-misconfigurations, product names, and impact metrics''~\cite{nvdhome}.
-\TUsubsection{National Vulnerability Database}
-Several concepts are used across the NVD's index of vulnerabilities; they
-strongly inform the working lexicon employed in this thesis and include
-a vulnerability's access vector and impact type.
-\TUsubsubsection{Access vector}
-The access vector of a vulnerability on NVD refers to the logical location from
-which the attacker may launch the attack. The possible attack vectors according
-to the National Vulnerability Database are as follows.
-\begin{description}
-\item[Local] The vulnerability is exploitable through physical or local account access
-    to the device on which the vulnerability resides.
-\item[Adjacent Network] The vulnerability is exploitable through access to a network
-    that is adjacent to the vulnerable host; that is, the attacker must be in the same
-    broadcast domain or collision domain (e.g. the same network segment or VLAN).
-\item[Network] No local or adjacent access is required to exploit the vulnerability;
-    in other words, it is exploitable over the Internet.
-\end{description}
-\TUsubsubsection{Impact Type}
-The vulnerability's impact type on NVD places the effects of the vulnerability's
-exploitation on the target into one of the following categories.
-, and another for some other type of privileged access.
-\begin{description}
-\item[Confidentiality] Confidentiality impacts allow the unauthorized disclosure 
-    of information (corresponding to STRIDE's ``information disclosure'')
-\item[Integrity] Allows modification of data (corresponding to STRIDE's ``tampering'')
-\item[Availability] Availability impacts correspond to disruptions of service (STRIDE's
-    ``denial of service'')
-\item[Security Protection] The security protection category refers to the effects
-    of exploits that provide unauthorized access to the target. This may be either
-    general system access or application access. The security protection category
-    corresponds roughly to STRIDE's ``elevation of privileges'' and also partly encompasses
-    ``spoofing identity''. It has three subcategories:
-    \begin{description}
-    \item[User access] This subcategory refers to the attacker's gaining user level access
-        to the operating system.
-    \item[Administrative access] This subcategory refers to the attacker's gaining root level
-        access to the operating system.
-    \item[Other access] This subcategory refers to any other type of privileged access on
-        the target.
-    \end{description}
-\end{description}
-\TUsubsection{Topologies}
-Introduction of actual terms begins with topologies, but first a note about the modeling
-of adversaries is needed. 
-
-Two approaches are possible for modeling the attacker. The first
-is to design the network model so that it is, in a way, from the attacker's perspective.
-In this scheme, henceforth the \emph{first person} strategy, the attacker is treated as
-implicit, and its access and connections are considered properties of the system itself.
-The adversary's access level to a server, for instance, would be modeled as a quality of
-that server asset.
-
-In the second approach, henceforth the \emph{third person} strategy, the attacker is
-modeled as a first class part of the system: as an asset. Its properties, connections,
-and access levels are modeled as qualities and topologies of the adversary asset.
-This strategy, which is the one employed primarily in this thesis, can model multiple
-adversaries. Aside from that difference, they are roughly equivalent and a matter
-of taste on behalf of the modeler and analyst. This section's terminology, however,
-assumes the third person model.
-
-Two types of topology terms are introduced in this section: connection and access. These
-correspond directly to the two NVD concepts introduced in the previous section.
-\TUsubsubsection{Connection Topologies}
-Connection topologies refer to how two assets are connected, over the network or otherwise.
-They may be local, adjacent, or network connected. These connection topologies begin with
-the word \texttt{connected}, followed by an underscore, then one of the three connection
-types: \texttt{local}, \texttt{adjacent}, or \texttt{network}. For local and adjacent
-connections, this is all that is necessary. 
-
-For network connections it is
-necessary to specify the available protocols individually. These are done by appending another
-underscore, then the lower case version of the standard abbreviation for the protocol
-(e.g. \texttt{connected\_network\_http} for web or \texttt{connected\_network\_ssh} for
-secure shell).
-
-Connections are one-way: the source of the connection topology is considered to be the
-``client'' in the relationship, and the destination of the connection is considered
-the ``server'', where such distinctions are meaningful.
-\TUsubsubsection{Access Topologies}
-Access topologies refer to trust relationships and distinguish what kind of access one
-asset (possibly a program, individual, attacker, user, or other security principal) has
-to another. Much like the subcategories of the Security Protection impact type,
-there are three basic types of access topology (plus the lack of a topology, which
-signifies a lack of any noteworthy trust or access relationship): user access,
-root access, and other access.
-
-They are named using the word \texttt{access}, followed by an underscore, followed
-by the lowercase name of the access type, then, if the access type is \texttt{other},
-an optional underscore delimited description of the access type (perhaps the name
-of the application whose access level is in question). Examples include
-\texttt{access\_user}, \texttt{access\_root}, \texttt{access\_other\_apache}, or
-\texttt{access\_other\_vsftpd}.
-\TUsubsection{Qualities}
-Although qualities are used in a more \emph{ad hoc} fashion to describe entity-specific
-asset properties, there is still a role for a few standard quality structures in the
-lexicon, namely a simple ``status'' type of property to be used in determining
-whether an asset is enabled or disabled.
-\TUsubsubsection{Status}
-The status property is simple but powerful. Each asset that represents a host has a
-quality named \texttt{status}. It may take the value \texttt{up} or \texttt{down}.
-This allows exploits against or involving the host in question to require that it
-be online as a precondition, and it provides a simple mechanism of action for
-denial of service attacks to be modeled -- they simply have the postcondition of
-a \texttt{status = down} quality fact.
-
-Later in this chapter, a simple preprocessor combined with a dash of syntactic sugar
-is introduced to automate most of the status modeling process across both exploits
-and the network model.
-
-\TUsection{Syntactic Sugar}
-\TUsubsection{Directional Topologies}
-This section introduces a new notation for specification of topologies. As it
-is common to model bidirectional topologies, an additional convenience syntax
-is now permitted to specify the directionality of a topology. As before, 
-topologies are specified by the word~\texttt{topology}, followed by a colon, 
-followed by the names of the assets in question; however, in the new syntax,
-they are separated not by a comma but by a directionality symbol:~\texttt{->} to 
-represent a one-way topology from the left asset to the right asset,
-or~\texttt{<->} to represent a two-way topology. To promote readability, there
-is no~\texttt{<-} directionality permitted.
-
-Furthermore, the model has no innate distinction between one-way and two-way
-topologies except the \texttt{<->} shorthand for specifying symmetric topologies.
-That is to say, a bidirectional topology fact is actually implemented as
-two unidirectional topology facts. Therefore, for example, if a bidirectional
-topology exists in the fact base, one of its component directional topologies may
-be removed by the realization of an exploit without affecting its reverse.
-\TUsubsection{Value Assignment}
-In preparation for the introduction of real-valued facts, the existing discrete
-type of qualities, henceforth called ``token valued'', are given a special
-assignment operator. Simply put, token values are assigned with the~\texttt{=}
-operator and tested with the~\texttt{=} and~\texttt{!=} operators.
-\TUsubsection{Host Denotation and Status Proprocessing}
-To support the use of status properties of host assets, a set of shorthand
-syntax is now provided for denoting which assets represent hosts. In practice,
-this has been observed to be the majority of modeled assets, so the shorthand
-is highly convenient for modelers. Host denotation and status processing is 
-done in two places: in the declaration of assets, and in the parameter list of 
-exploits.
-
-In the asset list declaration, up hosts are denoted by prefixing their name with
-the symbol~\texttt{@}, a signal to the host preprocessor to automatically add
-the \texttt{quality:hostname,status=up} fact; and down hosts are denoted with
-the~\texttt{!@} symbol, automatically adding the down host quality fact.
-
-Similarly, in exploit parameter lists, asset parameters that must have the
-up status precondition are declared by prefixing their names with the up host 
-symbol~\texttt{@}; likewise with the down symbol~\texttt{!@}. If no host
-status preconditions are required, no symbol is needed. The host status
-preprocessor automatically adds the required preconditions; if a host status
-postcondition is necessary, for example in the case of a denial of service
-attack bringing a host offline, the status property must be manually specified;
-this is not a significant burden, as this case arises considerably less
-frequently.
-\TUsubsection{Platform Properties}
-Platform facts are new types of facts introduced by this work. They use the
-specification used by MITRE's Common Platform Enumeration (CPE), a component
-of the Security Content Automation Protocol (SCAP). (TODO: CITE)
-They can specify operating systems, applications, and hardware.
-
-A CPE platform fact simply a valid CPE URI tied to an asset. The CPE URI is
-comprised of the word \texttt{cpe}, a 
-colon, then a slash, then the part type (\texttt{o} for operating system, \texttt{a} for
-application, or \texttt{h} for hardware), then a colon, then the CPE vendor abbreviation,
-then a colon, then the CPE product abbreviation, a colon, the version, a colon, the update, a colon, 
-the edition, a colon, then the language. Version is required, but the rest is optional.
-
-For example, to specify that a host is running Adobe Reader version 8.1, a 
-platform fact named \texttt{cpe:/a:adobe:reader:8.1} would be used. Platforms
-are matched according to the algorithms provided in the CPE specification,
-permitting blank (wildcard) fields and the prefix property.
-\TUsection{Examples}
-\TUsubsection{Illustrative}
+\TUsubsection{Generation Algorithm}
+\TUsubsection{Output}
+In order to aid understanding the generation process, this section expands on the
+illustrative example introduced in the preceding sections and demonstrates a
+sample attack graph generation process using the example. The reader is warned to
+avoid searching for meaning or design in the selection of these assets, qualities,
+and topologies; they are intended to be illustrative only, and any relation to 
+real world networks, problems, attacks, or situations is purely coincidental.
+This section will use the following network model specification.
 \begin{lstlisting}
 network model = 
     assets :
-        @asset_1;
-        @asset_2;
-        @asset_3;
+        asset_1;
+        asset_2;
+        asset_3;
 
     facts :
-        quality:asset_1,quality_1=value_1;
-        quality:asset_2,quality_1=value_2;        
-        quality:asset_3,quality_1=value_2;
-        topology:asset_1->asset_2,topology_1;
-        topology:asset_2<->asset_3,topology_2;
+        quality:asset_1,quality_1,value_1;
+        quality:asset_2,quality_1,value_2;        
+        quality:asset_3,quality_1,value_2;
+        topology:asset_1,asset_2,topology_1;
+        topology:asset_2,asset_3,topology_2;        
+        topology:asset_3,asset_2,topology_2;
 .
 \end{lstlisting}
 
+The following exploit pattern specifications are used in this section.
 \begin{lstlisting}
-exploit exploit_1(@asset_param_1,@asset_param_2)=
+exploit exploit_1(asset_param_1,asset_param_2)=
     preconditions:
-        quality:asset_param_1,quality_1=value_1;
-        topology:asset_param_1->asset_param_2,topology_1;
+        quality:asset_param_1,quality_1,value_1;
+        topology:asset_param_1,asset_param_2,topology_1;
     postconditions:
-        delete topology:asset_param_1->asset_param_2,topology_1;
-        insert quality:asset_param_1,quality_1=value_2;
+        delete topology:asset_param_1,asset_param_2,topology_1;
+        insert quality:asset_param_1,quality_1,value_2;
 .
 
-exploit exploit_2(@asset_param_1,@asset_param_2)=
+exploit exploit_2(asset_param_1,asset_param_2)=
     preconditions:
-        quality:asset_param_1,quality_1=value_2;
-        quality:asset_param_2,quality_1=value_2;
+        quality:asset_param_1,quality_1,value_2;
+        quality:asset_param_2,quality_1,value_2;
     postconditions:
-        insert topology:asset_param_1<->asset_param_2,topology_2;
+        insert topology:asset_param_1,asset_param_2,topology_2;
+        insert topology:asset_param_2,asset_param_1,topology_2;
 .
 \end{lstlisting}
-\TUsubsection{Blunderdome}
-\TUsubsection{Denial of Sleep}
-\TUsubsubsection{Insufficiencies}
-\TUsection{Analysis}
+
+Fig.~\ref{fig:ill_topology_1} represents the initial network state 
+(denoted State 1) specified
+in this example. Note that Fig.~\ref{fig:ill_topology_1} is \emph{not} an attack
+graph, merely a convenient graph based representation of the example network
+in use here. Since there is only one quality in use in the entire example, its
+name is not included in this graph representation; instead, each asset is labeled
+with its identifier and the value of \texttt{quality\_1} with the prefixing 
+\texttt{value\_} removed for brevity. Likewise, the edges that represent topologies
+are labeled with the topology name they represent with the prefixing \texttt{topology\_}
+removed.
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $1$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+	asset_1 -> asset_2 [label=" ", texlbl="1"];
+    asset_2 -> asset_3 [label=" ", texlbl="2"];
+    asset_3 -> asset_2 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 1 (initial network state) of the illustrative discrete example}
+\label{fig:ill_topology_1}
+\end{figure}
+
+Execution of the generation process begins by specifying a maximum ``depth''
+of generation, which will be 3 for the purposes of this exercise (although,
+as this attack graph converges with maximum shortest path of 3 from the
+initial state, this limitation is unnecessary), and by creating an initial list
+of states for analysis, which contains only State 1.
+
+Generation of the next set of states begins by creating a list of all valid
+attacks on State 1; that is, selecting all valid bindings of assets given State 1's
+fact base to exploit pattern parameters given their preconditions. Three such bindings
+are possible from State 1: \texttt{exploit\_1(asset\_1, asset\_2)}; \texttt{exploit2(asset\_2, asset\_3)}; and
+\texttt{exploit2(asset\_2, asset\_3)}. The latter two insert a topology into the fact base
+that already exists, therefore generating State 1, so State 1 has itself as a successor state
+twice. As State 1 already exists, these edges are added, and no further processing due to
+those transitions is done. The first attack, \texttt{exploit\_1(asset\_1, asset\_2)}, results in
+a new state, designated State 2. It is generated by performing the operations on State 1's
+fact base and creating a new state based on the results. State 2 is the only state added to
+the list of successor states.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+    asset_2 -> asset_3 [label=" ", texlbl="2"];
+    asset_3 -> asset_2 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 2 of the illustrative discrete example}
+\label{fig:ill_topology_2}
+\end{figure}
+
+For the next execution of the generation function, the successor state list becomes
+the new analysis state list, consisting now only of State 2, and the 
+remaining allowed ``depth'' is decremented to 2. 6 attacks are possible from State 2:
+\texttt{exploit\_2(asset\_1, asset\_2)}, \texttt{exploit\_2(asset\_2, asset\_1)}, 
+\texttt{exploit\_2(asset\_1, asset\_3)}, \texttt{exploit\_2(asset\_3, asset\_1)},
+\texttt{exploit\_2(asset\_2, asset\_3)}, and \texttt{exploit\_2(asset\_3, asset\_2)}. The process
+iterates through these attacks, generating new states and, if they are new, adding them
+to the list of successor states. \texttt{exploit\_2(asset\_1, asset\_2)} results in a new
+state, State 3 (see Fig.~\ref{fig:ill_topology_3}), which is added to the list of
+successor states. \texttt{exploit\_2(asset\_2, asset\_1)} also results in State 3, which
+already exists and is therefore not added to the list of successor states. 
+\texttt{exploit\_2(asset\_1, asset\_3)} generates a new state, State 4 
+(see Fig.~\ref{fig:ill_topology_4}), which is added to the list of successor states.
+\texttt{exploit\_2(asset\_3, asset\_1)} also generates State 4.
+\texttt{exploit\_2(asset\_2, asset\_3)} and \texttt{exploit\_2(asset\_3, asset\_2)}
+both result in State 2, which exists and is not added to the successor states.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+    asset_2 -> asset_3 [label=" ", texlbl="2"];
+    asset_1 -> asset_2 [label=" ", texlbl="2"];
+    
+    asset_3 -> asset_2 [label=" ", texlbl="2"];
+    asset_2 -> asset_1 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 3 of the illustrative discrete example}
+\label{fig:ill_topology_3}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+    asset_2 -> asset_3 [label=" ", texlbl="2"];
+    asset_1 -> asset_3 [label=" ", texlbl="2"];
+    
+    asset_3 -> asset_2 [label=" ", texlbl="2"];
+    asset_3 -> asset_1 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 4 of the illustrative discrete example}
+\label{fig:ill_topology_4}
+\end{figure}
+
+The next iteration finds the remaining allowed depth at 1 and the list of
+analysis states to contain State 3 and State 4. From State 3, the
+possible attacks are the same as the possible attacks in State 2:
+\texttt{exploit\_2(asset\_1, asset\_2)}, \texttt{exploit\_2(asset\_2, asset\_1)},
+\texttt{exploit\_2(asset\_1, asset\_3)}, \texttt{exploit\_2(asset\_3, asset\_1)},
+\texttt{exploit\_2(asset\_2, asset\_3)}, and \texttt{exploit\_2(asset\_3, asset\_2)}.
+Only the middle two, \texttt{exploit\_2(asset\_1, asset\_3)}, \texttt{exploit\_2(asset\_3, asset\_1)},
+generate a state that is not State 3 itself: State 5 (see Fig.~\ref{fig:ill_topology_5}),
+which is added to the list of successor states. The rest simply create new reflexive
+edges on State 3. The list of possible attacks on State 4 is the same, with only
+\texttt{exploit\_2(asset\_1, asset\_2)} and \texttt{exploit\_2(asset\_2, asset\_1)} generating
+a state other than State 4 itself. Both of those attacks generate State 5 again, which
+already exists and therefore is not added to the list of successor states.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    asset_1 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_1} \\ $2$ \end{tabular}"];
+    asset_2 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_2} \\ $2$ \end{tabular}"];
+    asset_3 [shape=circle, texlbl="\begin{tabular}{c}\texttt{\bf asset\_3} \\ $2$ \end{tabular}"];
+    asset_1 -> asset_2 [label=" ", texlbl="2"];
+    asset_2 -> asset_3 [label=" ", texlbl="2"];
+    asset_3 -> asset_1 [label=" ", texlbl="2"];
+    
+    asset_2 -> asset_1 [label=" ", texlbl="2"];
+    asset_3 -> asset_2 [label=" ", texlbl="2"];
+    asset_1 -> asset_3 [label=" ", texlbl="2"];
+}
+\end{dot2tex}
+\caption{State 5 of the illustrative discrete example}
+\label{fig:ill_topology_5}
+\end{figure}
+
+The next iteration finds the list of analysis states to contain only State 5, and
+the remaining allowed depth is 0. Because the depth limit is reached, generation
+ceases. However, even if the depth limit had not been reached, execution would have
+soon terminated. All 6 possible attacks from State 5 would have generated State 5 itself.
+Therefore the list of successor states would be empty, and the next iteration's list of
+analysis states would be empty, which would also cause generation to cease. A representation
+of the resulting attack graph (with execution halting after 3 iterations) is provided
+in Fig.~\ref{fig:ill_attack_graph}.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    rankdir=LR;
+    state_1 [shape=circle, texlbl="State 1"];
+    state_2 [shape=circle, texlbl="State 2"];
+    state_3 [shape=circle, texlbl="State 3"];
+    state_4 [shape=circle, texlbl="State 4"];
+    state_5 [shape=circle, texlbl="State 5"];
+    
+    state_1 -> state_1;
+    state_1 -> state_1;
+    state_1 -> state_2;
+    
+    state_2 -> state_2;
+    state_2 -> state_2;
+    state_2 -> state_3;
+    state_2 -> state_3;
+    state_2 -> state_4;
+    state_2 -> state_4;
+    
+    state_3 -> state_3;
+    state_3 -> state_3;
+    state_3 -> state_3;
+    state_3 -> state_3;
+    state_3 -> state_5;
+    state_3 -> state_5;
+    
+    state_4 -> state_4;
+    state_4 -> state_4;
+    state_4 -> state_4;
+    state_4 -> state_4;
+    state_4 -> state_5;
+    state_4 -> state_5;
+}
+\end{dot2tex}
+\caption{The illustrative example's attack graph to depth 3}
+\label{fig:ill_attack_graph}
+\end{figure}
+
+This concludes the description of the basic attack graph model employed at the
+University of Tulsa. The chapters following this one are devoted to
+this model's expansion and analysis.
