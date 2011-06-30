@@ -87,20 +87,16 @@ for this stage is provided in Fig.~\ref{fig:binding_computation_pc}.
 
 \begin{figure}
 \begin{lstlisting}
-def get_attack_bindings(assets, exploits):
-    # Return format is a list of elements of the form:
-    #     (exploit name, (param1, param2, . . .))
-    
-    attacks = []
-    
-    for exploit in exploits:
-        param_perms = (permutations of assets with 
-                          length len(exploit.params))
-        for params in param_perms:
-            param_bindings = map with keys=exploit.params,
-                                      values=params
-            attacks.append( (exploit, param_bindings) )
-    return attacks
+def get_attack_bindings(assets, exploits): 
+ attacks = [] 
+ for exploit in exploits:
+  param_perms = (permutations of assets with 
+                    length len(exploit.params))
+  for params in param_perms:
+   param_bindings = map with keys=exploit.params,
+                             values=params
+   attacks.append( (exploit, param_bindings) )
+ return attacks
 \end{lstlisting}
 \label{fig:binding_computation_pc}
 \caption{Attack binding computation pseudocode}
@@ -122,30 +118,30 @@ Pseudocode for these two functions is provided in Fig.~\ref{fig:get_attacks_pc}.
 \begin{figure}
 \begin{lstlisting}
 def get_attacks(network_state, attack_bindings):
-    valid_attacks = []
-    
-    for attack in attack_bindings:
-        if validate_attack(network_state.factbase, attack):
-            valid_attacks.append(attack)
-    return valid_attacks
+ valid_attacks = []
+ 
+ for attack in attack_bindings:
+  if validate_attack(network_state.factbase, attack):
+   valid_attacks.append(attack)
+ return valid_attacks
 
 def validate_attack(factbase, attack):
-    # Recall: attack is of the form (exploit, binding map)
-    exploit = attack[0]
-    binding_dict = attack[1]
-    
-    for precondition in exploit.preconditions:
-        if precondition.type == 'quality':
-            if ('quality', binding_dict[precondition.asset], 
-                    precondition.name, 
-                    precondition.value) not in factbase:
-                return False
-        else if precondition.type == 'topology':
-            if ('topology', binding_dict[precondition.source], 
-                    binding_dict[precondition.dest],
-                    precondition.name) not in factbase:
-                return False
-    return True
+ # Recall: attack is of the form (exploit, binding map)
+ exploit = attack[0]
+ binding_dict = attack[1]
+ 
+ for precondition in exploit.preconditions:
+  if precondition.type == 'quality':
+   if ('quality', binding_dict[precondition.asset], 
+           precondition.name, 
+           precondition.value) not in factbase:
+       return False
+  else if precondition.type == 'topology':
+   if ('topology', binding_dict[precondition.source], 
+           binding_dict[precondition.dest],
+           precondition.name) not in factbase:
+    return False
+ return True
 \end{lstlisting}
 \label{fig:get_attacks_pc}
 \caption{Attack validation pseudocode}
@@ -169,47 +165,47 @@ network state data in a per-state map that is used only for quality lookups.
 \begin{lstlisting}
 def get_successor_state(network_state, attack):
 
-    successor_assets = deep copy of network_state.assets
-    successor_facts = deep copy of network_state.factbase
-    
-    # Recall: attack is of the form (exploit, binding map)
-    exploit = attack[0]
-    binding_dict = attack[1]
-    
-    for postcondition in exploit.postconditions:
-        if postcondition.operation == 'insert':
-            if postcondition.type == 'topology':
-                successor_facts.insert(('topology',
-                    binding_dict[postcondition.source],
-                    binding_dict[postcondition.dest],
-                    postcondition.name,
-                    value=postcondition.value)
-            else if postcondition.type == 'quality':
-                old_value = get_quality_value(binding_dict[postcondition.asset], 
-                                              postcondition.name)
-                successor_facts.remove(('quality',
-                                        binding_dict[postcondition.asset],
-                                        postcondition.name,
-                                        old_value))
-                successor_facts.insert(('quality',
-                                        binding_dict[postcondition.asset],
-                                        postcondition.name,
-                                        postcondition.value))
-        elif postcondition.operation == 'delete':
-            if postcondition.type == 'topology':
-                successor_facts.insert(('topology',
-                                        binding_dict[postcondition.source],
-                                        binding_dict[postcondition.dest],
-                                        postcondition.name))
-            elif postcondition.type == 'quality':
-                old_value = get_quality_value(binding_dict[postcondition.asset], 
-                                              postcondition.name)
-                successor_facts.remove(('quality',
-                                        binding_dict[postcondition.asset],
-                                        postcondition.name,
-                                        old_value))
-    return new network_state(assets=successor_assets,
-                             factbase=successor_facts)
+ successor_assets = deep copy of network_state.assets
+ successor_facts = deep copy of network_state.factbase
+ 
+ # Recall: attack is of the form (exploit, binding map)
+ exploit = attack[0]
+ binding_dict = attack[1]
+ 
+ for postcondition in exploit.postconditions:
+  if postcondition.operation == 'insert':
+   if postcondition.type == 'topology':
+    successor_facts.insert(('topology',
+        binding_dict[postcondition.source],
+        binding_dict[postcondition.dest],
+        postcondition.name,
+        value=postcondition.value)
+   else if postcondition.type == 'quality':
+    old_value = get_quality_value(binding_dict[postcondition.asset], 
+                                  postcondition.name)
+    successor_facts.remove(('quality',
+                            binding_dict[postcondition.asset],
+                            postcondition.name,
+                            old_value))
+    successor_facts.insert(('quality',
+                            binding_dict[postcondition.asset],
+                            postcondition.name,
+                            postcondition.value))
+  elif postcondition.operation == 'delete':
+   if postcondition.type == 'topology':
+    successor_facts.insert(('topology',
+                            binding_dict[postcondition.source],
+                            binding_dict[postcondition.dest],
+                            postcondition.name))
+   elif postcondition.type == 'quality':
+    old_value = get_quality_value(binding_dict[postcondition.asset], 
+                                  postcondition.name)
+    successor_facts.remove(('quality',
+                            binding_dict[postcondition.asset],
+                            postcondition.name,
+                            old_value))
+ return new network_state(assets=successor_assets,
+                          factbase=successor_facts)
 \end{lstlisting}
 \label{fig:get_succstate_pc}
 \caption{Successor state generation pseudocode}
@@ -244,32 +240,32 @@ Pseudocode for this process is provided in Fig.~\ref{fig:ag_generation_pc}.
 \begin{lstlisting}
 def generate_attack_graph(analysis_states, depth, attack_bindings,
                           attack_graph):
-    if len(analysis_states) == 0 or depth == 0:
-        return attack_graph
-    
-    # This will hold the new states added in this iteration:
-    successor_states = []
+ if len(analysis_states) == 0 or depth == 0:
+  return attack_graph
+ 
+ # This will hold the new states added in this iteration:
+ successor_states = []
 
-    # For each state to be processed for successors:
-    for analysis_state in analysis_states:
-        if analysis_state not in attack_graph:
-            attack_graph.add_node(analysis_state)
+ # For each state to be processed for successors:
+ for analysis_state in analysis_states:
+  if analysis_state not in attack_graph:
+   attack_graph.add_node(analysis_state)
 
-        # For each valid attack in that state:
-        for attack in get_attacks(analysis_state, attack_bindings):
-            successor_state = get_successor_state(analysis_state, attack,
-                                                  exploit_dict)
-            if successor_state == analysis_state:
-                continue
-                
-            if successor_state not in attack_graph:
-                successor_states.append(successor_state)
-                attack_graph.add_node(successor_state)
-            
-            attack_graph.add_edge(analysis_state, successor_state)
-            
-    return generate_attack_graph(successor_states, depth-1, attack_bindings,
-                                 attack_graph)
+  # For each valid attack in that state:
+  for attack in get_attacks(analysis_state, attack_bindings):
+   successor_state = get_successor_state(analysis_state, attack,
+                                         exploit_dict)
+   if successor_state == analysis_state:
+    continue
+       
+   if successor_state not in attack_graph:
+    successor_states.append(successor_state)
+    attack_graph.add_node(successor_state)
+   
+   attack_graph.add_edge(analysis_state, successor_state)
+      
+ return generate_attack_graph(successor_states, depth-1, attack_bindings,
+                              attack_graph)
 \end{lstlisting}
 \label{fig:ag_generation_pc}
 \caption{Attack graph generation pseudocode}
@@ -285,17 +281,17 @@ and the exploit patterns in Fig.~\ref{fig:ill_xp}.
 \begin{figure}
 \begin{lstlisting}
 network model = 
-    assets :
-        asset_1;
-        asset_2;
-        asset_3;
+  assets :
+    asset_1;
+    asset_2;
+    asset_3;
 
-    facts :
-        quality:asset_1,quality_1,value_1;
-        quality:asset_2,quality_1,value_2;
-        quality:asset_3,quality_1,value_1;
-        topology:asset_1,asset_2,topology_1;
-        topology:asset_3,asset_2,topology_1;
+  facts :
+    quality:asset_1,quality_1,value_1;
+    quality:asset_2,quality_1,value_2;
+    quality:asset_3,quality_1,value_1;
+    topology:asset_1,asset_2,topology_1;
+    topology:asset_3,asset_2,topology_1;
 .
 \end{lstlisting}
 \label{fig:ill_nm}
@@ -304,20 +300,20 @@ network model =
 \begin{figure}
 \begin{lstlisting}
 exploit exploit_1(asset_param_1,asset_param_2)=
-    preconditions:
-        quality:asset_param_1,quality_1,value_1;
-        topology:asset_param_1,asset_param_2,topology_1;
-    postconditions:
-        delete topology:asset_param_1,asset_param_2,topology_1;
-        insert topology:asset_param_2,asset_param_1,topology_1;
+  preconditions:
+    quality:asset_param_1,quality_1,value_1;
+    topology:asset_param_1,asset_param_2,topology_1;
+  postconditions:
+    delete topology:asset_param_1,asset_param_2,topology_1;
+    insert topology:asset_param_2,asset_param_1,topology_1;
 .
 
 exploit exploit_2(asset_param_1,asset_param_2)=
-    preconditions:
-        quality:asset_param_1,quality_1,value_2;
-        topology:asset_param_1,asset_param_2,topology_1;
-    postconditions:
-        insert quality:asset_param_2,quality_1,value_2;
+  preconditions:
+    quality:asset_param_1,quality_1,value_2;
+    topology:asset_param_1,asset_param_2,topology_1;
+  postconditions:
+    insert quality:asset_param_2,quality_1,value_2;
 .
 \end{lstlisting}
 \label{fig:ill_xp}
