@@ -159,8 +159,15 @@ be removed by the realization of an exploit without affecting its reverse.
 In preparation for the introduction of real-valued facts, the existing discrete
 type of qualities, henceforth called ``token valued'', are given a special
 assignment operator. Simply put, token values are assigned with the~\texttt{=}
-operator and tested with the~\texttt{=} and~\texttt{!=} operators.
-\TUsubsection{Host Denotation and Status Proprocessing}
+operator and tested with the~\texttt{=} and~\texttt{!=} operators. This
+enables a robust distinction between assignment operators and relational
+operators.
+
+Additionally, \texttt{delete} operations in postconditions take only a quality
+name, with no value required (eliminating the confusing possibility of a
+command to \texttt{delete quality:a,q!=5}, one of several deletion commands
+that has little meaning).
+\TUsubsection{Host Declaration and Status Proprocessing}
 To support the use of status properties of host assets, a set of shorthand
 syntax is now provided for denoting which assets represent hosts. In practice,
 this has been observed to be the majority of modeled assets, so the shorthand
@@ -182,6 +189,21 @@ postcondition is necessary, for example in the case of a denial of service
 attack bringing a host offline, the status property must be manually specified;
 this is not a significant burden, as this case arises considerably less
 frequently.
+\TUsubsection{Global and grouped exploits}
+For a variety of modeling tasks, it is convenient to cause an exploit to be
+fired on all possible bindings simultaneously or to synchronize two exploits'
+firing with one another. Two optional keywords are now permitted at the beginning
+of the exploit header for this purpose: \texttt{global} and \texttt{group()}.
+The \texttt{group} keyword takes a single argument.
+
+Their semantic behavior
+is as follows. When a global exploit is fired on one binding of assets, it will
+also be fired on all other assets for which a valid binding exists, and the
+corresponding state transition will be considered a single edge on the attack
+graph. When a group exploit is fired on a binding of assets, all other exploits
+denoted with the group keyword and the same group argument will also attempt
+to fire on the same asset binding. Obviously grouped exploits require the same
+number of parameters.
 \TUsubsection{Platform Properties}
 Platform facts are new types of facts introduced by this work. They use the
 specification used by MITRE's Common Platform Enumeration (CPE), a component
@@ -199,43 +221,9 @@ For example, to specify that a host is running Adobe Reader version 8.1, a
 platform fact named \texttt{cpe:/a:adobe:reader:8.1} would be used. Platforms
 are matched according to the algorithms provided in the CPE specification,
 permitting blank (wildcard) fields and the prefix property.
+\TUsection{Generation process changes}
+% TODO
 \TUsection{Examples}
 \TUsubsection{Illustrative}
-\begin{lstlisting}
-network model = 
-    assets :
-        @asset_1;
-        @asset_2;
-        @asset_3;
-
-    facts :
-        quality:asset_1,quality_1=value_1;
-        quality:asset_2,quality_1=value_2;        
-        quality:asset_3,quality_1=value_2;
-        topology:asset_1->asset_2,topology_1;
-        topology:asset_2<->asset_3,topology_2;
-.
-\end{lstlisting}
-
-\begin{lstlisting}
-exploit exploit_1(@asset_param_1,@asset_param_2)=
-    preconditions:
-        quality:asset_param_1,quality_1=value_1;
-        topology:asset_param_1->asset_param_2,topology_1;
-    postconditions:
-        delete topology:asset_param_1->asset_param_2,topology_1;
-        insert quality:asset_param_1,quality_1=value_2;
-.
-
-exploit exploit_2(@asset_param_1,@asset_param_2)=
-    preconditions:
-        quality:asset_param_1,quality_1=value_2;
-        quality:asset_param_2,quality_1=value_2;
-    postconditions:
-        insert topology:asset_param_1<->asset_param_2,topology_2;
-.
-\end{lstlisting}
 \TUsubsection{Blunderdome}
-\TUsubsection{Denial of Sleep}
-\TUsubsubsection{Insufficiencies}
 \TUsection{Analysis}

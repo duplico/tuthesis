@@ -257,7 +257,7 @@ most significantly, it captures the ways in which an attacker's actions interact
 depend upon each other.
 
 This threat-centric model is not necessarily the most useful for system stakeholders. It
-requires, in a sense, that one work backward from the attack to the system state
+requires that one work backward from the attack to the system state
 necessary to realize the attack. If, instead, an analyst desires to work from a system characterization
 and explore the attack space permitted by that system characterization, the attack tree framework
 must be in some sense turned upside down. 
@@ -295,31 +295,6 @@ This permits generation and analysis to take a
 more nuanced view of a network state, including reachability analysis to determine whether a
 given topology permits communication between two hosts~\cite{ingols2009modeling}. This approach
 is favored in the work of MIT Lincoln Laboratory and the University of California, Davis.
-\TUsubsubsection{Generation}
-Attack graph generation is the process of chaining exploits to enumerate the
-attack space~\cite{campbell2002modeling}~\cite{phillips1998graph}~\cite{sheyner2002automated}.
-Methods for generating attack graphs
-share a common general architecture among the modern
-methods that use preconditions and postconditions in exploit definitions,
-pictured in Fig. \ref{fig:generation}. The attack graph generation
-process combines network state and exploit patterns as input, applying exploit postconditions
-back onto the network state to generate its output of successor states.
-
-\begin{figure}
-\centering
-\begin{dot2tex}[options=-t raw --autosize]
-digraph G {
-    Generator [texlbl="Generation Engine", shape="rectangle"];
-    Exploits [texlbl="\begin{tabular}{c}Exploit Rules\\ (Generic transitions)\end{tabular}", shape="ellipse"];
-	State [texlbl="\begin{tabular}{c}Network State\\ (Facts)\end{tabular}", shape="ellipse"];
-	Exploits -> Generator [texlbl="\begin{tabular}{c}1a. Read exploit \\ preconditions\end{tabular}", label=" "];
-	State -> Generator [texlbl="\begin{tabular}{c}1b. Match preconditions \\ with network state\end{tabular}", label=" "];
-	Generator -> State [texlbl="\begin{tabular}{c}2. Apply new\\ network state\end{tabular}", label=" "];
-}
-\end{dot2tex}
-\caption{Attack graph generation process}
-\label{fig:generation}
-\end{figure}
 \TUsubsubsection{Research Directions}
 Research in attack graphs is spread throughout a variety of pathways. These include
 evaluating a network's security~\cite{ammann2002scalable}, specification of formal languages
@@ -329,7 +304,7 @@ and reachability analysis between hosts in a single network state~\cite{ingols20
 For a thorough literature review up to 2005 and more detailed discussion of popular research directions, 
 refer to the work of Lippmann and Ingols~\cite{lippmann2005annotated}.
 
-This work can be considered to fall into four broad categories, referenced
+Attack graph work can be considered to fall into four broad categories, referenced
 occasionally throughout this work by the following names.
 \begin{description}
 \item[Modeling] Attack graph modeling concerns the development of the underlying representation
@@ -361,7 +336,7 @@ on aggregating sufficiently similar states (which also touches visualization).
 
 %%%%%%%%%%%%%%%%%%
 
-\TUsection{Attack Graph Execution and Modeling}
+\TUsection{Attack Graph Generation and Modeling}
 This sections presents a version of the attack graph modeling framework specific
 to traditional information systems. The framework has a very permissive model that
 includes notions of assets, qualities, topologies. Assets represent potentially
@@ -374,18 +349,17 @@ state transitions.
 For the purposes of this work, an attack graph is comprised of the following components.
 \begin{description}
 	\item[Assets] Assets are the subjects in the attack graph formalism, mainly representing
-		attackable system components. For example, in a model of the RFID denial of sleep
-		attack, the assets are the RFID tags, the reader, the possible rogue reader,
-		and any hosts connected over the network with the RFID reader. Assets are specified
+		attackable system components. For example, an asset may represent a host
+        on a network, an attacker, or a critical document. Assets are specified
 		with unique names, and they are decorated with \emph{qualities} and \emph{topologies}.
 		Assets can also be used to model users and adversaries if it is necessary to give them
 		explicit properties. A model's collection of assets is fixed at definition time and
 		is not changed by state transitions.
 	\item[Qualities] Qualities represent properties of an asset, such as a software package or
-		version that is installed, whether it is in sleep mode or not, and so on. Qualities are
+		version that is installed, whether it is offline, online, or in sleep mode. Qualities are
 		can be considered a key/value pair, where both the key and the value are string tokens. For
 		example, the \texttt{host1} asset may have the quality \texttt{power} and the value \texttt{on}.
-		Together with topologies, qualities make up the collection of facts.
+		Together with topologies, qualities make up the network state's collection of facts.
 	\item[Topologies] Topologies represent relationships between two assets. These can be physical such
 		as denoting that a printer is plugged into a computer, logical such as denoting that one
 		host is accessible from another on an adjacent network, or more abstract such as a particular
@@ -413,7 +387,10 @@ The primitive domains are the most basic
 domains that describe the atomic units of
 the formalism: assets, properties (qualities), values (qualities), relationships (topologies),
 vulnerabilities (exploit pattern identifiers), and parameters (free asset variables in the attack
-patterns), and operations (used in postconditions representing insert or delete actions):
+patterns), and operations (used in postconditions representing insert or delete actions).
+See Fig.~\ref{fig:primitivedomains}.
+
+\begin{figure}
 \begin{align*}
     \mathcal{A} :& \text{assets} \\
     \mathcal{P} :& \text{properties (quality names)} \\
@@ -423,6 +400,9 @@ patterns), and operations (used in postconditions representing insert or delete 
     \mathcal{I} :& \text{parameters (free asset names)} \\
     \text{Op} =& \left\{\text{ins}, \text{del} \right\}
 \end{align*}
+\label{fig:primitivedomains}
+\caption{Attack graph primitive domains}
+\end{figure}
 
 \TUsubsubsection{Compound Domains}
 Compound domains comprise the fundamental concepts that are composed of combinations
@@ -479,14 +459,7 @@ by the~\texttt{=} symbol.
 
 The first component of the specification itself is an asset list.
 The asset list is a semicolon separated list of the names of network
-assets preceded by the word \texttt{assets} and a colon. For example:
-\begin{lstlisting}
-network model = 
-assets :
-asset_1;
-asset_2;
-asset_3;
-\end{lstlisting}
+assets preceded by the word \texttt{assets} and a colon.
 
 Following the asset list, the initial
 fact base is specified as a semicolon separated list of facts freceded by the 
@@ -498,18 +471,9 @@ word~\texttt{topology}, followed by a colon, followed by the names of the
 source asset, a comma, the name of the destination asset, then the name of 
 the topology. The fact listing, 
 and thus the network model specification, is concluded with a period. 
-For example:
-\begin{lstlisting}
-facts :
-	quality:asset_1,quality_1=value_1;
-	quality:asset_2,quality_1=value_2;
-	topology:asset_1,asset_2,topology_1;
-	topology:asset_2,asset_3,topology_2;
-    topology:asset_3,asset_2,topology_2;
-.
-\end{lstlisting}
+An example network model specification is found in Fig.~\ref{fig:nmspec}
 
-The completed version of this network model specification would be as follows.
+\begin{figure}
 \begin{lstlisting}
 network model = 
     assets :
@@ -518,47 +482,22 @@ network model =
     asset_3;
 
 facts :
-	quality:asset_1,quality_1=value_1;
-	quality:asset_2,quality_1=value_2;
+	quality:asset_1,quality_1,value_1;
+	quality:asset_2,quality_1,value_2;
 	topology:asset_1,asset_2,topology_1;
 	topology:asset_2,asset_3,topology_2;
     topology:asset_3,asset_2,topology_2;
 .
 \end{lstlisting}
+\label{fig:nmspec}
+\caption{Example background network model specification}
+\end{figure}
 \TUsubsection{Exploit Specification}
 Exploits are specified using a related scheme. An exploit pattern resembles a function
 and contains four parts: a header or signature, preconditions, postconditions, and a
-terminating period symbol.
+terminating period symbol. An example may be found in Fig.~\ref{fig:xpspec}.
 
-An exploit specification begins with the word \texttt{exploit} followed by a
-unique identifier to name the exploit pattern, an opening parenthesis, a comma separated
-list of parameter names (which are to be bound to assets), a closing parenthesis, and 
-the~\texttt{=} symbol. For example:
-\begin{lstlisting}
-exploit exploit_1(asset_param_1,asset_param_2)=
-\end{lstlisting}
-
-The preconditions list follows. It begins with the word \texttt{preconditions}, followed
-by a colon, followed by a semicolon separated sequence of facts, which adhere to the
-same grammar as the facts for network model specification. For example:
-\begin{lstlisting}
-preconditions:
-    quality:asset_param_1,quality_1,value_1;
-    topology:asset_param_1,asset_param_2,topology_1;
-\end{lstlisting}
-
-The postconditions list follows this. It begins with the word \texttt{postconditions},
-followed by a colon, followed by a semicolon separated sequence of operations. Operations
-consist of the word \texttt{insert} or \texttt{delete}, followed by a space, followed by
-a fact. For example:
-\begin{lstlisting}
-postconditions:
-    delete topology:asset_param_1,asset_param_2,topology_1;
-    insert quality:asset_param_1,quality_1,value_2;
-\end{lstlisting}
-
-The exploit pattern is terminated with a period character. The full example from this
-subsection would appear as follows.
+\begin{figure}
 \begin{lstlisting}
 exploit exploit_1(asset_param_1,asset_param_2)=
     preconditions:
@@ -569,6 +508,24 @@ exploit exploit_1(asset_param_1,asset_param_2)=
         insert quality:asset_param_1,quality_1,value_2;
 .
 \end{lstlisting}
+\label{fig:xpspec}
+\caption{Example background exploit pattern specification}
+\end{figure}
+
+An exploit specification begins with the word \texttt{exploit} followed by a
+unique identifier to name the exploit pattern, an opening parenthesis, a comma separated
+list of parameter names (which are to be bound to assets), a closing parenthesis, and 
+the~\texttt{=} symbol.
+
+The preconditions list follows. It begins with the word \texttt{preconditions}, followed
+by a colon, followed by a semicolon separated sequence of facts, which adhere to the
+same grammar as the facts for network model specification. 
+
+The postconditions list follows this. It begins with the word \texttt{postconditions},
+followed by a colon, followed by a semicolon separated sequence of operations. Operations
+consist of the word \texttt{insert} or \texttt{delete}, followed by a space, followed by
+a fact. The exploit pattern is terminated with a period character. Again, an
+example of this format is found in Fig.~\ref{xpspec}.
 
 Before continuing, a few words on the semantics of exploit processing may reduce
 the chance of confusion. The \texttt{insert} operation inserts a new rule in the
@@ -583,34 +540,41 @@ This thesis is primarily concerned with modeling attack graphs, but it is worth
 giving some consideration to the attack graph generation process used in its
 reference implementation.
 
-Currently attack graph generation proceeds according to a straightforward process
+Attack graph generation is the process of chaining exploits to enumerate the
+attack space~\cite{campbell2002modeling}~\cite{phillips1998graph}~\cite{sheyner2002automated}.
+Methods for generating attack graphs
+share a common general architecture among the modern
+methods that use preconditions and postconditions in exploit definitions,
+pictured in Fig. \ref{fig:generation}. The attack graph generation
+process combines network state and exploit patterns as input, applying exploit postconditions
+back onto the network state to generate its output of successor states.
+
+\begin{figure}
+\centering
+\begin{dot2tex}[options=-t raw --autosize]
+digraph G {
+    Generator [texlbl="Generation Engine", shape="rectangle"];
+    Exploits [texlbl="\begin{tabular}{c}Exploit Rules\\ (Generic transitions)\end{tabular}", shape="ellipse"];
+	State [texlbl="\begin{tabular}{c}Network State\\ (Facts)\end{tabular}", shape="ellipse"];
+	Exploits -> Generator [texlbl="\begin{tabular}{c}1a. Read exploit \\ preconditions\end{tabular}", label=" "];
+	State -> Generator [texlbl="\begin{tabular}{c}1b. Match preconditions \\ with network state\end{tabular}", label=" "];
+	Generator -> State [texlbl="\begin{tabular}{c}2. Apply new\\ network state\end{tabular}", label=" "];
+}
+\end{dot2tex}
+\caption{Attack graph generation process}
+\label{fig:generation}
+\end{figure}
+
+This thesis employs this method, which proceeds 
 depending upon a monotonicity assumption: the attacker never moves ``backwards''.
 That is, once an exploit is realized, even though the attacker may have the capability
-of undoing it, he does not do so.
-
-A maximum attack graph ``depth'' (really maximum permitted shortest path length from the
-node representing the initial state)
-is selected before generation begins. Then the program initializes a graph with a single
-node (the starting state), and places the starting state and the node identifier in a
-lookup table. Then it begins to recurse using the depth value, which is initialized to
-the value selected by the user; and a list of available 
-states (nodes), which is initialized to contain a single entry: the starting state.
-
-The generation process is as follows. For each available state, a list of all valid 
-attacks (or bound exploit patterns) is generated. 
-Every permutation of every possible exploit realization from the state according to
-the pattern preconditions is included in this attack list. The attacks' postcondition
-operations are applied to the network state in order to generate (or load from memory, if
-the new fact base has already been generated by another attack on this or another state)
-successor states and add directed edges from the state in question to its successor state.
-If the successor state is newly generated, it is added to a successor state list.
-The generation function is called again, with the depth value decremented and the successor
-state list passed as the new list of available states. Execution ceases when the depth
-value reaches zero or the list of available states is empty.
+of undoing it, he does not do so. A maximum attack graph ``depth'' (really 
+maximum permitted shortest path length from the
+node representing the initial state) is selected before generation begins, and
+no self loops are permitted, though loops in general are allowed.
 
 As this work's specific algorithm is a contribution of this thesis, it is given
 more detailed treatment in chapter 3.
-
 
 \TUsection{Case Studies}
 Throughout this thesis, two examples of attacks are used to illustrate the models presented.
@@ -636,7 +600,7 @@ Fig.~\ref{fig:blunderarch}~\cite{louthan2010blunderdome}.
 \end{figure}
 
 \begin{table}
-\centering
+\centering % TODO: fix the layout of this table.
 \begin{tabular}{p{1.5in}|p{1in}|p{1in}|p{1in}}
 Stage & Precondition	&	Attack	&	Postcondition \\ \hline \hline
 Gain remote user access & SSH public key available (given); weak public key 
@@ -654,8 +618,8 @@ on the ISO 18000-7 RFID tag inventory system similar to those used by the United
 Department of Defense for shipping tracking and the Department of Energy for tracking spent
 fuel containers~\cite{chen2009radiofrequency}. The attack
 is similar to the ones described by Buennemeyer, \emph{et al.}~\cite{buennemeyer2006battery},
-and is of a newly distinguished class of attacks sometimes termed denial of sleep
-attacks~\cite{brownfield2005wireless}~\cite{raymond2009effects}.
+and is of a newly distinguished class of attacks sometimes termed \emph{denial
+of sleep attacks}~\cite{brownfield2005wireless}~\cite{raymond2009effects}.
 
 These ISO 18000-7 RFID tags are active and battery powered; they are used for inventory and
 shipment tracking. In particular, they are used by the Department of Energy to monitor
