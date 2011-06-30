@@ -140,7 +140,6 @@ This strategy may have a place in modeling some systems but falls short of the g
 modeling complex, interdependent networks of hybrid systems with more conventional computer networks.
 \begin{figure}
 \centering
-% TODO Shrink:
 \begin{dot2tex}[options=-t raw --autosize]
 digraph G {
     rankdir=TD;
@@ -200,6 +199,17 @@ digraph G {
 \caption{Example hybrid link automaton}
 \label{fig:linkmachine}
 \end{figure}
+
+Other alternatives may exist in the realm of hybrid systems research. Although
+the hybrid automata is the gold standard for modeling hybrid systems, other
+frameworks do exist such as hybrid process algebras~\cite{cuijpers2005hybrid}~\cite{bergstra2005process},
+an entirely symbolic system with many of the same properties and drawbacks as
+hybrid automata. Hybrid Petri nets are similar to hybrid automata in that they
+pair a standard discrete model (in this case, Petri nets instead of finite state
+automata) with differential equations to model the continuous side of the
+system or process~\cite{champagnat1998petri}. Because Petri nets are designed to
+model distributed systems, hybrid Petri nets may hold some promise, though they
+are not the topic of this thesis.
 \TUsection{Attack Graphs}
 \TUsubsection{Introduction}
 An attack graph is one of several related formalisms that utilize graph theory to
