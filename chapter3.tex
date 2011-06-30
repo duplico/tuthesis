@@ -49,8 +49,8 @@ type network_state:
     assets : set of strings;
     factbase : set of fact-tuples;
 \end{lstlisting}
-\label{fig:netstate_pc}
 \caption{Network state datatype pseudocode}
+\label{fig:netstate_pc}
 \end{figure}
 
 \TUsubsection{Exploit parsing}
@@ -72,8 +72,8 @@ type postcondition:
     operation : 'insert' or 'delete';
     fact : fact-tuple
 \end{lstlisting}
-\label{fig:exploit_pc}
 \caption{Exploit datatype pseudocode}
+\label{fig:exploit_pc}
 \end{figure}
 
 \TUsubsection{Attack binding computation}
@@ -98,8 +98,8 @@ def get_attack_bindings(assets, exploits):
    attacks.append( (exploit, param_bindings) )
  return attacks
 \end{lstlisting}
-\label{fig:binding_computation_pc}
 \caption{Attack binding computation pseudocode}
+\label{fig:binding_computation_pc}
 \end{figure}
 
 \TUsubsection{Attack validation}
@@ -143,8 +143,8 @@ def validate_attack(factbase, attack):
     return False
  return True
 \end{lstlisting}
-\label{fig:get_attacks_pc}
 \caption{Attack validation pseudocode}
+\label{fig:get_attacks_pc}
 \end{figure}
 \TUsubsection{Successor state computation}
 Successor state computation is the second component of attack application;
@@ -207,8 +207,8 @@ def get_successor_state(network_state, attack):
  return new network_state(assets=successor_assets,
                           factbase=successor_facts)
 \end{lstlisting}
-\label{fig:get_succstate_pc}
 \caption{Successor state generation pseudocode}
+\label{fig:get_succstate_pc}
 \end{figure}
 \TUsubsection{Attack graph generation}
 Here the attack graph generation process begins in earnest. A recursive process,
@@ -267,8 +267,8 @@ def generate_attack_graph(analysis_states, depth, attack_bindings,
  return generate_attack_graph(successor_states, depth-1, attack_bindings,
                               attack_graph)
 \end{lstlisting}
-\label{fig:ag_generation_pc}
 \caption{Attack graph generation pseudocode}
+\label{fig:ag_generation_pc}
 \end{figure}
 \TUsection{Example}
 In order to aid understanding the generation process, this section demonstrates a
@@ -294,6 +294,7 @@ network model =
     topology:asset_3,asset_2,topology_1;
 .
 \end{lstlisting}
+\caption{Illustrative example network model}
 \label{fig:ill_nm}
 \end{figure}
 
@@ -316,6 +317,7 @@ exploit exploit_2(asset_param_1,asset_param_2)=
     insert quality:asset_param_2,quality_1,value_2;
 .
 \end{lstlisting}
+\caption{Illustrative example exploit patterns}
 \label{fig:ill_xp}
 \end{figure}
 
@@ -331,6 +333,7 @@ are labeled with the topology name they represent.
 
 \begin{figure}
 \includegraphics[width=4in]{ag_illustrative_simple/nm_state0}
+\caption{State 0 of the illustrative discrete example}
 \label{fig:ill_topology_0}
 \end{figure}
 
