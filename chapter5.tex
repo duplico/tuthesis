@@ -11,22 +11,121 @@ have turned out to be more onerous than desired. However, since the use of
 attack graphs on hybrid systems with real valued properties is quite nascent, 
 being introduced in this thesis, there is a significant contribution to their
 study even in introducing less than ideal solutions to their inherent problems.
+
+The ultimate goal of the specification of a hybrid attack graph for cyber
+physical systems modeling must be the creation of a formalism capable of
+modeling a network containing both traditional information systems (as
+existing attack graph incarnations can) and hybrid systems (i.e. those that
+can be modeled as hybrid automata). Therefore, the ideal hybrid attack graph
+should be able to define systems (assets) that have some equivalence to a
+hybrid automaton.
+
+This thesis presents two novel attack graph elements with this requirement
+in mind. The first is the ability to give both qualities and topologies
+real (continuous domain) values, and correspondingly to permit exploits to
+test and operate on these values in the expected ways with a full selection of
+real-valued relational and assignment operators. These new types of facts are 
+at the heart of this new model. 
+
+The second contribution is modeling the progression
+of time; as implemented in this thesis, time progression does not require any
+new syntactic elements as compared to those provided in the discrete 
+enhancements in the preceding chapter; those syntactic elements, however, are
+used in a novel fashion to specify the
+time evolution of quality and topology values.
+
+The remainder of this chapter is structured as follows. First, the new
+syntactic elements are introduced. Second, the semantic changes that these new
+elements impose upon the generation process are described. Then the current
+convention for the specification of time evolution is described. Next, 
+time state aggregation, an enhancement for cognitive scalability purposes,
+is introduced along with its semantic changes to the generation process.
+Finally, a pair of examples are provided illustrating the ability of the
+hybrid attack graph not only to capture cyber physical systems, but also to
+enhanc the modeling capabilities of attack graphs for traditional information
+systems.
 \TUsection{Definition of New Syntax}
-\TUsubsection{The update operator}
 \TUsubsection{Terminology}
-\TUsubsection{Topology values}
+First and foremost, a discussion of the new terminology involved in the
+transition to hybrid attack graphs is required. This is mostly concerned with
+facts, as the movement to hybrid attack graphs is mostly concerned with changes
+to the fact system.
+
+Until now, qualities have had only string type values, and
+topologies have had no values at all. In this chapter, that changes. Although
+there will always remain a need for these discrete valued qualities and name
+only topologies, there is also a need for qualities with 
+continuous, numerical values. The introduction of a second type of quality
+value is somewhat less jarring, however, than that of topologies with
+values.
+
+As the hybrid attack graph introduced by this thesis is a strict superset
+of the University of Tulsa style discrete attack graph, the existing style
+of quality and topology facts remains valid in the new language and therefore
+must be distinguished from the new type of fact in some way. The discrete
+only facts, therefore, are called \emph{token valued} (or \emph{token facts},
+whereas the new continuous facts are called \emph{real valued} (or \emph{real
+facts}).
+
+% Additionally, later in this chapter another class of fact is introduced: a
+% rate fact, which is a special case of a real fact. Rate facts are not a new
+% syntactic element but are rather specified by convention and invoked by the
+% new timing capability. TODO: this isn't true; add to future work.
 \TUsubsection{Operators}
+At the heart of the hybrid attack graph lies the new real facts. Their
+existence marks the introduction of a true type system to the attack graph
+model, which must be dealt with in some fashion. Furthermore, these new real 
+facts demand new real operators to deal with them.
+
+Typing is dealt with by ensuring that the sets of both assignment and relational
+operators used for token and real facts are disjoint. While token qualities are
+assigned with the \texttt{=} operator, real facts (both quality and topology)
+are assigned using a \texttt{:=} operator.
+
+As for the relational operators, token facts are tested using \texttt{=} 
+and \texttt{!==}. The relational operators permitted for real facts (both
+quality and topology) are different: \texttt{==}, \texttt{>}, \texttt{>=},
+\texttt{<=}, and \texttt{<>} (for not equal).
+
+Finally, because a principal property of real values is their suitability for
+arithmetic, a number of new operators are introduced for use in exploit
+postconditions only, with their straightforward C-like meanings: \texttt{:=},
+\texttt{+=}, \texttt{-=}, \texttt{*=}, and \texttt{/=}. Note that currently
+these operators take only literal reals as their second operand; variables
+are not permitted.
+\TUsubsection{Topology values}
+Due to the usefulness of permitting real valued relationships between assets,
+be they physical such as distance, or IT related like latency or signal
+strength, in hybrid attack graphs, real topologies may take values. The
+syntax for this is identical to the existing token topology syntax, except
+followed by an operator and a number.
+
+% TODO initial factbase
+% TODO exploit precondition
+% TODO exploit postcondition
+\TUsubsection{The update operation}
+Because of the semantics of binary arithmetic operators such as \texttt{+=},
+the term \texttt{insert} in postcondition operations is somewhat psychologically
+unsatisfactory. Therefore, it is now aliased to \texttt{update}, a semantically
+identical operation. In spite of its apparent redundancy, it provides for
+future expansion as well as readability.
 \TUsubsection{Restrictions}
-\TUsection{Implementation challenges}
+% TODO what does "restrictions" mean? wtf was I going to write here?
+\TUsection{Generation process changes}
 \TUsubsection{Topologies}
 \TUsubsection{Matching}
 \TUsubsection{Updating}
 \TUsubsection{Variable updates}
 \TUsection{Time}
-\TUsubsection{Rate qualities}
 \TUsubsection{Time exploits}
+Exploits are not just for adversary actions anymore. Time is implemented using
+a single group of global exploits, each of which increments a class of assets'
+position in time depending upon its particular state. The global status
+causes them to trigger on all assets simultaneously, while the grouping causes
+all the time exploits to trigger in concert with each other.
+
+
 \TUsection{Time State Aggregation}
-\TUsection{Modeling challenges}
 \TUsection{Examples}
 \TUsubsection{Blunderdome}
 \TUsubsubsection{Added Capability}

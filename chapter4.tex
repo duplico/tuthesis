@@ -222,10 +222,15 @@ platform fact named \texttt{cpe:/a:adobe:reader:8.1} would be used. Platforms
 are matched according to the algorithms provided in the CPE specification,
 permitting blank (wildcard) fields and the prefix property.
 \TUsection{Generation process changes}
+These new capabilities require some adjustments to the semantic behavior of the
+attack graph generation generation process. Happily, the attack graph generation
+algorithm itself is largely unchanged, although more sophisticated fact handling
+is required. This section discusses briefly these changes.
 \TUsubsection{Bidirectional topologies}
 \TUsubsection{Platform properties}
 \TUsubsection{Precondition matching}
 % due to introduction of #!, prepare for real values
+\TUsubsection{Global and grouped exploits}
 \TUsection{Examples}
 \TUsubsection{Illustrative}
 \TUsubsection{Blunderdome}
