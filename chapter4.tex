@@ -1,8 +1,3 @@
-% Add:
-%%%
-% New symbols for quality assignments
-%%%
-% platform properties
 \TUchapter{Discrete Extensions}
 \TUsection{Introduction}
 For various reasons, the adaptation of the attack graph formalism described in
@@ -195,6 +190,7 @@ fired on all possible bindings simultaneously or to synchronize two exploits'
 firing with one another. Two optional keywords are now permitted at the beginning
 of the exploit header for this purpose: \texttt{global} and \texttt{group()}.
 The \texttt{group} keyword takes a single argument.
+# NO CONSISTENCY CHECKING (race conditions possible).
 
 Their semantic behavior
 is as follows. When a global exploit is fired on one binding of assets, it will
@@ -204,13 +200,28 @@ graph. When a group exploit is fired on a binding of assets, all other exploits
 denoted with the group keyword and the same group argument will also attempt
 to fire on the same asset binding. Obviously grouped exploits require the same
 number of parameters.
+
+Two \emph{caveats} are required with global and grouped exploits. The first
+is that a group may not mix global and nonglobal exploits. If mixing of
+nonglobals and globals were permitted within a single group, the result would
+be behavior that is compatible with neither the concept of a group or the
+concept of a global (a group requires that each single attack binding be made
+to all exploits within the group, whereas a global requires every possible
+attack binding be made simultaneously).
+
+The second warning is that no consistency checking is specified. That is,
+preconditions are checked against a predecessor state, then postconditions
+are applied in arbitrary order. This means that if multiple attacks in a group
+modify the same facts on the same assets, indeterminate behavior or race
+conditions may occur. For this reason, it is advised to group exploits that
+will not do this.
 \TUsubsection{Platform Properties}
 Platform facts are new types of facts introduced by this work. They use the
 specification used by MITRE's Common Platform Enumeration (CPE), a component
 of the Security Content Automation Protocol (SCAP). (TODO: CITE)
 They can specify operating systems, applications, and hardware.
 
-A CPE platform fact simply a valid CPE URI tied to an asset. The CPE URI is
+A CPE platform fact is simply a valid CPE URI tied to an asset. The CPE URI is
 comprised of the word \texttt{cpe}, a 
 colon, then a slash, then the part type (\texttt{o} for operating system, \texttt{a} for
 application, or \texttt{h} for hardware), then a colon, then the CPE vendor abbreviation,
@@ -224,14 +235,223 @@ permitting blank (wildcard) fields and the prefix property.
 \TUsection{Generation process changes}
 These new capabilities require some adjustments to the semantic behavior of the
 attack graph generation generation process. Happily, the attack graph generation
-algorithm itself is largely unchanged, although more sophisticated fact handling
+algorithm itself is unchanged, although more sophisticated fact handling,
+both for precondition processing and postcondition application,
 is required. This section discusses briefly these changes.
 \TUsubsection{Bidirectional topologies}
+The addition of bidirectional topologies introduces a new requirement for
+parsing or precondition/postcondition analysis: that single bidirectional 
+topology facts be decomposed into pairs
+of unidirectional topologies. In the reference implementation, this is done
+not in the initial parse itself but rather in the portion of fact handling that
+converts the raw parsed data structure into the generator's internal fact
+data structure.
 \TUsubsection{Platform properties}
+The new platform properties introduce another set of conditional logic to
+precondition processing. Since there are no operators, precondition matching
+is relatively simple syntactically; however, because of the prefix
+property of its encoding and the ability to have blank ``wildcard'' fields
+in the matched CPE, a matching algorithm must be used. The matching algorithm
+in the reference implementation is based on the one provided in the CPE
+specification. %TODO: CITE
+The pseudocode for this thesis's platform fact matching functionality is
+provided in Fig.~\cite{fig:cpe_match_pc}
+
+\begin{figure}
+\begin{lstlisting}
+def has_platform(factbase_platformlist, platform):
+ # Platform is a tuple
+ for cpe in factbase_platformlist:
+  if len(cpe) >= len(platform):
+      ret = False
+      for components in zip(cpe, platform):
+       if components[0] == components[1] or platform == '':
+        ret = True
+       else:
+        ret = False
+        break
+       if ret:
+        return cpe # Return the matched platform
+ return False
+\end{lstlisting}
+\caption{Platform fact matching pseudocode}
+\label{fig:cpe_match_pc}
+\end{figure}
 \TUsubsection{Precondition matching}
-% due to introduction of #!, prepare for real values
+On the other hand, precondition matching for quality facts must become
+somewhat more complicated with the addition of the not-equal relational
+operator. Merely building a fact and checking for its membership in the
+factbase data structure is no longer sufficient. 
+
+Although the not-equal relational operator \emph{could} be implemented
+similarly to the equality relational operator, by building a fact from the
+given name and value and checking for its exclusion from (instead of inclusion 
+in) the factbase, a more advanced fact checking method is provided in order 
+to ease the transition to permitting real values for qualities.
+
+The fact base data structure is updated to include maps from quality names to
+quality values in order to facilitate lookup. Although this results in an
+increased storage requirement, it prevents costly lookups in the existing
+factbase data structure. Fact checking, then, is done using these simple hash
+table lookups and comparisons. A new specification for the network state
+data structure reflecting these changes is provided in 
+Fig.~\ref{fig:netstate_map_pc}.
+
+\begin{figure}
+\begin{lstlisting}
+fact-tuple = ('quality', asset, name, value) or
+           = ('topology', source, dest, name) or
+           = ('platform', platform_part, ..., language)
+
+type network_state:
+    assets : set of strings;
+    factbase : set of fact-tuples;
+    qualities : map (keys=assets, vals=map(keys=quality_name,
+                                           vals=quality_value))
+\end{lstlisting}
+\caption{Updated discrete network state datatype pseudocode}
+\label{fig:netstate_map_pc}
+\end{figure}
+
 \TUsubsection{Global and grouped exploits}
+The simultaneous application of global and grouped exploits is also
+fairly straightforward. Postcondition processing requires only the minor change
+of permitting a list of postconditions to be processed sequentially (which
+really only requires the union of their postcondition facts) using the
+existing postcondition application method.
+
+Precondition processing, however, insofar as it causes the selection and
+grouping of attacks that should be fed into the generation function,
+each producing its own state transition, is somewhat more commplex. To permit
+a reader to follow along, pseudocode is provided in 
+Fig.~\ref{fig:cpe_glgr_precondition_pc}.
+
+The reference implementation uses a two-pass algorithm over the set of
+valid attacks (selected using the existing precondition processing method).
+First, a pair of mappings are instanciated to store the attack data structures.
+The group mapping is keyed on group names and has as values more maps, which are
+themselves keyed to tuples of assets (representing bindings values) and valued
+with specific attack bindings. The global mapping is keyed on exploit name
+and also valued with attack bindings.
+
+The first step is to loop through all the attacks. Attacks are placed in the
+appropriate map (or maps) depending on their group (and binding) and global
+configuration.
+
+The second step is to use these maps to generate groupings of attacks, which
+are to be applied by the postconditions processor in the same manner as single
+attacks themselves are applied. First, groups and bindings are looped through.
+A grouping is generated for each group name. If the members of the group are
+from global exploits, their attacks are loaded from the global map (and
+subsequently removed from the global map). Otherwise, they are added individually
+from the group/binding map.
+
+Once each exploit's attacks are added according to a particular binding, either
+(if the group is nonglobal) the next binding is consulted, which begins a new
+attack aggregation, or execution breaks to the next group (if the group is
+global, meaning that every possible binding has already been added). Finally,
+each remaining global exploit (that is, the ungrouped global attacks) is
+added as its own attack grouping. The groupings are returned.
+\begin{figure}
+\begin{lstlisting}
+    group_dict = map keyed on group name
+    globl_dict = map keyed on exploit name
+    
+    for attack in attacks:
+        group = attack.group
+        globl = attack.globl
+        binding = attack.binding.values # asset list
+
+        if group:
+            if group in group_dict and binding in group_dict[group]:
+                group_dict[group][binding].append(attack)
+            elif group in group_dict:
+                group_dict[group][binding] = [attack,]
+            else:
+                group_dict[group] = new map{binding : [attack,]}
+        if globl:
+            if attack.name in globl_dict:
+                globl_dict[attack.name].append(attack)
+            else:
+                globl_dict[attack.name] = [attack,]
+    
+    agg_attacks = [] # Aggregated attacks
+
+    for group_id in group_dict:
+        group_attacks = group_dict[group_id]
+        for binding in group_attacks:
+            agg_group = []
+            group_is_global = None
+            for attack in group_attacks[binding]:
+                if attack.name in globl_dict: # group and global
+                    agg_group += globl_dict[attack[0]]
+                    remove globl_dict[attack[0]]
+                    if group_is_global == False: error
+                    group_is_global = True
+                else: # Not global
+                    if group_is_global == True: error
+                    group_is_global = False
+                    agg_group.add(attack)
+            agg_attacks.append(agg_group)
+            if group_is_global:
+                # Global status already covers all bindings
+                break
+    for globl_attack in globl_dict: # ungrouped globals
+        agg_attacks.append(list(globl_dict[globl_attack]))
+\end{lstlisting}
+\caption{Group and global attack selection}
+\label{fig:cpe_glgr_precondition_pc}
+\end{figure}
 \TUsection{Examples}
 \TUsubsection{Illustrative}
+For completeness, this section provides the updated syntax's version of
+Chapter 3's example, which is otherwise unchanged. The network model is
+provided in Fig.~\ref{fig:ill_updated_nm}, and the exploit patterns are
+provided in Fig.~\ref{fig:ill_updated_xp}.
+
+\begin{figure}
+\begin{lstlisting}
+network model = 
+  assets :
+    asset_1;
+    asset_2;
+    asset_3;
+
+  facts :
+    quality:asset_1,quality_1=value_1;
+    quality:asset_2,quality_1=value_2;
+    quality:asset_3,quality_1=value_1;
+    topology:asset_1->asset_2,topology_1;
+    topology:asset_3->asset_2,topology_1;
+.
+\end{lstlisting}
+\caption{Illustrative example network model in the new format}
+\label{fig:ill_updated_nm}
+\end{figure}
+
+\begin{figure}
+\begin{lstlisting}
+exploit exploit_1(asset_param_1,asset_param_2)=
+  preconditions:
+    quality:asset_param_1,quality_1=value_1;
+    topology:asset_param_1->asset_param_2,topology_1;
+  postconditions:
+    delete topology:asset_param_1->asset_param_2,topology_1;
+    insert topology:asset_param_2->asset_param_1,topology_1;
+.
+
+exploit exploit_2(asset_param_1,asset_param_2)=
+  preconditions:
+    quality:asset_param_1,quality_1=value_2;
+    topology:asset_param_1->asset_param_2,topology_1;
+  postconditions:
+    insert quality:asset_param_2,quality_1=value_2;
+.
+\end{lstlisting}
+\caption{Illustrative example exploit patterns in the new format}
+\label{fig:ill_updated_xp}
+\end{figure}
+
 \TUsubsection{Blunderdome}
-\TUsection{Analysis}
+This section presents an attack graph model of the Blunderdome exercise
+described in section~\ref{sec:blunderdome}.
