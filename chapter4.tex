@@ -455,3 +455,125 @@ exploit exploit_2(asset_param_1,asset_param_2)=
 \TUsubsection{Blunderdome}
 This section presents an attack graph model of the Blunderdome exercise
 described in section~\ref{sec:blunderdome}.
+\TUsubsubsection{Network Model}
+The network model for the Blunderdome exercise follows in a straightforward
+from the network diagram (Fig.~\ref{fig:blunderarch}), including each network
+element as an asset, plus an asset for the attacker. The facts include the
+attacker's grade on the web server, the SSH and HTTP connection topologies,
+and platform facts for the relevant applications and operating systems subject
+to exploitation: OpenSSL, Linux, and the Blunderdome specific grades tracking
+application (which receives a dummy CPE entry).
+
+\begin{figure}
+\begin{lstlisting}
+network model = 
+ assets :
+  attacker;
+  login_server;
+  web_server;
+    
+ facts :
+  quality:web_server,grade=F;
+  topology:attacker->login_server,connected_network_ssh;
+  topology:login_server->web_server,connected_network_http;
+  platform:login_server,cpe:/a:openssl_project:openssl:0.9.8c-1;
+  platform:login_server,cpe:/o:linux:kernel:2.6.24;
+  platform:web_server,cpe:/a:isec:blundergrades;
+.
+\end{lstlisting}
+\caption{Blunderdome network model}
+\label{fig:blunder_nm}
+\end{figure}
+
+In this model there are three access topologies in play: access_admin,
+access_user, and access_other_blunderdome, representing access to the 
+Blunderdome web application.
+\TUsubsubsection{Exploit Patterns}
+The exploits in the Blunderdome exercise, provided in Fig.~\ref{fig:blunder_xp}
+fall into three categories. The first is the set of straightforward CVE-based exploits
+that could easily be extracted automatically from the National Vulnerability
+Database. The second is the hand generated exploits like blunder_sqli, which
+has hand-generated custom behavior to modify the attacker's grade. The third
+are the exploit patterns that do not necessarily represent abuse cases 
+but rather state transitions due to attacker actions.
+
+\begin{figure}
+\begin{lstlisting}
+exploit CVE_2008_0166_1(a, l)=
+ preconditions:
+  platform:l,cpe:/a:openssl_project:openssl:0.9.8c-1;
+  topology:a->l,connected_network_ssh;
+ postconditions:
+  insert topology:a->l,access_user;
+.
+
+exploit CVE_2008_0600_1(a,l)=
+ preconditions:
+  topology:a->l,access_user;
+  platform:l,cpe:/o:linux:kernel:2.6.24;
+ postconditions:
+  insert topology:a->l,access_admin;
+.
+
+exploit blunder_sqli(a,w)=
+ preconditions:
+  platform:w,cpe:/a:isec:blundergrades;
+  topology:a->w,access_other_blunderdome;
+ postconditions:
+  insert quality:w,grade=A;
+.
+
+exploit ssh_http_tunnel(a,l,w)=
+ preconditions:
+  topology:a->l,connected_network_ssh;
+  topology:a->l,access_user;
+  topology:l->w,connected_network_http;
+ postconditions:
+  insert topology:a->w,connected_network_http;
+.
+
+exploit blunder_login(a,l,w)=
+ preconditions:
+  topology:a->w,connected_network_http;
+  topology:a->l,access_admin;
+ postconditions:
+  insert topology:a->w,access_other_blunderdome;
+.
+\end{lstlisting}
+\caption{Blunderdome exploit patterns}
+\label{fig:blunder_xp}
+\end{figure}
+
+The first two exploits could be automatically generated from the CVE entries
+in the NVD. The third was hand generated due to its being an internal custom 
+piece of software without NVD entries and the complex behavior the exploit must
+encode.
+
+The next exploit, ssh_http_tunnel, represents a common idiom involved in
+attack chaining: using access to one machine to create new access topologies
+to adjacent machines. The last exploit, blunder_login, represents access to
+the Blunderdome credentials due to administrative access to the login
+server. This could also be modeled using an additional asset representing the
+credentials, but for simplicity the method with fewer assets is demonstrated.
+
+The resulting attack graph is provided in Fig.~\ref{fig:blunder_ag}; the
+graphical representation of the starting state and ending state in 
+Fig.~\ref{fig:blunder_s0} and Fig.~\ref{fig:blunder_s6}.
+
+\begin{figure}
+\includegraphics[width=5in]{ag_blunderdome/ag_depth5}
+\caption{Blunderdome exercise attack graph}
+\label{fig:blunder_ag}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=5in]{ag_blunderdome/nm_state0}
+\caption{Blunderdome exercise starting state}
+\label{fig:blunder_s0}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=5in]{ag_blunderdome/nm_state6}
+\caption{Blunderdome exercise ending state}
+\label{fig:blunder_s6}
+\end{figure}
