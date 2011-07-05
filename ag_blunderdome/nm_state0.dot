@@ -1,0 +1,7 @@
+digraph G {
+attacker [label="0.attacker"];
+web_server [label="0.web_server\ntoken:grade=F\ncpe:/a:isec:blundergrades"];
+login_server [label="0.login_server\ncpe:/o:linux:kernel:2.6.24\ncpe:/a:openssl_project:openssl:0.9.8c-1"];
+attacker -> login_server  [key=0, label=connected_network_ssh];
+login_server -> web_server  [key=0, label=connected_network_http];
+}
