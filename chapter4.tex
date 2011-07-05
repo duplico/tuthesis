@@ -190,7 +190,6 @@ fired on all possible bindings simultaneously or to synchronize two exploits'
 firing with one another. Two optional keywords are now permitted at the beginning
 of the exploit header for this purpose: \texttt{global} and \texttt{group()}.
 The \texttt{group} keyword takes a single argument.
-# NO CONSISTENCY CHECKING (race conditions possible).
 
 Their semantic behavior
 is as follows. When a global exploit is fired on one binding of assets, it will
@@ -485,14 +484,14 @@ network model =
 \label{fig:blunder_nm}
 \end{figure}
 
-In this model there are three access topologies in play: access_admin,
-access_user, and access_other_blunderdome, representing access to the 
+In this model there are three access topologies in play: access\_admin,
+access\_user, and access\_other\_blunderdome, representing access to the 
 Blunderdome web application.
 \TUsubsubsection{Exploit Patterns}
 The exploits in the Blunderdome exercise, provided in Fig.~\ref{fig:blunder_xp}
 fall into three categories. The first is the set of straightforward CVE-based exploits
 that could easily be extracted automatically from the National Vulnerability
-Database. The second is the hand generated exploits like blunder_sqli, which
+Database. The second is the hand generated exploits like blunder\_sqli, which
 has hand-generated custom behavior to modify the attacker's grade. The third
 are the exploit patterns that do not necessarily represent abuse cases 
 but rather state transitions due to attacker actions.
@@ -549,9 +548,9 @@ in the NVD. The third was hand generated due to its being an internal custom
 piece of software without NVD entries and the complex behavior the exploit must
 encode.
 
-The next exploit, ssh_http_tunnel, represents a common idiom involved in
+The next exploit, ssh\_http\_tunnel, represents a common idiom involved in
 attack chaining: using access to one machine to create new access topologies
-to adjacent machines. The last exploit, blunder_login, represents access to
+to adjacent machines. The last exploit, blunder\_login, represents access to
 the Blunderdome credentials due to administrative access to the login
 server. This could also be modeled using an additional asset representing the
 credentials, but for simplicity the method with fewer assets is demonstrated.
