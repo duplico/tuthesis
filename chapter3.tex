@@ -264,7 +264,8 @@ def generate_attack_graph(analysis_states, depth, attack_bindings,
    
    attack_graph.add_edge(analysis_state, successor_state)
       
- return generate_attack_graph(successor_states, depth-1, attack_bindings,
+ return generate_attack_graph(successor_states, depth-1,
+                              attack_bindings,
                               attack_graph)
 \end{lstlisting}
 \caption{Attack graph generation pseudocode}
