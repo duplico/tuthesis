@@ -83,7 +83,7 @@ assigned with the \texttt{=} operator, real facts (both quality and topology)
 are assigned using a \texttt{:=} operator.
 
 As for the relational operators, token facts are tested using \texttt{=} 
-and \texttt{!==}. The relational operators permitted for real facts (both
+and \texttt{!=}. The relational operators permitted for real facts (both
 quality and topology) are different: \texttt{==}, \texttt{>}, \texttt{>=},
 \texttt{<=}, and \texttt{<>} (for not equal).
 
@@ -100,32 +100,192 @@ strength, in hybrid attack graphs, real topologies may take values. The
 syntax for this is identical to the existing token topology syntax, except
 followed by an operator and a number.
 
-% TODO initial factbase
-% TODO exploit precondition
-% TODO exploit postcondition
 \TUsubsection{The update operation}
 Because of the semantics of binary arithmetic operators such as \texttt{+=},
 the term \texttt{insert} in postcondition operations is somewhat psychologically
 unsatisfactory. Therefore, it is now aliased to \texttt{update}, a semantically
 identical operation. In spite of its apparent redundancy, it provides for
 future expansion as well as readability.
-\TUsubsection{Restrictions}
-% TODO what does "restrictions" mean? wtf was I going to write here?
-\TUsection{Generation process changes}
-\TUsubsection{Topologies}
-\TUsubsection{Matching}
-\TUsubsection{Updating}
-\TUsubsection{Variable updates}
 \TUsection{Time}
+A fundamental requirement of modeling hybrid systems is the progression of
+time, as the most interesting and distinctive properties of physical processes
+are their evolution over time. Another goal is to avoid introducing additional
+special cases. To that end, this section introduces a method for handling time
+using only previously introduced attack graph functionality.
 \TUsubsection{Time exploits}
 Exploits are not just for adversary actions anymore. Time is implemented using
 a single group of global exploits, each of which increments a class of assets'
 position in time depending upon its particular state. The global status
 causes them to trigger on all assets simultaneously, while the grouping causes
-all the time exploits to trigger in concert with each other.
+all the time exploits to trigger in concert with each other. As before,
+an important requirement is that the sets of facts affected by time exploits
+be disjoint over all grouped time exploits to avoid indeterminate behavior.
 
+A selection of time exploits is provided in Fig.~\ref{fig:illustrative_time_xp}
+of time exploits that might simplistically model
+a car driving away from a wall unless somehow compromised by an attacker,
+who causes the car to drive toward the wall at a constant rate.
 
-\TUsection{Time State Aggregation}
+\begin{figure}
+\begin{lstlisting}
+global group(time) exploit car_depart(c,w)=
+    preconditions:
+        platform:c,cpe:/h:honda:civic;
+        quality:c,compromised != true;
+        quality:w,wall=true;
+    postconditions:
+        update topology:c<->w,distance+=25;
+.
+
+global group(time) exploit car_approach(c,w)=
+    preconditions:
+        platform:c,cpe:/h:honda:civic;
+        quality:c,compromised=true;
+        quality:w,wall=true;
+    postconditions:
+        update topology:c<->w,distance-=50;
+.
+\end{lstlisting}
+\caption{Updated hybrid network state datatype pseudocode}
+\label{fig:illustrative_time_xp}
+\end{figure}
+
+This method of modeling time requires time to be quantized and time stepping
+behavior to be used.
+
+\TUsubsection{Time State Aggregation}
+\TUsection{Generation process changes}
+\TUsubsection{Topologies}
+Even without concern for real types, the move to hybrid attack graphs 
+introduces a new, more basic requirement for the processing of preconditions
+and postconditions: topology values. The topology fact handling is updated
+to parallel the handling of qualities. In fact, in the hybrid attack graph
+reference implementation, every topology, even token topologies, have values:
+real topologies have floating-point values, and token topologies have boolean
+values.
+
+This results in the new factbase data structure provided in 
+Fig.~\ref{fig:netstate_map_hybrid_pc}. The intermediate hash map representation
+for topology facts is keyed on source asset names, with values that are
+themselves hash maps keyed on destination asset names, with values that are
+\emph{also} hash maps keyed on topology names, with values storing topology
+values. Again, for token topologies, this value is always the boolean true.
+
+\begin{figure}
+\begin{lstlisting}
+fact-tuple = ('quality', asset, name, value) or
+           = ('topology', source, dest, name) or
+           = ('platform', platform_part, ..., language)
+
+type network_state:
+    assets : set of strings;
+    factbase : set of fact-tuples;
+    qualities : map (keys=assets, vals=map(keys=quality_name,
+                                           vals=quality_value))
+    topologies : map (keys=src_assets, vals=map(keys=dest_asset,
+                                                vals=map(keys=topology,
+                                                         vals=values))
+\end{lstlisting}
+\caption{Updated hybrid network state datatype pseudocode}
+\label{fig:netstate_map_hybrid_pc}
+\end{figure}
+\TUsubsection{Matching}
+With the introduction of new relational operators, significantly more advanced
+precondition processing than strict matching. Happily, the changes introduced
+in the previous chapter anticipated this, so the heavy lifting required for
+fact value lookup already exists. All that remains is the mapping of the
+parsed attack graph operators onto implementation operators in the generation
+software.
+
+As illustrated in the pseudocode in Fig.~\ref{fig:hybrid-matching}, this is
+done in the reference implementation by maintaining a map from the string
+representations of the relational operators onto boolean functions that apply
+them. The new relational operator precondition processing does not impact the
+remainder of the generation process.
+
+\begin{figure}
+\begin{lstlisting}
+RELOPS = map(keys = ('==', '<>', '>=', '<=', '<', '>', '=', '!=',
+             vals = (associated functions))
+             
+def matches_topology(source, dest, name, value=True, op='==',
+                     check_reverse=False):
+    if source in factbase.topologies and
+      dest in factbase.topologies[source] and
+      name in factbase.topologies[source][dest]:
+        my_value = factbase.topologies[source][dest][name]
+    else:
+        return False
+
+    if type(my_value) != type(value):
+        Error: Cannot match token values with real values.
+    
+    if check_reverse:
+        return RELOPS[op](my_value, value) and
+               matches_topology(dest, source, name, value=value,
+                                op=op)
+    else:
+        return RELOPS[op](my_value, value)
+
+def matches_quality(asset, name, value, op='=='):
+    if asset in factbase.qualities and
+      name in factbase.qualities[asset]:
+        my_value = factbase.qualities[asset][name]
+    else:
+        return False
+    
+    if type(my_value) != type(value):
+        Error: Cannot match token values with real values.
+    
+    return RELOPS[op](my_value, value)
+\end{lstlisting}
+\caption{Hybrid precondition matching pseudocode}
+\label{fig:hybrid-matching}
+\end{figure}
+\TUsubsection{Updating}
+The hybrid attack graph includes assignment operators that require new
+postcondition handling that closely parallels their precondition handling.
+The same issues are addressed here; value querying and setting is already
+handled, but operator selection is not. The pseudocode for this process is
+presented in Fig.~\ref{fig:hybrid-postcondition}.
+
+\begin{figure}
+\begin{lstlisting}
+ASSIGNOPS = map(keys=('+=', '-=', '*=','/=', ':=', '='),
+                vals=(associated functions)
+
+def set_quality(factbase, asset, name, value, op='='):
+    if asset in factbase.qualities and
+      name in factbase.qualities[asset]:
+        my_value = factbase.qualities[asset][name]
+    else:
+        my_value = 0
+    new_value = ASSIGNOPS[op](my_value, value)
+    update factbase with:
+        factbase.qualities[asset][name] = new_value
+
+def set_topology(factbase, source, dest, name, value=True, op=None):
+    if not op: # Token
+        update factbase with:
+            factbase.topologies[source][dest][name] = value
+    else: # Real
+        if source in factbase.topologies and
+          dest in factbase.topologies[source] and
+          name in factbase.topologies[source][dest]:
+            my_value = self.assets[source].get_topology(dest, name)
+        else:
+            my_value = 0
+        new_value = ASSIGNOPS[op](my_value, new_value)
+        update factbase with:
+        factbase.qualities[source][dest][name] = new_value
+\end{lstlisting}
+\caption{Hybrid postcondition application pseudocode}
+\label{fig:hybrid-postcondition}
+\end{figure}
+\TUsubsection{Variable updates}
+TODO: what does this mean?
+\TUsubsection{Time state aggregation}
+
 \TUsection{Examples}
 \TUsubsection{Blunderdome}
 \TUsubsubsection{Added Capability}
