@@ -1,0 +1,17 @@
+network model = 
+    assets :
+        reader;
+        tag1;
+    
+    facts :
+        platform:tag1,cpe:/h:ieee18000-7:tag;
+        quality:tag1,mode=wake; # test
+        quality:tag1,status=up;
+        quality:tag1,battery:=10000;
+        quality:tag1,timeout:=30;
+        
+        quality:reader,clock:=0;
+        quality:reader,rogue=false;
+        platform:reader,cpe:/h:ieee18000-7:reader;
+        quality:reader,status=up;
+.
