@@ -133,6 +133,7 @@ global group(time) exploit car_depart(c,w)=
         platform:c,cpe:/h:honda:civic;
         quality:c,compromised != true;
         quality:w,wall=true;
+        quality:c,status=up;
     postconditions:
         update topology:c<->w,distance+=25;
 .
@@ -142,8 +143,22 @@ global group(time) exploit car_approach(c,w)=
         platform:c,cpe:/h:honda:civic;
         quality:c,compromised=true;
         quality:w,wall=true;
+        quality:c,status=up;
+        topology:c<->w,distance>25;
     postconditions:
-        update topology:c<->w,distance-=50;
+        update topology:c<->w,distance-=25;
+.
+
+global group(time) exploit car_crash(c,w)=
+    preconditions:
+        platform:c,cpe:/h:honda:civic;
+        quality:c,compromised=true;
+        quality:w,wall=true;
+        quality:c,status=up;
+        topology:c<->w,distance<=25;
+    postconditions:
+        update topology:c<->w,distance:=0;
+        update quality:c,status=down;
 .
 \end{lstlisting}
 \caption{Updated hybrid network state datatype pseudocode}
@@ -153,7 +168,6 @@ global group(time) exploit car_approach(c,w)=
 This method of modeling time requires time to be quantized and time stepping
 behavior to be used.
 
-\TUsubsection{Time State Aggregation}
 \TUsection{Generation process changes}
 \TUsubsection{Topologies}
 Even without concern for real types, the move to hybrid attack graphs 
@@ -282,10 +296,6 @@ def set_topology(factbase, source, dest, name, value=True, op=None):
 \caption{Hybrid postcondition application pseudocode}
 \label{fig:hybrid-postcondition}
 \end{figure}
-\TUsubsection{Variable updates}
-TODO: what does this mean?
-\TUsubsection{Time state aggregation}
-
 \TUsection{Examples}
 \TUsubsection{Blunderdome}
 \TUsubsubsection{Added Capability}
