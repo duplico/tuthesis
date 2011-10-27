@@ -1,0 +1,7 @@
+digraph G {
+attacker [label="32.attacker"];
+tag0 [label="32.tag0\nreal:power=30.0\ntoken:mode=sleep\ntoken:status=up\ncpe:/h::Tag"];
+reader [label="32.reader\ntoken:status=up\ncpe:/h::VulnerableReader"];
+attacker -> reader  [key=0, label=connected_network];
+reader -> tag0  [key=0, label=connected_rfid];
+}
