@@ -1,17 +1,21 @@
 network model = 
     assets :
+        attacker;
         reader;
-        tag1;
+        tag0;
     
     facts :
-        platform:tag1,cpe:/h:ieee18000-7:tag;
-        quality:tag1,mode=wake; # test
-        quality:tag1,status=up;
-        quality:tag1,battery:=10000;
-        quality:tag1,timeout:=30;
-        
-        quality:reader,clock:=0;
-        quality:reader,rogue=false;
-        platform:reader,cpe:/h:ieee18000-7:reader;
+        # Reader:
+        platform:reader,cpe:/h::VulnerableReader;
         quality:reader,status=up;
+        
+        # Tag:
+        platform:tag0,cpe:/h::Tag;
+        quality:tag0,status=up;
+        quality:tag0,power:=100;
+        quality:tag0,mode=sleep;
+        
+        # Topologies:
+        topology:attacker -> reader,connected_network;
+        topology:reader -> tag0,connected_rfid;
 .
