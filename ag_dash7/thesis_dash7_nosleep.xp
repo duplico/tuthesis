@@ -32,15 +32,15 @@ global group(time) exploit wake_power_dec(t)=
         update quality:t,power-=25;
 .
 
-global group(time) exploit sleep_power_dec(t)=
-    preconditions:
-        platform:t,cpe:/h::Tag;
-        quality:t,mode=sleep;
-        quality:t,status=up;
-        quality:t,power>10;
-    postconditions:
-        update quality:t,power-=10;
-.
+#global group(time) exploit sleep_power_dec(t)=
+#    preconditions:
+#        platform:t,cpe:/h::Tag;
+#        quality:t,mode=sleep;
+#        quality:t,status=up;
+#        quality:t,power>10;
+#    postconditions:
+#        update quality:t,power-=10;
+#.
 
 global group(time) exploit wake_power_die(t)=
     preconditions:
@@ -53,13 +53,13 @@ global group(time) exploit wake_power_die(t)=
         update quality:t,status=down;
 .
 
-global group(time) exploit sleep_power_die(t)=
-    preconditions:
-        platform:t,cpe:/h::Tag;
-        quality:t,mode=sleep;
-        quality:t,status=up;
-        quality:t,power<=11;
-    postconditions:
-        update quality:t,power:=0;
-        update quality:t,status=down;
-.
+#global group(time) exploit sleep_power_die(t)=
+#    preconditions:
+#        platform:t,cpe:/h::Tag;
+#        quality:t,mode=sleep;
+#        quality:t,status=up;
+#        quality:t,power<=11;
+#    postconditions:
+#        update quality:t,power:=0;
+#        update quality:t,status=down;
+#.
