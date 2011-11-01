@@ -31,7 +31,7 @@ background on a particularly relevent modeling framework for hybrid systems call
 hybrid automaton, which is used in this thesis as the standard benchmark against which to
 compare hybrid modeling techniques.
 \TUsubsection{Definition}
-A newer, better term for the systems investigated in this thesis is \emph{cyber physical systems}
+A newer term for the systems investigated in this thesis is \emph{cyber physical systems}
  (CPS).
 Put simply, a cyber physical system is a networked hybrid system: a networked computer system that is 
 tightly coupled to the physical world.
@@ -59,29 +59,38 @@ version of the formalism described in 1996 by Henzinger~\cite{henzinger1996theor
 reader interested in more than a superficial understanding is referred. 
 
 Formally,
-a hybrid automaton $H$ is made up of a set of real-valued state variables, their first derivatives,
-a set of operational modes and switches between the modes, and predicates attached to those modes and
-switches describing the operation of the system in those modes and the discrete transitions between
-them. One can think of a hybrid automaton as a pairing of a finite state machine whose states (called
-modes) and transitions (called switches) denote the discrete-domain behavior of the hybrid system, with
-a set of differential equations attached to each mode, which govern its continuous-domain behavior. Switches
-may also be labeled in order to permit synchronization across composed hybrid automata.
+a hybrid automaton $H$ is made up of a set of real-valued state variables, 
+their first derivatives, a set of operational modes and switches between the 
+modes, predicates describing continuous evolution over time, and guards on the
+switches.
 
-Modes may be decorated with invariant conditions (which state whether the system is allowed to be in that mode),
-flow conditions (which state how the continuous domain state variables are permitted to evolve while in that
-mode), and initial conditions (which state under which, if any, conditions the automaton may begin its operation
-with that mode). Switches are decorated with jump conditions, which serve as guards on the switch determining
-both (1) when the switch is allowed to be taken, and (2) the discrete changes in state variables due to that
+One can think of a hybrid automaton as a pairing of a finite state machine 
+whose states (called modes) and transitions (called switches) denote the 
+discrete-domain behavior of the hybrid system, while differential equations 
+govern its continuous-domain behavior.
+
+Modes may be decorated with invariant conditions (which state whether the 
+system is allowed to be in that mode), flow conditions (which state how the 
+continuous domain state variables are permitted to evolve while in that
+mode), and initial conditions (which state under which, if any, conditions the 
+automaton may begin its operation with that mode). Switches are decorated with 
+jump conditions, which serve as guards on the switch determining
+both (1) when the switch is allowed to be taken, and (2) the discrete changes 
+in state variables due to that
 switch's activation.
 
-A simple example of a hybrid automaton is given in Fig.~\ref{fig:thermostat}, which models a simple
+A simple example of a hybrid automaton is given in Fig.~\ref{fig:thermostat}, 
+which models a simple
 heater thermostat~\cite{henzinger1996theory}. The vertices in the automaton represent 
 its operating modes, and the edges represent its control
-switches. In the ``Off'' mode, the temperature (given by $x$) must be greater than or equal to 18, and
-its first derivative with respect to time (denoted $\dot{x}$) is $-0.1x$, which represents a cooling of
-the environment. When the temperature is strictly less than 19, the switch from off to on is available (but
-not mandatory until the off mode's invariant condition $x \geq 18$ ceases to be satisfied.) The switch from
-on to off behaves similarly.
+switches. In the ``Off'' mode, the temperature (given by $x$) must be greater 
+than or equal to 18, and
+its first derivative with respect to time (denoted $\dot{x}$) is $-0.1x$, which 
+represents a cooling of
+the environment. When the temperature is strictly less than 19, the switch from
+off to on is available (but
+not mandatory until the off mode's invariant condition $x \geq 18$ ceases to 
+be satisfied.) The switch from on to off behaves similarly.
 
 \begin{figure}
 \centering
@@ -108,9 +117,8 @@ digraph G {
 \label{fig:thermostat}
 \end{figure}
 
-The hybrid automaton model is sufficiently rich to capture many hybrid systems. 
 \TUsubsubsection{Shortcomings}
-There are some problems with the hybrid automaton model. A hybrid automaton is not guaranteed to
+A hybrid automaton is not guaranteed to
 have a valid execution, and computing whether it does or not is non-trivial~\cite{lygeros1999existence}.
 Model checking has been developed for only some subclasses of 
 automata~\cite{henzinger1997hytech}~\cite{frehse2005phaver}, and many desirable
@@ -130,14 +138,36 @@ powerful hybrid I/O automaton~\cite{lynch1996hybrid}~\cite{lynch2001hybrid}, its
 timed I/O automaton~\cite{kaynar2010theory}, and also in the PHAVer model 
 checker~\cite{frehse2005phaver}.
 
-The work of this thesis is also something of an outgrowth from an instance of this strategy in
-which prototypical ``hybrid link automata'' were developed to model explicit communication channels.
-An example of the cognitive scalability issues inherent with this design is given in Fig.~\ref{fig:linkmachine},
-a considered ``hybrid link automaton'' prototype modeling
-a link on which messages may be dropped, injected, or delayed, and on which rudimentary mutual
-exclusion of messages is enforced.
-This strategy may have a place in modeling some systems but falls short of the goal of 
-modeling complex, interdependent networks of hybrid systems with more conventional computer networks.
+The work of this thesis is also something of an outgrowth from an instance of 
+this strategy in which prototypical ``hybrid link automata'' were developed to 
+model explicit communication channels. An example of the cognitive scalability 
+issues inherent with this design is given in Fig.~\ref{fig:linkmachine},
+a considered ``hybrid link automaton'' prototype. This models a link between two
+unseen hybrid automata called $S$ (the message source) and $D$ (the message
+destination). The link is named $\lambda$, and the message is denoted with 
+$\mu$. The idle state represents no message on the wire.
+The link exhibits the following behaviors:
+
+\begin{description}
+\item[Messaging] The messages in the automaton are encoded as either
+    ``source : link : message'' for a message incoming to the link, or
+    ``link : destination : message'' for outgoing. These are actually hybrid
+    automata events, which are used with its composition facility to simulate
+    messaging.
+\item[Unreliable delivery] The unguarded switch from the transmit to idle mode
+    permits transition back to idle without the actual emission of a message.
+\item[Message injection] The unguarded switch from Idle to Transmit permits a
+    message to transmit without being received.
+\item[Latency] The clock ($C_{\lambda\mu}$, which increments at a rate 
+    $\dot{C}_{\lambda\mu}$) permits a certain waiting period between entry to
+    the Transmit mode and actual transmission of the message.
+\item[Rudimentary mutual exclusion] The Wait mode permits only a single
+    message to be on the wire at a time.
+\end{description}
+
+This strategy may have a place in modeling some systems but falls short of 
+the goal of  modeling complex, interdependent networks of hybrid systems 
+with more conventional computer networks---it is simply too low level.
 \begin{figure}
 \centering
 \begin{dot2tex}[options=-t raw --autosize]
@@ -200,9 +230,9 @@ digraph G {
 \label{fig:linkmachine}
 \end{figure}
 
-Other alternatives may exist in the realm of hybrid systems research. Although
-the hybrid automata is the gold standard for modeling hybrid systems, other
-frameworks do exist such as hybrid process algebras~\cite{cuijpers2005hybrid}~\cite{bergstra2005process},
+Although the hybrid automaton is the gold standard for modeling hybrid systems, 
+other frameworks do exist such as hybrid process 
+algebras~\cite{cuijpers2005hybrid}~\cite{bergstra2005process},
 an entirely symbolic system with many of the same properties and drawbacks as
 hybrid automata. Hybrid Petri nets are similar to hybrid automata in that they
 pair a standard discrete model (in this case, Petri nets instead of finite state
@@ -210,7 +240,7 @@ automata) with differential equations to model the continuous side of the
 system or process~\cite{champagnat1998petri}. Because Petri nets are designed to
 model distributed systems, hybrid Petri nets may hold some promise, though they
 are not the topic of this thesis.
-\TUsection{Attack Graphs}
+\TUsection{Attack Trees and Graphs}
 \TUsubsection{Introduction}
 An attack graph is one of several related formalisms that utilize graph theory to
 model the state space of computer systems attacks. Perhaps they are best introduced
@@ -250,7 +280,7 @@ digraph G {
 \end{figure}
 
 There are a few features of this modeling method to note. It is goal oriented, meaning that
-the consequences of the attack are known, and the goal is to ennumerate and and analyze the
+the consequences of the attack are known, and the goal is to enumerate and and analyze the
 means by which those consequences could be reached. It is, as an attack model, agnostic to the
 underlying system model which makes it difficult to generate automatically. Finally, and perhaps
 most significantly, it captures the ways in which an attacker's actions interact and 
@@ -264,29 +294,33 @@ must be in some sense turned upside down.
 Attack graphs do exactly that.
 \TUsubsection{Attack Graphs}
 \TUsubsubsection{Introduction}
-In contrast to attack trees, attack graphs permit a topology-aware exploratory analysis of
-the state space of a system. It is a graph theoretic model in which vertices represent individual
-system states, and edges represent state transitions caused by an adversary. The concept as
-introduced in 1998 included notions of generalized attack patterns to be bound to state transitions;
-network elements and their individual configurations; network topology (three characteristics common
-to all current attack graph iterations); a notion of the attacker's capabilities, and edge weights
-representing likelihood~\cite{phillips1998graph}. A similar structure called a privilege graph was
-introduced in 1994~\cite{dacier1994privilege}.
+In contrast to attack trees, attack graphs permit a topology-aware exploratory 
+analysis of the state space of a system. It is a graph theoretic model in which 
+vertices represent individual system states, and edges represent state 
+transitions caused by an adversary. The concept as originally introduced 
+includes notions of generalized attack patterns to be bound to state 
+transitions; network elements and their individual configurations; network 
+topology (three characteristics common to all current attack graph iterations); 
+a notion of the attacker's capabilities, and edge weights representing 
+likelihood~\cite{phillips1998graph}. A similar structure called a privilege 
+graph was introduced around the same time~\cite{dacier1994privilege}.
 
 Most approaches to attack graph modeling represent exploits (attack patterns) using
-preconditions and postconditions~\cite{lippmann2005annotated} since this was suggested in about 2000~\cite{templeton2001requires}. Exploits are chained together by matching preconditions in a state node's
-underlying system model and applying their postconditions to generate a successor state.
+preconditions and postconditions~\cite{lippmann2005annotated, 
+templeton2001requires}. Exploits are chained together by matching preconditions
+in a state node's underlying system model and applying their postconditions to 
+generate a successor state.
 \TUsubsubsection{Model Types}
 The modeling substrates of attack graphs can be broadly separated into two schools of
 thought, separated by the philosophy that guides the representation of the underlying
 network model over which network states and transitions are computer.
 
 A specification of an underlying network model may be done with only very loose
-restrictions, allowing arbitrary keywords as named qualities and topoligies of network objects.
-This thesis employs this method. It is also favored in the work of George Mason 
-University~\cite{ammann2002scalable}~\cite{wang2006minimum}. It has the advantage of
-permitting more straightforward adaptation into the continuous domain, which is the reason
-it is favored by this work. 
+restrictions, allowing arbitrary keywords as named qualities and topoligies of 
+network objects, as is favored in the work of George Mason 
+University~\cite{ammann2002scalable}~\cite{wang2006minimum}.
+This thesis employs this method, permitting more straightforward adaptation 
+into the continuous domain.
 
 An alternate specification method is much more restricted, confining the modeler to
 certain sets of terms that may, for example, impose explicit computer networking 
@@ -325,9 +359,8 @@ occasionally throughout this work by the following names.
 	steps in a meaningful fashion.
 \end{description}
 
-Its goal being to introduce an architecture for modeling hybrid systems with
-attack graphs, this thesis is mainly concerned with the modeling stage. However, 
-some amount of work is included in the generation stage, particularly
+This thesis is mainly concerned with the modeling stage. Some amount of work
+is included in the generation stage, particularly
 dealing with the progression of time; consideration is also given to analysis, 
 particularly on identifying failure states and
 on aggregating sufficiently similar states (which also touches visualization).
@@ -337,7 +370,7 @@ on aggregating sufficiently similar states (which also touches visualization).
 %%%%%%%%%%%%%%%%%%
 
 \TUsection{Attack Graph Generation and Modeling}
-This sections presents a version of the attack graph modeling framework specific
+This section presents a version of the attack graph modeling framework specific
 to traditional information systems. The framework has a very permissive model that
 includes notions of assets, qualities, topologies. Assets represent potentially
 attackable system components; qualities assign an arbitrary string value to a named
@@ -346,7 +379,7 @@ connection between them. Exploit patterns with preconditions and postconditions 
 to free variables that can be bound at generation time to assets serve to describe potential
 state transitions.
 \TUsubsection{Intuitive Definition}
-For the purposes of this work, an attack graph is comprised of the following components.
+An attack graph is comprised of the following components.
 \begin{description}
 	\item[Assets] Assets are the subjects in the attack graph formalism, mainly representing
 		attackable system components. For example, an asset may represent a host
@@ -359,7 +392,6 @@ For the purposes of this work, an attack graph is comprised of the following com
 		version that is installed, whether it is offline, online, or in sleep mode. Qualities are
 		can be considered a key/value pair, where both the key and the value are string tokens. For
 		example, the \texttt{host1} asset may have the quality \texttt{power} and the value \texttt{on}.
-		Together with topologies, qualities make up the network state's collection of facts.
 	\item[Topologies] Topologies represent relationships between two assets. These can be physical such
 		as denoting that a printer is plugged into a computer, logical such as denoting that one
 		host is accessible from another on an adjacent network, or more abstract such as a particular
@@ -451,27 +483,13 @@ preceding intuitive definition, for instance.
 \TUsubsection{Network Model Specification}
 The attack graph execution model expanded upon by this thesis does 
 not use this formal notation to represent system elements, instead favoring a 
-more user friendly specification language. This section describes that 
-specification language and the generation process. % Todo: name it? :)
-A network model specification consists of a list of assets and an initial fact base 
-(list of qualities and topologies). It begins with the phrase \texttt{network model}, followed
-by the~\texttt{=} symbol. 
+more user friendly specification language. 
 
-The first component of the specification itself is an asset list.
-The asset list is a semicolon separated list of the names of network
-assets preceded by the word \texttt{assets} and a colon.
-
-Following the asset list, the initial
-fact base is specified as a semicolon separated list of facts freceded by the 
-word \texttt{facts} and a colon. Facts may occur in any order. Qualities are 
-specified by the word \texttt{quality}, followed by a colon, followed by the 
-asset in question, a comma, then the name of the quality, then a comma, 
-then the value of the quality. Topologies are specified by the 
-word~\texttt{topology}, followed by a colon, followed by the names of the 
-source asset, a comma, the name of the destination asset, then the name of 
-the topology. The fact listing, 
-and thus the network model specification, is concluded with a period. 
-An example network model specification is found in Fig.~\ref{fig:nmspec}
+The first component of the specification itself is an asset list. Following the
+asset list, the initial
+fact base is specified as a semicolon separated list of qualities and 
+topologies. An example network model specification is found in 
+Fig.~\ref{fig:nmspec}.
 
 \begin{figure}
 \begin{lstlisting}
@@ -512,42 +530,21 @@ exploit exploit_1(asset_param_1,asset_param_2)=
 \label{fig:xpspec}
 \end{figure}
 
-An exploit specification begins with the word \texttt{exploit} followed by a
-unique identifier to name the exploit pattern, an opening parenthesis, a comma separated
-list of parameter names (which are to be bound to assets), a closing parenthesis, and 
-the~\texttt{=} symbol.
-
-The preconditions list follows. It begins with the word \texttt{preconditions}, followed
-by a colon, followed by a semicolon separated sequence of facts, which adhere to the
-same grammar as the facts for network model specification. 
-
-The postconditions list follows this. It begins with the word \texttt{postconditions},
-followed by a colon, followed by a semicolon separated sequence of operations. Operations
-consist of the word \texttt{insert} or \texttt{delete}, followed by a space, followed by
-a fact. The exploit pattern is terminated with a period character. Again, an
-example of this format is found in Fig.~\ref{fig:xpspec}.
-
-Before continuing, a few words on the semantics of exploit processing may reduce
-the chance of confusion. The \texttt{insert} operation inserts a new rule in the
-fact base, which has the effect of replacing any previous rule with which it
-conflicts. For example, the insertion of \texttt{value\_2} as the value of the quality
-\texttt{quality\_1} in the example exploit \texttt{exploit\_1} would replace the
-existing value of \texttt{value\_1} specified in the preconditions; no ambiguity
-is introduced. The same is true of topologies.
+Exploit patterns resemble functions whose bodies are lists of preconditions,
+which are identical in form to the facts in the network model (except that their
+assets are free rather than bound) and postconditions, which are simply
+deletions or insertions (with overwrite semantics) of facts.
 
 \TUsubsection{Generation Process}
-This thesis is primarily concerned with modeling attack graphs, but it is worth
-giving some consideration to the attack graph generation process used in its
-reference implementation.
-
 Attack graph generation is the process of chaining exploits to enumerate the
 attack space~\cite{campbell2002modeling}~\cite{phillips1998graph}~\cite{sheyner2002automated}.
 Methods for generating attack graphs
 share a common general architecture among the modern
 methods that use preconditions and postconditions in exploit definitions,
 pictured in Fig. \ref{fig:generation}. The attack graph generation
-process combines network state and exploit patterns as input, applying exploit postconditions
-back onto the network state to generate its output of successor states.
+process combines network state and exploit patterns as input, applying exploit 
+postconditions back onto the network state to generate its output of successor 
+states.
 
 \begin{figure}
 \centering
@@ -565,7 +562,7 @@ digraph G {
 \label{fig:generation}
 \end{figure}
 
-This thesis employs this method, which proceeds 
+This method (used in this thesis as well), proceeds
 depending upon a monotonicity assumption: the attacker never moves ``backwards''.
 That is, once an exploit is realized, even though the attacker may have the capability
 of undoing it, he does not do so. A maximum attack graph ``depth'' (really 
@@ -579,15 +576,15 @@ more detailed treatment in chapter 3.
 \TUsection{Case Studies}
 Throughout this thesis, two examples of attacks are used to illustrate the models presented.
 The first is on a traditional information system, based upon an offensive educational exercise
-deployed at the University of Tulsa in 2008 involving several chained attacks. The second is the 
+deployed at the University of Tulsa involving several chained attacks. The second is the 
 denial of service through battery exhaustion of a simple
 cyber-physical system of active radio frequency identification (RFID) tags and readers.
 \TUsubsection{Blunderdome}
 \label{sec:blunderdome}
 The first case study is an attack on a simulated educational network deployed as part of a
-security engineering course in 2008. Dubbed the Blunderdome, it featured a firewalled network of
+security engineering course. Dubbed the Blunderdome, it featured a firewalled network of
 two hosts available per attacker. See Table \ref{table:blundertasks} for a listing of the stages and
-their preconditions and results. The attacker was required to log into a login server by cracking
+their preconditions and results. The attacker was required to log into a server by cracking
 its weak SSH key (due to an operating system vulnerability), execute an elevation of privilege (due
 to a Linux kernel vulnerability), log into the web server, and execute a SQL injection attack to
 change a simulated grade. The architecture from the exercise is provided in 
@@ -614,6 +611,7 @@ Change grade & Address and credentials for web service & Execute SQL injection &
 \label{table:blundertasks}
 \end{table}
 \TUsubsection{RFID Denial of Sleep}
+\label{sec:bg:rfid}
 The second case study used throughout this work is a denial of service attack
 on the ISO 18000-7 RFID tag inventory system similar to those used by the United States
 Department of Defense for shipping tracking and the Department of Energy for tracking spent

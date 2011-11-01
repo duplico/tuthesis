@@ -1,15 +1,157 @@
 \TUchapter{Results}
-\TUsection{Hybrid Capabilities}
-\TUsection{Analysis Capabilities}
+\TUsection{Introduction}
+The preceding chapters introduced a framework for discrete attack graphs,
+a set of enhancements to that framework to improve its modeling capabilities for
+discrete systems, and a set of extensions to enable it to model cyber-physical
+systems.
+
+This section provides an analysis of the resulting framework (including
+a discussion of its performance) and its capabilities (articulating its
+contribution to the hybrid systems modeler), as well as a discussion of the
+network and system analysis that it enables.
+\TUsection{Discrete Capabilities}
+Enough space has already been dedicated to specific additions: platform
+facts, host processing, and the standard lexicon. These provide enhancements
+to the modeler and ease model acquisition from a standard network 
+representation. However, further discussion is warranted of the power added
+by global exploits and grouping exploits.
+
+Recall that, in short, globalness applies one exploit to multiple asset 
+bindings, whereas grouping applies multiple exploits to the same asset binding.
+Consider the goal of modeling a fuzzer or automated attack script that
+simultaneously attempts to exploit a variety of common web vulnerabilities on
+a form on a web server. A successful buffer overflow may give the attacker
+login access to the server; successful cross-site scripting may give the
+attacker the ability to spoof messages to users; and a successful SQL injection
+attack may give the attacker access to sensitive information. Grouping these
+automated attacks together enables the modeler to better capture the behavior
+of such a ``script kiddie''.
+
+Consider also the case of executing a denial of service attack on a single
+network of arbitrary size by disabling a perimeter device. Such an attack would
+be impossible to encode in a single transition without the use of a global
+exploit. Such an exploit might appear as in Fig.~\ref{fig:network_dos_global}.
+
+\begin{figure}
+\begin{lstlisting}
+global exploit kill_router(a, r, h)=
+    preconditions:
+        platform:r,cpe:/h::VulnerableRouter;
+        quality:r,status=up;
+        quality:h,status=up;
+        topology:a->r,connected_network;
+        topology:h->r,connected_local_to_internet;
+    postconditions:
+        insert quality:r,status=down;
+        insert quality:h,status=down;
+.
+\end{lstlisting}
+\caption{Global exploit disabling an entire network}
+\label{fig:network_dos_global}
+\end{figure}
+
+Additionally, the hybrid extensions also permits the use of
+networking concepts such as port number (in which, typically, the use of a
+port number 1024 or below requires administrative rights) or latency for the
+purposes of modeling certain scenarios on information systems without physical
+components.
+\TUsection{Hybrid Systems Modeling Capabilities}
+The real power of the new extensions show in modeling hybrid systems. For
+this discussion it is useful to draw upon the theory of hybrid automata for
+hybrid systems. A useful goal is the ability to model any hybrid system
+(expressible as a hybrid automaton) in the hybrid attack graph formalism. This
+is hindered by two major constraints: the inability to use variables
+in the right hand side of precondition and postcondition expressions in
+hybrid automata, and the requirement that the time domain be discretized.
+
+\TUsubsection{Classes of hybrid systems modeled by hybrid attack graphs}
+\label{sec:hag_ha}
+Happily, Henzinger and others have articulated a special case of the
+hybrid automaton called the linear hybrid automaton~\cite{henzinger1996theory}.
+The linear hybrid automaton is a hybrid automaton in which (1) all conditions
+in the automaton are boolean combinations of linear inequalities, and (2) all
+flow conditions use only free variables from $\dot{X}$. In this case, a linear
+inequality is an inequality on linear terms, or linear combinations of
+integer constants with real valued variables.
+
+Clearly restriction (1) does not hold, because of the lack of variables
+on the right hand side of the operators in the attack graph language. However,
+the subcase in which the left hand side is the variable in question, and the
+right hand side is the constant $k_0$ does.
+
+Restriction (2) is more subtle but less restricting. As it permits free
+variables only from $\dot{X}$, so long as only one free variable from $\dot{X}$ is
+used this is exactly equivalent to the behavior permitted in time evolution
+exploit patterns. In the less deterministic (and less common) case in which
+multiple free variables from $\dot{X}$ are involved in a flow condition,
+the hybrid attack graph language permits an execution that conforms to the
+hybrid system specification, but not one that explores all possibilities.
+
+\TUsubsection{Hybrid systems to hybrid attack graph mapping}
+The hybrid attack graph permits discrete time
+simulation of a small, very well behaved subclass of linear hybrid automata. 
+Informally, this can be accomplished by the following general mapping:
+\begin{description}
+\item[Hybrid automata onto assets] The asset itself represents the automaton.
+    Therefore its variables take the form of facts on that asset, its
+    conditions take the form of preconditions and postconditions on exploits,
+    and events, jumps, and time evolution are done on the exploits.
+\item[Control modes onto qualities] The control mode itself is selected based
+    upon a quality on the asset. The mode is implemented by the time
+    evolution exploit responsible for that particular asset in that
+    particular mode. Control switches are not explicitly encoded but can be
+    thought of as part of the discrete exploits that serve to change the
+    exploit's mode.
+\item[State variables onto qualities] The state variables are encoded
+    explicitly as qualities about the asset in the fact base.
+\item[Initial conditions onto network model] The initial conditions are
+    implemented in the network model initial state.
+\item[Jump conditions onto non-time exploit conditions] The jump conditions,
+    which select when a mode transition \emph{may} occur, are mapped onto
+    the conditions of a non-time exploit. This is because, although these
+    conditions may 
+\item[Invariant conditions onto time exploits] Invariant conditions indicate
+    when a mode \emph{must} change in order for the inexorable passage of time
+    to proceed. Therefore, these conditions are placed explicitly into time 
+    exploits to ensure that they are executed before time may continue to pass.
+    Their postconditions include a change of the discrete mode quality.
+\item[Flow conditions onto time exploits] Flow conditions, which dictate the
+    continuous evolution of the system over time, are implemented as rates of
+    change in time exploit postconditions (e.g. \texttt{temp-=5}). Their
+    repeated application over the discretized time intervals cause the
+    simulation of continuous time evolution.
+\item[Events onto global groupings] Event labels, which are used to synchronize
+    mode transitions between multiple automata, are implemented as global group
+    names, which force the globally grouped exploits to fire on the
+    synchronized assets simultaneously.
+\end{description}
+
+\TUsubsection{Zeno concerns}
+Two additional concerns exist, to which brief mention is due: globally zeno 
+behavior and isolated zeno behavior.
+
+Globally zeno behavior occurs in a hybrid attack graph when the
+repeated application of non-timed exploits is capable of providing an infinite
+transition path (infinite connected subgraph) in which there are no time 
+evolution attacks. That is, a model exhibiting globally Zeno behavior not only
+generates an infinitely large attack graph, but it also generates one that is
+capable of causing the \emph{convergence of time}, which obviously fails to
+capture real world behavior.
+
+Such models are probably (but
+not necessarily) ill-formed. Infinitely repeated application of discrete
+exploits is a sign of poor modeling decisions: ideally, exploits should not be
+applied multiple times to the same assets; if they are (as in the setting of a
+mode), they should depend upon either the source mode being different from the
+destination mode or else depend upon some other result of time evolution. In the
+case of mapping onto hybrid automata, this means that self loops (jumps from a
+mode onto itself) need to be addressed with caution.
+
+Isolated zeno behavior, which may also be the sign of an ill-formed model, 
+occurs when an otherwise active hybrid asset is not fully covered by the time
+exploit group. This may occur legitimately if no continuous evolution is
+occuring in the asset's mode, or if (as in the case of the Civic in the
+car crash example pictured in Fig.~\ref{fig:fullbunny_two_ag}) the asset is
+no longer an active part of the simulation. If this behavior appears, care 
+should be given that it is not an oversight on the part of the modeler.
 \TUsection{Performance}
-\TUsection{Hybrid system equivalence}
-\TUsection{Toward Visualization}
-% Discrete Blunderdome specification
-% Failed discrete RFID-DOS specification
-% Attack graphs for both
-
-% Continuous Blunderdome specification
-% RFID-DOS specification
-% Attack graphs
-
-% zeno possible

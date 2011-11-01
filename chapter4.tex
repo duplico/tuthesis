@@ -10,7 +10,7 @@ This chapter introduces these enhancements, which include a working lexicon of
 standard terms for topologies and qualities based upon the Common Vulnerability
 Enumeration and National Vulnerability Database; some syntactic
 changes to ease the modeling of information systems; a scheme for integrating with
-the Common Platform Enumeration.
+the Common Platform Enumeration~\cite{buttner2009common}.
 
 \TUsection{Working Lexicon}
 \TUsubsection{Introduction}
@@ -128,10 +128,6 @@ be online as a precondition, and it provides a simple mechanism of action for
 denial of service attacks to be modeled -- they simply have the postcondition of
 a \texttt{status = down} quality fact.
 
-Later in this chapter, a simple preprocessor combined with a dash of syntactic sugar
-is introduced to automate most of the status modeling process across both exploits
-and the network model.
-
 \TUsection{Syntactic Sugar}
 \TUsubsection{Directional Topologies}
 This section introduces a new notation for specification of topologies. As it
@@ -191,7 +187,7 @@ firing with one another. Two optional keywords are now permitted at the beginnin
 of the exploit header for this purpose: \texttt{global} and \texttt{group()}.
 The \texttt{group} keyword takes a single argument.
 
-Their semantic behavior
+Their behavior
 is as follows. When a global exploit is fired on one binding of assets, it will
 also be fired on all other assets for which a valid binding exists, and the
 corresponding state transition will be considered a single edge on the attack
@@ -212,12 +208,13 @@ The second warning is that no consistency checking is specified. That is,
 preconditions are checked against a predecessor state, then postconditions
 are applied in arbitrary order. This means that if multiple attacks in a group
 modify the same facts on the same assets, indeterminate behavior or race
-conditions may occur. For this reason, it is advised to group exploits that
+conditions may occur. For this reason, it is advised to group only exploits that
 will not do this.
 \TUsubsection{Platform Properties}
 Platform facts are new types of facts introduced by this work. They use the
-specification used by MITRE's Common Platform Enumeration (CPE), a component
-of the Security Content Automation Protocol (SCAP). (TODO: CITE)
+specification used by MITRE's Common Platform Enumeration 
+(CPE)~\cite{buttner2009common}, a component
+of the Security Content Automation Protocol (SCAP).
 They can specify operating systems, applications, and hardware.
 
 A CPE platform fact is simply a valid CPE URI tied to an asset. The CPE URI is
@@ -254,7 +251,7 @@ in the matched CPE, a matching algorithm must be used. The matching algorithm
 in the reference implementation is based on the one provided in the CPE
 specification. %TODO: CITE
 The pseudocode for this thesis's platform fact matching functionality is
-provided in Fig.~\cite{fig:cpe_match_pc}
+provided in Fig.~\ref{fig:cpe_match_pc}
 
 \begin{figure}
 \begin{lstlisting}
@@ -381,19 +378,16 @@ for attack in attacks:
 
 agg_attacks = [] # Aggregated attacks, the goal of this code
 
-# Global groups:
-for group_id in globl_group_dict:
+for group_id in globl_group_dict: # Global groups:
     group_attacks = globl_group_dict[group_id]
     agg_attacks.append(globl_group_dict[group_id])
 
-# Non-global groups:
-for group_id in group_dict:
+for group_id in group_dict: # Non-global groups:
     group_attacks = group_dict[group_id]
     for binding in group_attacks:
         agg_attacks.append(group_attacks[binding])
 
-# Non-grouped globals
-for globl_attack in globl_dict: # ungrouped globals
+for globl_attack in globl_dict: # Non-grouped globals
     agg_attacks.append(list(globl_dict[globl_attack]))
 \end{lstlisting}
 \caption{Group and global attack selection}
@@ -422,7 +416,7 @@ network model =
     topology:asset_3->asset_2,topology_1;
 .
 \end{lstlisting}
-\caption{Illustrative example network model in the new format}
+\caption{``Illustrative example'' network model in the new format}
 \label{fig:ill_updated_nm}
 \end{figure}
 
@@ -445,7 +439,7 @@ exploit exploit_2(asset_param_1,asset_param_2)=
     insert quality:asset_param_2,quality_1=value_2;
 .
 \end{lstlisting}
-\caption{Illustrative example exploit patterns in the new format}
+\caption{``Illustrative example'' exploit patterns in the new format}
 \label{fig:ill_updated_xp}
 \end{figure}
 
@@ -454,7 +448,7 @@ This section presents an attack graph model of the Blunderdome exercise
 described in section~\ref{sec:blunderdome}.
 \TUsubsubsection{Network Model}
 The network model for the Blunderdome exercise follows in a straightforward
-from the network diagram (Fig.~\ref{fig:blunderarch}), including each network
+manner from the network diagram (Fig.~\ref{fig:blunderarch}), including each network
 element as an asset, plus an asset for the attacker. The facts include the
 attacker's grade on the web server, the SSH and HTTP connection topologies,
 and platform facts for the relevant applications and operating systems subject
@@ -488,10 +482,10 @@ Blunderdome web application.
 \TUsubsubsection{Exploit Patterns}
 The exploits in the Blunderdome exercise, provided in Fig.~\ref{fig:blunder_xp}
 fall into three categories. The first is the set of straightforward CVE-based exploits
-that could easily be extracted automatically from the National Vulnerability
+that could be extracted automatically from the National Vulnerability
 Database. The second is the hand generated exploits like blunder\_sqli, which
 has hand-generated custom behavior to modify the attacker's grade. The third
-are the exploit patterns that do not necessarily represent abuse cases 
+is the exploit patterns that do not necessarily represent abuse cases 
 but rather state transitions due to attacker actions.
 
 \begin{figure}
@@ -547,11 +541,10 @@ piece of software without NVD entries and the complex behavior the exploit must
 encode.
 
 The next exploit, ssh\_http\_tunnel, represents a common idiom involved in
-attack chaining: using access to one machine to create new access topologies
+attack chaining: using access to one machine to ``pivot'' and create new access topologies
 to adjacent machines. The last exploit, blunder\_login, represents access to
 the Blunderdome credentials due to administrative access to the login
-server. This could also be modeled using an additional asset representing the
-credentials, but for simplicity the method with fewer assets is demonstrated.
+server.
 
 The resulting attack graph is provided in Fig.~\ref{fig:blunder_ag}; the
 graphical representation of the starting state and ending state in 
