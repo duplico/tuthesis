@@ -6,12 +6,6 @@ modeling syntax and generation semantics required to permit real values for
 qualities and topologies. Furthermore, some initial attempts at representing
 the passage of time are described. 
 
-Some of the requirements that this new hybrid scheme places on the modeler
-have turned out to be more onerous than desired. However, since the use of 
-attack graphs on hybrid systems with real valued properties is quite nascent, 
-being introduced in this thesis, there is a significant contribution to their
-study even in introducing less than ideal solutions to their inherent problems.
-
 The ultimate goal of the specification of a hybrid attack graph for cyber
 physical systems modeling must be the creation of a formalism capable of
 modeling a network containing both traditional information systems (as
@@ -128,11 +122,31 @@ who causes the car to drive toward the wall at a constant rate.
 
 \begin{figure}
 \begin{lstlisting}
+network model=
+    assets:
+        civic;
+        wall;
+    facts:
+        platform:civic,cpe:/h:honda:civic;
+        quality:civic,compromised=true;
+        quality:civic,status=up;
+
+        platform:wall,cpe:/h::wall;
+
+        topology:civic<->wall,distance:=50;
+.
+\end{lstlisting}
+\caption{Car example network model}
+\label{fig:illustrative_time_nm}
+\end{figure}
+
+\begin{figure}
+\begin{lstlisting}
 global group(time) exploit car_depart(c,w)=
     preconditions:
-        platform:c,cpe:/h:honda:civic;
+        platform:c,cpe:/h:honda;
         quality:c,compromised != true;
-        quality:w,wall=true;
+        platform:w,cpe:/h::wall;
         quality:c,status=up;
     postconditions:
         update topology:c<->w,distance+=25;
@@ -140,9 +154,9 @@ global group(time) exploit car_depart(c,w)=
 
 global group(time) exploit car_approach(c,w)=
     preconditions:
-        platform:c,cpe:/h:honda:civic;
+        platform:c,cpe:/h:honda;
         quality:c,compromised=true;
-        quality:w,wall=true;
+        platform:w,cpe:/h::wall;
         quality:c,status=up;
         topology:c<->w,distance>25;
     postconditions:
@@ -151,9 +165,9 @@ global group(time) exploit car_approach(c,w)=
 
 global group(time) exploit car_crash(c,w)=
     preconditions:
-        platform:c,cpe:/h:honda:civic;
+        platform:c,cpe:/h:honda;
         quality:c,compromised=true;
-        quality:w,wall=true;
+        platform:w,cpe:/h::wall;
         quality:c,status=up;
         topology:c<->w,distance<=25;
     postconditions:
@@ -161,12 +175,12 @@ global group(time) exploit car_crash(c,w)=
         update quality:c,status=down;
 .
 \end{lstlisting}
-\caption{Updated hybrid network state datatype pseudocode}
+\caption{Car example exploit patterns (note time)}
 \label{fig:illustrative_time_xp}
 \end{figure}
 
 This method of modeling time requires time to be quantized and time stepping
-behavior to be used.
+behavior to be used. 
 
 \TUsection{Generation process changes}
 \TUsubsection{Topologies}
@@ -204,8 +218,8 @@ type network_state:
 \label{fig:netstate_map_hybrid_pc}
 \end{figure}
 \TUsubsection{Matching}
-With the introduction of new relational operators, significantly more advanced
-precondition processing than strict matching. Happily, the changes introduced
+With the introduction of new relational operators, more advanced
+precondition processing is required. Happily, the changes introduced
 in the previous chapter anticipated this, so the heavy lifting required for
 fact value lookup already exists. All that remains is the mapping of the
 parsed attack graph operators onto implementation operators in the generation
@@ -297,6 +311,280 @@ def set_topology(factbase, source, dest, name, value=True, op=None):
 \label{fig:hybrid-postcondition}
 \end{figure}
 \TUsection{Examples}
-\TUsubsection{Denial of Sleep}
+\TUsubsection{Car}
+A useful preliminary example is the scenario involving a car as described in
+Figs.~\ref{fig:illustrative_time_xp} and \ref{fig:illustrative_time_nm}. The
+corresponding attack graph for that scenario is given in 
+Fig.~\ref{fig:fullbunny_simple_ag}. As the car is compromised from the start,
+it only has three states. Of especial note is are the exploit transitions,
+both of which are collected into a group called ``time'', signifying that
+they represent time steps. The global and grouping mechanisms, however, only 
+truly become dramatic once combined with discrete exploits causing mode % TODO: describe
+transitions, and even moreso once multiple assets are involved.
 
-\TUsubsection{Automobile}
+\begin{figure}
+\includegraphics[height=3in]{ag_car/simple/full_bunny_1_ag_5}
+\caption{Simple car attack graph}
+\label{fig:fullbunny_simple_ag}
+\end{figure}
+
+Suppose the initial conditions were changed so that the \texttt{compromised}
+quality began as \texttt{false}, and an additional exploit called \texttt{own}
+were added so as to match the patterns given in Fig.~\ref{fig:fullbunny_one_xp}.
+
+\begin{figure}
+\begin{lstlisting}
+global group(time) exploit car_depart(c,w)=
+    preconditions:
+        platform:c,cpe:/h:honda;
+        quality:c,compromised != true;
+        platform:w,cpe:/h::wall;
+        quality:c,status=up;
+    postconditions:
+        update topology:c<->w,distance+=25;
+.
+
+global group(time) exploit car_approach(c,w)=
+    preconditions:
+        platform:c,cpe:/h:honda;
+        quality:c,compromised=true;
+        platform:w,cpe:/h::wall;
+        quality:c,status=up;
+        topology:c<->w,distance>25;
+    postconditions:
+        update topology:c<->w,distance-=25;
+.
+
+global group(time) exploit car_crash(c,w)=
+    preconditions:
+        platform:c,cpe:/h:honda;
+        quality:c,compromised=true;
+        platform:w,cpe:/h::wall;
+        quality:c,status=up;
+        topology:c<->w,distance<=25;
+    postconditions:
+        update topology:c<->w,distance:=0;
+        update quality:c,status=down;
+.
+
+exploit own_civic(c)=
+    preconditions:
+        platform:c,cpe:/h:honda:civic;
+        quality:c,compromised=false;
+        quality:c,status=up;
+    postconditions:
+        update quality:c,compromised=true;
+.
+\end{lstlisting}
+\caption{One-car hybrid example}
+\label{fig:fullbunny_one_xp}
+\end{figure}
+
+In this case, the resulting attack graph (shown in 
+Fig.~\ref{fig:fullbunny_one_ag} to a maximum generation depth of 5) clearly
+illustrates the interaction of the discrete behavior of the attacker (an
+attack occuring in the ``cyber'' world) with the continuous evolution of the
+car (in the physical world). This embodies a common trait of hybrid systems
+and also hybrid attacks: their discrete behavior acts to place them into
+operational modes wherein the passage of time causes important behavior. In
+this case, the evolution of time is clearly denoted by the transitions labeled
+\texttt{group(time)}.
+
+\begin{figure}
+\includegraphics[width=6in]{ag_car/onecar/full_bunny_onecar_ag_5}
+\caption{One-car automotive attack graph}
+\label{fig:fullbunny_one_ag}
+\end{figure}
+
+One final automobile example serves to illustrate the behavior of the
+combined global and grouped exploits and their use in implementing
+timing behavior. Consider the case in which, while the exploits remain
+as in the previous example's definition in Fig.~\ref{fig:fullbunny_one_xp},
+an additional nearby car is introduced that seeks to drive away from the wall
+at the same rate as \texttt{civic} but that is \emph{not} vulnerable to the 
+discrete \texttt{own} exploit. This network model is provided in 
+Fig.~\ref{fig:fullbunny_two_nm}.
+
+\begin{figure}
+\begin{lstlisting}
+network model=
+    assets:
+        civic;
+        accord;
+        wall;
+    facts:
+        platform:civic,cpe:/h:honda:civic;
+        quality:civic,compromised=false;
+        quality:civic,status=up;
+        
+        platform:accord,cpe:/h:honda:accord;
+        quality:accord,compromised=false;
+        quality:accord,status=up;
+
+        platform:wall,cpe:/h::wall;
+
+        topology:civic<->wall,distance:=50;
+        topology:accord<->wall,distance:=60;
+.
+\end{lstlisting}
+\caption{Two-car example network model}
+\label{fig:fullbunny_two_nm}
+\end{figure}
+
+The resulting attack graph is provided in Fig.~\ref{fig:fullbunny_two_ag}.
+Observe the sometimes heterogeneity of the time evolution exploit groups.
+Of particular interest is the transition from state 3 to state 6, in which
+the crashing of the Civic has the discrete consequence of placing it into a
+mode in which it no longer changes state with time.
+
+\begin{figure}
+\includegraphics[width=6in]{ag_car/twocar/full_bunny_twocar_ag_5}
+\caption{Two-car automotive attack graph}
+\label{fig:fullbunny_two_ag}
+\end{figure}
+\TUsubsection{Denial of Sleep}
+The final example serves to demonstrate further the interaction of discrete
+attacks with time; it is also used later to discuss scaling behavior. The network
+model given in Fig.~\ref{fig:rfid1_nm} describes a system of a single
+RFID reader with a single RFID tag, in the ISO 18000-7 system as described 
+in section~\ref{sec:bg:rfid}. The tag begins with a battery life of 100, which
+is drained at a rate of 25 per time step if the sleep denial attack is being
+executed, and at a rate of 10 per time step if not. This behavior is shown in
+the exploit patterns in Fig.~\ref{fig:rfid1_xp2}, along with
+the discrete attacks \texttt{own\_reader} (which gives the attacker control of
+the reader) and \texttt{deny\_sleep} (which causes a tag to enter the
+denial of sleep mode) in Fig.~\ref{fig:rfid1_xp1}.
+
+\begin{figure}
+\begin{lstlisting}
+network model = 
+    assets :
+        attacker;
+        reader;
+        tag0;
+    
+    facts :
+        # Reader:
+        platform:reader,cpe:/h::VulnerableReader;
+        quality:reader,status=up;
+        
+        # Tag:
+        platform:tag0,cpe:/h::Tag;
+        quality:tag0,status=up;
+        quality:tag0,power:=100;
+        quality:tag0,mode=sleep;
+        
+        # Topologies:
+        topology:attacker -> reader,connected_network;
+        topology:reader -> tag0,connected_rfid;
+.
+\end{lstlisting}
+\caption{One tag RFID system network model}
+\label{fig:rfid1_nm}
+\end{figure}
+
+\begin{figure}
+\begin{lstlisting}
+exploit own_reader(a, r)=
+    preconditions:
+        platform:r,cpe:/h::VulnerableReader;
+        quality:r,status=up;
+        topology:a->r,connected_network;
+    postconditions:
+        insert topology:a->r,access_admin;
+.
+
+exploit deny_sleep(a, r, t)=
+    preconditions:
+        platform:r,cpe:/h::VulnerableReader;
+        quality:r,status=up;
+        
+        platform:t,cpe:/h::Tag;
+        quality:t,status=up;
+        quality:t,mode=sleep;
+        
+        topology:a->r,access_admin;
+        topology:r->t,connected_rfid;
+    postconditions:
+        update quality:t,mode=wake;
+.
+\end{lstlisting}
+\caption{One tag RFID system discrete exploit patterns}
+\label{fig:rfid1_xp1}
+\end{figure}
+
+
+
+\begin{figure}
+\begin{lstlisting}
+global group(time) exploit wake_power_dec(t)=
+    preconditions:
+        platform:t,cpe:/h::Tag;
+        quality:t,status=up;
+        quality:t,mode=wake;
+        quality:t,power>25;
+    postconditions:
+        update quality:t,power-=25;
+.
+
+global group(time) exploit sleep_power_dec(t)=
+    preconditions:
+        platform:t,cpe:/h::Tag;
+        quality:t,mode=sleep;
+        quality:t,status=up;
+        quality:t,power>10;
+    postconditions:
+        update quality:t,power-=10;
+.
+
+global group(time) exploit wake_power_die(t)=
+    preconditions:
+        platform:t,cpe:/h::Tag;
+        quality:t,mode=wake;
+        quality:t,status=up;
+        quality:t,power<=25;
+    postconditions:
+        update quality:t,power:=0;
+        update quality:t,status=down;
+.
+
+global group(time) exploit sleep_power_die(t)=
+    preconditions:
+        platform:t,cpe:/h::Tag;
+        quality:t,mode=sleep;
+        quality:t,status=up;
+        quality:t,power<=10;
+    postconditions:
+        update quality:t,power:=0;
+        update quality:t,status=down;
+.
+\end{lstlisting}
+\caption{One tag RFID system continuous exploit patterns}
+\label{fig:rfid1_xp2}
+\end{figure}
+
+Two attack graphs help to demonstrate the execution of this model. The first is
+given in Fig.~\ref{fig:rfid1_ag6}, which is the attack graph generated to a
+depth of 6. Observe that the leftmost set of edges is the worst case
+scenario: the attacker immediately takes control of the network and kills
+the tags in only 4 timesteps. The rightmost edge, then, is the best case
+scenario: in this situation, the attacker never (at least to a generation
+depth of 6) acts. The only transitions are those caused by the normal
+time evolution of the system.
+
+Likewise, Fig.~\ref{fig:rfid1_ag11} is the attack graph generated to its
+full depth. There are only two leaf nodes: state 21, in which the attacker
+has executed the denial of sleep attack to the demise of the tag, and state
+40, in which the tag has died on its own.
+
+\begin{figure}
+\includegraphics[width=6in]{ag_dash7/sleep_ag_6}
+\caption{One tag RFID system attack graph (depth of 6)}
+\label{fig:rfid1_ag6}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=6in]{ag_dash7/sleep_ag_11}
+\caption{One tag RFID system attack graph (full depth)}
+\label{fig:rfid1_ag11}
+\end{figure}
