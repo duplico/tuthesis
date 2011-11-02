@@ -174,15 +174,7 @@ should be given that it is not an oversight on the part of the modeler.
                         \item[Validate attack] $O(\text{preconditions})$, which is
                             technically bounded by $O(\text{assets})^2 \cdot O(\text{facts})$
                             but is in practice quite small
-                    \end{description}
-                    \item[For global attacks] $O(\text{global\_exploits})$
-                    \begin{description}
-                        \item[Process attack] $O(\text{parameters})$, which is technically
-                            bounded by $O(\text{assets})$ but is in practice quite small.
-                    \end{description}
-                    \item[For grouped attacks] $O(\text{groups})$
-                    \begin{description}
-                        \item[Process attack] $O(\text{binding\_combinations})$
+                        \item[Process groups and globals] $O(1)$
                     \end{description}
                 \end{description}
                 \item[For each valid attack] $O(\text{binding\_combinations}) \cdot O(\text{exploits})$
@@ -220,23 +212,76 @@ derivation of binding\_combinations from earlier in this section, this means
 that the number of states produced is at worst $(\text{assets}!)^{\text{depth}}$.
 More tightly, this is in 
 $O\left(\left({\text{assets}! \over (\text{assets}-\text{Params})!}\right)^{\text{depth}}\right)$.
+This controls the scaling behavior of the recursive generator function.
 
-This controls the scaling behavior of the generator.
+Furthermore, the fact count should actually be broken up into qualities and
+topologies (treating platform facts as special cases of qualities for the
+purposes of this analysis), as the possible number of these fact types grow 
+with respect to the asset count at different rates. The bound on facts, then,
+is actually $O(\text{assets} \cdot \text{qualities} + 
+\text{assets}^2 \cdot \text{topologies})$.
 
-Therefore, this outline reveals the following bound on the generation process:
-$
-O(\text{facts}) + O(\text{exploits}) + O\left(\left({\text{assets}! \over (\text{assets}-\text{Params})!}\right)^{\text{depth}}\right) \cdot 
- (O(\text{assets}) + O(\text{facts}) + 
-  (O(\text{binding\_combinations}) \cdot O(\text{exploits}) \cdot
-   (O(\text{preconditions}))
-   + O(\text{global\_exploits}) \cdot
-   (O(\text{parameters}))
-   + O(\text{groups}) \cdot
-   (O(\text{binding\_combinations})
-   )
-  )
-  + O(\text{binding\_combinations}) \cdot O(\text{exploits}) \cdot
-   (O(\text{assets}) + O(\text{facts}) + O(\text{postconditions})
-   )
- )$
+Driven by the formal definition of the attack graph domains given in 
+Section~\ref{sec:domains} and treating platform facts as just a special case
+of qualities, notation will henceforth be as in Table~\ref{table:onotation},
+presented in order of appearance in the program outline. The table also
+includes $P$ and $p$, which refer to the largest number of pre- and 
+post-conditions in any single exploit in the input. These can be bounded (in
+practice, very loosely) by $O((AQ + A^2T)(A))$, but this bound is due to the
+(never practically implemented for nontrivial $A$) possibility of an exploit
+taking every possible asset parameter and operating on every possible quality
+and topology for each possible asset combination. Similarly, the number of
+parameters in exploit patterns could be bounded loosely by $O(A)$, but this is
+not realistic. Therefore, the new $a$, $p$ and $P$ inputs are used instead.
+The symbol for the number of fact names, $f$, is used in the next
+section to simplify some notation.
+
+\begin{table}
+\centering % TODO: fix the layout of this table.
+\begin{tabular}{r|l}
+Domain & Symbol \\ \hline
+Facts       & $F = |\mathcal{Q}+\mathcal{T}|$ \\
+Fact names  & $f$ \\
+Exploits    & $E = |\mathcal{E}|$ \\
+Depth       & $d$ \\
+Assets      & $A = |\mathcal{A}|$ \\
+Qualities   & $Q = |\mathcal{Q}|$ \\
+Topologies  & $T = |\mathcal{T}|$ \\
+Most preconditions in any exploit & $p$ \\
+Most postconditions in any exploit & $P$ \\
+Most parameters in any exploit & $a$
+\end{tabular}
+\caption{Symbols for the magnitudes of attack graph input domains}
+\label{table:onotation}
+\end{table}
+
+Using a shorthand of $B$ to refer to binding combinations, the outline
+reveals the following bound on the generation process:
+
+$O((B^d)((A+F) + BEp + BE(A+F+P)))$.
+
+Recall that $B = {A! \over (A-a)!}$, so is in $O({A! \over (A-a)!})$ 
+(more loosely, $O(A^a)$ or $O(A!)$ or
+even $O(A^A)$ are also valid), and that $F = AQ + A^2T$ (More loosely, $A^2f$). 
+Then the generation process is more precisely in:
+
+$O(((\frac{A!}{(A-a)!})^d)((A+AQ + A^2T) + \frac{A!}{(A-a)!}Ep + \frac{A!}{(A-a)!}E(A+AQ + A^2T+P)))$
+
+Switching to the looser bounds of $A$ for $p$ and $P$, and $A^A$ for $B$ 
+(thereby eliminating $a$) 
+simplifies the presentation of this expression to a function only of $f$,
+$E$, $A$, and $d$. It is already clear that execution time is controlled almost
+completely by the growth of $A$ and $d$, but this resultant asymptotic bound for
+execution time of the (hybrid) attack graph generation process presents that 
+fact quite dramatically:
+
+$O((A^Ad)((A+A^2f) + A^AEA + A^AE(A+A^2f+A)))$
+
+= $O(fEA^{Ad+A+2})$
+
+Worst case generation time, then, is expected to grow linearly with fact names 
+and exploit patterns, exponentially with generation depth (for divergent 
+graphs), and factorially with assets. The next section demonstrates imperically
+the effects of generation depth and asset growth on execution time.
+
 \TUsubsection{Execution Profile}
