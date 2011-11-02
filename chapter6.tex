@@ -127,8 +127,8 @@ Informally, this can be accomplished by the following general mapping:
 \end{description}
 
 \TUsubsection{Zeno concerns}
-Two additional concerns exist, to which brief mention is due: globally zeno 
-behavior and isolated zeno behavior.
+Two additional concerns exist, to which brief mention is due: \emph{globally 
+zeno} behavior and \emph{isolated zeno} behavior.
 
 Globally zeno behavior occurs in a hybrid attack graph when the
 repeated application of non-timed exploits is capable of providing an infinite
@@ -156,6 +156,87 @@ no longer an active part of the simulation. If this behavior appears, care
 should be given that it is not an oversight on the part of the modeler.
 \TUsection{Performance}
 \TUsubsection{Introduction}
-\TUsubsection{Program Outline}
-\TUsubsection{Asymptotic Analysis}
+\TUsubsection{Program Outline and Asymptotic Analysis}
+\begin{description}
+    \item[Build attack graph] $O(1)$
+    \begin{description}
+        \item[Load initial state] $O(\text{facts})$
+        \item[Load exploits] $O(\text{exploits})$
+        \item[Generate attack graph (recursive)] $O(\text{depth})$
+        \begin{description}
+            \item[For each analysis state] $O(\text{states})$
+            \begin{description}
+                \item[Copy network model] $O(\text{assets}) + O(\text{facts})$
+                \item[Get valid attacks] $O(1)$
+                \begin{description}
+                    \item[For attack in attack bindings] $O(\text{binding\_combinations}) \cdot O(\text{exploits})$
+                    \begin{description}
+                        \item[Validate attack] $O(\text{preconditions})$, which is
+                            technically bounded by $O(\text{assets})^2 \cdot O(\text{facts})$
+                            but is in practice quite small
+                    \end{description}
+                    \item[For global attacks] $O(\text{global\_exploits})$
+                    \begin{description}
+                        \item[Process attack] $O(\text{parameters})$, which is technically
+                            bounded by $O(\text{assets})$ but is in practice quite small.
+                    \end{description}
+                    \item[For grouped attacks] $O(\text{groups})$
+                    \begin{description}
+                        \item[Process attack] $O(\text{binding\_combinations})$
+                    \end{description}
+                \end{description}
+                \item[For each valid attack] $O(\text{binding\_combinations}) \cdot O(\text{exploits})$
+                \begin{description}
+                    \item[Get successor state] $O(1)$
+                    \begin{description}
+                        \item[Build network model] $O(\text{assets}) + O(\text{facts})$
+                        \item[Add postconditions] $O(\text{postconditions})$, which is
+                            technically bounded by $O(\text{assets})^2 \cdot O(\text{facts})$
+                            but is in practice quite small.
+                    \end{description}
+                \end{description}
+            \end{description}
+        \end{description}
+    \end{description}
+\end{description}
+There are two non-obvious variables included here. One is binding\_combinations, which is
+actually the result of a permutation operation. This is bounded loosely by
+by $O(\text{assets}!)$ and more tightly for a given scenario by 
+$O\left({\text{assets}! \over (\text{assets}-\text{Params})!}\right)$ (alternatively $O(\text{assets}^{\text{Params}})$),
+where $\text{Params}$ is the length of the longest parameter list on any exploit pattern.
+
+The other is states. In this case, it refers to the number of ``analysis states''
+in an iteration of the generation function, which is actually defined in terms
+of the previous iteration's states. Luckily, we can avoid having to solve for
+this quantity by combining the sections ``Generate attack graph (recursive)''
+with ``For each analysis state''. Using the knowledge that the body of that for
+loop is reached once and only once for each state generated, the bound for the
+number of executions of the combined structure is equivalent to the bound on
+the number of states in the attack graph. Because a scenario is not guaranteed
+to converge to a closed attack graph, this is necessarily a function of the
+maximum depth. Each state may produce up to $\text{binding\_combinations} \cdot
+\text{exploits}$ new states. This may happen up to depth times. Using the
+derivation of binding\_combinations from earlier in this section, this means 
+that the number of states produced is at worst $(\text{assets}!)^{\text{depth}}$.
+More tightly, this is in 
+$O\left(\left({\text{assets}! \over (\text{assets}-\text{Params})!}\right)^{\text{depth}}\right)$.
+
+This controls the scaling behavior of the generator.
+
+Therefore, this outline reveals the following bound on the generation process:
+$
+O(\text{facts}) + O(\text{exploits}) + O\left(\left({\text{assets}! \over (\text{assets}-\text{Params})!}\right)^{\text{depth}}\right) \cdot 
+ (O(\text{assets}) + O(\text{facts}) + 
+  (O(\text{binding\_combinations}) \cdot O(\text{exploits}) \cdot
+   (O(\text{preconditions}))
+   + O(\text{global\_exploits}) \cdot
+   (O(\text{parameters}))
+   + O(\text{groups}) \cdot
+   (O(\text{binding\_combinations})
+   )
+  )
+  + O(\text{binding\_combinations}) \cdot O(\text{exploits}) \cdot
+   (O(\text{assets}) + O(\text{facts}) + O(\text{postconditions})
+   )
+ )$
 \TUsubsection{Execution Profile}
