@@ -162,7 +162,7 @@ generator is warranted. This section first
 provides an outline of the execution of the generation program, decorated with
 the order of magnitude of the asymptotic bound of the execution time at
 each step. This is used to provide a bound on the scaling of the generator as
-a whole. The next subsection demonstrates the imperical results of a performance
+a whole. The next subsection demonstrates the empirical results of a performance
 analysis, providing graphical scaling data from code profiling
 to confirm the predictions of the outline.
 
@@ -201,7 +201,7 @@ Possible asset bindings & $B$ \\
 
 \TUsubsection{Program Outline and Asymptotic Analysis}
 The following outline articulates the order of execution steps in the reference
-generator. Each bolded step is decorated with the order of the number of
+generator. Each boldface step is decorated with the order of the number of
 times that piece of code is executed. Indented steps are substeps, which are
 executed on the order of their own decorated order, multiplied by the orders of
 each of their parent steps. The outline uses the symbols defined in 
@@ -307,9 +307,11 @@ fact quite dramatically:
 
 $O((A^AE)^d((A+A^2f) + A^AEA + A^AE(A+A^2f+A)))$
 
-= $O(fEA^{Ad+A+2})$
-= $O(E^{d+1}fA^{A(d+1)+2})$
-\approx $O(O(E^{d+1}fA!^{d}))$ (in a mild abuse of notation)
+$= O(fEA^{Ad+A+2})$
+
+$= O(E^{d+1}fA^{A(d+1)+2})$
+
+$\approx O(E^{d+1}fA!^{d})$ (in a mild abuse of notation)
 
 Worst case generation time, then, is expected to grow linearly with fact names, 
 polynomially with exploit patterns, exponentially with generation depth (for divergent 
@@ -333,7 +335,7 @@ The results, showing dramatic exponential behavior, are provided in
 Fig.~\ref{fig:assetperf}. These are graphed on a logarithmic scale with a
 reference line of $A^A$ in Fig.~\ref{fig:assetperflog}.
 
-This exponential behavior especially effects hybrid attack graphs with time 
+This exponential behavior especially affects hybrid attack graphs with time 
 because time group exploits are likely to bind to nearly every permutation of 
 asset choices. As an example, observe the large number of permutations of 
 bindings of the time group exploits to car assets in 

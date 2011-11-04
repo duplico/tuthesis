@@ -55,10 +55,6 @@ only facts, therefore, are called \emph{token valued} (or \emph{token facts}),
 whereas the new continuous facts are called \emph{real valued} (or \emph{real
 facts}).
 
-% Additionally, later in this chapter another class of fact is introduced: a
-% rate fact, which is a special case of a real fact. Rate facts are not a new
-% syntactic element but are rather specified by convention and invoked by the
-% new timing capability. TODO: this isn't true; add to future work.
 \TUsubsection{Operators}
 At the heart of the hybrid attack graph lies the new real facts. Their
 existence marks the introduction of a true type system to the attack graph
@@ -189,7 +185,7 @@ reference implementation, every topology, even token topologies, has a value:
 real topologies have floating-point values, and token topologies have boolean
 values.
 
-This results in the new factbase data structure provided in 
+This results in the new fact base data structure provided in 
 Fig.~\ref{fig:netstate_map_hybrid_pc}. The intermediate hash map representation
 for topology facts is keyed on source asset names, with values that are
 themselves hash maps keyed on destination asset names, with values that are
@@ -213,7 +209,7 @@ type network_state:
                                vals=map(keys=topology,
                                         vals=values))
 \end{lstlisting}
-\caption{Updated hybrid network state datatype pseudocode}
+\caption{Updated hybrid network state data type pseudocode}
 \label{fig:netstate_map_hybrid_pc}
 \end{figure}
 \TUsubsection{Matching}
@@ -335,7 +331,7 @@ transitions, and even more so once multiple assets are involved.
 \end{figure}
 
 Suppose the initial conditions were changed so that the \texttt{compromised}
-quality began as \texttt{false}, and an additional exploit called \texttt{own_civic}
+quality began as \texttt{false}, and an additional exploit called \texttt{own\_civic}
 were added so as to match the patterns given in Fig.~\ref{fig:fullbunny_one_xp}.
 
 \begin{figure}
@@ -389,7 +385,7 @@ exploit own_civic(c)=
 In this case, the resulting attack graph (shown in 
 Fig.~\ref{fig:fullbunny_one_ag} to a maximum generation depth of 5) clearly
 illustrates the interaction of the discrete behavior of the attacker (an
-attack occuring in the ``cyber'' world) with the continuous evolution of the
+attack occurring in the ``cyber'' world) with the continuous evolution of the
 car (in the physical world). This embodies a common trait of hybrid systems
 and also hybrid attacks: their discrete behavior acts to place them into
 operational modes wherein the passage of time causes important behavior. In
@@ -409,7 +405,7 @@ timing behavior. Consider the case that, while keeping the exploits
 as in Fig.~\ref{fig:fullbunny_one_xp}, introduces an additional car
 that drives away from the wall
 at the same rate as \texttt{civic} but is \emph{not} vulnerable to the 
-\texttt{own_civic} exploit. This network model is provided in 
+\texttt{own\_civic} exploit. This network model is provided in 
 Fig.~\ref{fig:fullbunny_two_nm}.
 
 \begin{figure}
@@ -574,7 +570,7 @@ Two attack graphs help to demonstrate the execution of this model. The first is
 given in Fig.~\ref{fig:rfid1_ag6}, which is the attack graph generated to a
 depth of 6. Observe that the leftmost set of edges is the worst case
 scenario: the attacker immediately takes control of the network and kills
-the tags in only 4 timesteps. The rightmost edge, then, is the best case
+the tags in only 4 time steps. The rightmost edge, then, is the best case
 scenario: in this situation, the attacker never (to a
 depth of 6) acts. The only transitions are those caused by the normal
 time evolution of the system.
