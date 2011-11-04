@@ -380,57 +380,51 @@ dealing with the progression of time.
 
 \TUsection{Attack Graph Generation and Modeling}
 This section presents a version of the attack graph modeling framework specific
-to traditional information systems. The framework has a very permissive model that
+to traditional information systems. The framework has a very permissive 
+modeling language that
 includes notions of assets, qualities, topologies. Assets represent potentially
 attackable system components; qualities assign an arbitrary string value to a named
-property of an asset, and topologies bind pairs of assets together with a named
-connection between them. Exploit patterns with preconditions and postconditions attached
-to free variables that can be bound at generation time to assets serve to describe potential
-state transitions.
+property of an asset, and topologies connect pairs of assets.
+Exploit patterns have preconditions and postconditions on parameterized assets
+that can be bound at generation time to assets to create state transitions.
 \TUsubsection{Intuitive Definition}
 An attack graph is comprised of the following components.
 \begin{description}
-	\item[Assets] Assets are the subjects in the attack graph formalism, mainly representing
-		attackable system components. For example, an asset may represent a host
-        on a network, an attacker, or a critical document. Assets are specified
-		with unique names, and they are decorated with \emph{qualities} and \emph{topologies}.
-		Assets can also be used to model users and adversaries if it is necessary to give them
-		explicit properties. A model's collection of assets is fixed at definition time and
-		is not changed by state transitions.
+	\item[Assets] Assets are the security principals in the attack graph 
+        formalism. For example, an asset may represent a host, an attacker, or 
+        a document. Assets are specified with unique names, and they are 
+        decorated with \emph{qualities} and \emph{topologies}.
 	\item[Qualities] Qualities represent properties of an asset, such as a software package or
-		version that is installed, whether it is offline, online, or in sleep mode. Qualities are
-		can be considered a key/value pair, where both the key and the value are string tokens. For
-		example, the \texttt{host1} asset may have the quality \texttt{power} and the value \texttt{on}.
-	\item[Topologies] Topologies represent relationships between two assets. These can be physical such
-		as denoting that a printer is plugged into a computer, logical such as denoting that one
-		host is accessible from another on an adjacent network, or more abstract such as a particular
-		trust relationship or level of access that a subject has on another. Topologies are directed and
-		named with string tokens. For example, \texttt{host1} might be accessible over the network via the
-		web by \texttt{host2}, so a directed topology from \texttt{host2} to \texttt{host1} called
-		\texttt{network\_remote\_web} might be used. Together with qualities, topologies make up the
-		network state's collection of facts.
+		version, or whether it is offline, online, or in sleep mode. 
+        Qualities are key/value pairs, where both the key and the value are 
+        strings.
+	\item[Topologies] Topologies represent relationships between two assets.
+        In addition to network connections, these include abstract 
+        relationships such as trust or access. Topologies are directed and
+		named with strings. Together with qualities, topologies make up the
+		network state's collection of facts, also called the ``fact base''.
 	\item[State] A network or system state is comprised of all of the facts about the system's asset
 		collection. A network model's state is fully described by the asset collection and the fact base;
 		given the constant asset collection, a state is uniquely described by its fact base. The fact
 		base is all the qualities and topologies that are valid for that state.
-	\item[Exploit patterns] Exploit patterns are generalized templates for how the actions of the attacker
-		can alter the system state by inserting and removing qualities and topologies (but not assets).
-		They are written as functions that take a number of parameters corresponding to assets, mapping
-		a set of preconditions (facts about the free asset parameters) to a set of postconditions:
-		insert and delete actions on qualities and topologies to update the fact base and therefore
-		generate a new network state.
+	\item[Exploit patterns] Exploit patterns are general templates for how the 
+        actions of the attacker can alter the system state by inserting and 
+        removing qualities and topologies (but not assets).
+		They are written as functions that take parameters corresponding to assets,
+        are guarded by preconditions, and specify a set of postconditions:
+		insert and delete actions on qualities and topologies to update the 
+        fact base and therefore generate new network states.
 \end{description}
 \TUsubsection{Formal Definition}
 \label{sec:domains}
 \TUsubsubsection{Primitive Domains}
-To further clarify the data types in use by the attack graph formalism,
-this section provides a more formal definition of their domains.
-The primitive domains are the most basic 
-domains that describe the atomic units of
+To clarify the attack graph formalism,
+this section provides a more formal definition of its components' domains.
+The primitive domains describe the atomic units of
 the formalism: assets, properties (qualities), values (qualities), relationships (topologies),
-vulnerabilities (exploit pattern identifiers), and parameters (free asset variables in the attack
+vulnerabilities (exploit pattern identifiers), parameters (free asset variables in the attack
 patterns), and operations (used in postconditions representing insert or delete actions).
-See Fig.~\ref{fig:primitivedomains}.
+See Fig.~\ref{fig:primitivedomains} these elements' formal notation.
 
 \begin{figure}
 \begin{align*}
@@ -447,33 +441,32 @@ See Fig.~\ref{fig:primitivedomains}.
 \end{figure}
 
 \TUsubsubsection{Compound Domains}
-Compound domains comprise the fundamental concepts that are composed of combinations
+Compound domains are composed of combinations
 of members of the primitive domains. These form the level of abstraction that it is
-most convenient to discuss in the articulation of the execution model and in the
-preceding intuitive definition, for instance.
+most convenient to discuss intuitively.
 \begin{description}
     \item[Qualities] Qualities bind an asset to a property to a value; therefore their
-        domain is the cartesian product of those domains. The $n$ subscripts denote that
+        domain is their Cartesian product. The $n$ subscripts denote that
         these are bound qualities of a network state, rather than free qualities in
         exploit preconditions and postconditions:
         \begin{align*}
             \mathcal{Q}_n &: \mathcal{A} \times \mathcal{P} \times \mathcal{V}
         \end{align*}
     \item[Topologies] Topologies bind an asset to another asset through a relationship; therefore their
-        domain is the cartesian product of those domains:
+        domain is the Cartesian product of those domains:
         \begin{align*}
             \mathcal{T}_n&: \mathcal{A} \times \mathcal{A} \times \mathcal{R}
         \end{align*}
-    \item[Network states] A network state, then, is denoted by a collection of assets, and a fact base
-        of qualities and topologies; the domain of a network state is the cartesian product
+    \item[Network states] A network state is a collection of assets, and a fact base
+        of qualities and topologies; the domain of a network state is the Cartesian product
         of the power sets of these domains:
         \begin{align*}
             \mathcal{N}&: \mathbb{P}(\mathcal{A}) \times \mathbb{P}(\mathcal{Q}_n) \times \mathbb{P}(\mathcal{T}_n)
         \end{align*}
-    \item[Exploit patterns] Exploit patterns, taken from the domain $\mathcal{E}$ 
+    \item[Exploit patterns] Exploit patterns, taken from the domain $\mathcal{E}$,
 		depend upon free versions of qualities and topologies,
-		which are parameterized by members of $\mathcal{I}$ rather than $\mathcal{A}$, which are used in
-		preconditions and, when combined with an operator, postconditions:
+		members of $\mathcal{I}$ rather than $\mathcal{A}$. These are used in
+		preconditions and, with operators, postconditions:
         \begin{align*}
 			\mathcal{Q}_e&: \mathcal{I} \times \mathcal{P} \times \mathcal{V} \\
 			\mathcal{T}_e&: \mathcal{I} \times \mathcal{I} \times \mathcal{R} \\
@@ -490,11 +483,12 @@ preceding intuitive definition, for instance.
         \end{align*}
 \end{description}
 
-\TUsubsection{Network Model Specification}
-The attack graph execution model expanded upon by this thesis does 
+\TUsubsection{Specification Language}
+The attack graph generator does 
 not use this formal notation to represent system elements, instead favoring a 
 more user friendly specification language. 
 
+\TUsubsubsection{Network Model Specification}
 The first component of the specification itself is an asset list. Following the
 asset list, the initial
 fact base is specified as a semicolon separated list of qualities and 
@@ -521,9 +515,11 @@ facts :
 \label{fig:nmspec}
 \end{figure}
 \TUsubsection{Exploit Specification}
-Exploits are specified using a related scheme. An exploit pattern resembles a function
-and contains four parts: a header or signature, preconditions, postconditions, and a
-terminating period symbol. An example may be found in Fig.~\ref{fig:xpspec}.
+Exploit patterns resemble functions whose bodies are lists of preconditions,
+which are identical in form to the facts in the network model (except that their
+assets are free rather than bound) and postconditions, which are simply
+deletions or insertions (with overwrite semantics) of facts. An example may be 
+found in Fig.~\ref{fig:xpspec}.
 
 \begin{figure}
 \begin{lstlisting}
@@ -540,17 +536,11 @@ exploit exploit_1(asset_param_1,asset_param_2)=
 \label{fig:xpspec}
 \end{figure}
 
-Exploit patterns resemble functions whose bodies are lists of preconditions,
-which are identical in form to the facts in the network model (except that their
-assets are free rather than bound) and postconditions, which are simply
-deletions or insertions (with overwrite semantics) of facts.
-
 \TUsubsection{Generation Process}
 Attack graph generation is the process of chaining exploits to enumerate the
-attack space~\cite{campbell2002modeling}~\cite{phillips1998graph}~\cite{sheyner2002automated}.
-Methods for generating attack graphs
-share a common general architecture among the modern
-methods that use preconditions and postconditions in exploit definitions,
+attack space~\cite{campbell2002modeling,phillips1998graph,sheyner2002automated}.
+Modern methods for generating attack graphs
+share a common general architecture,
 pictured in Fig. \ref{fig:generation}. The attack graph generation
 process combines network state and exploit patterns as input, applying exploit 
 postconditions back onto the network state to generate its output of successor 
@@ -572,21 +562,18 @@ digraph G {
 \label{fig:generation}
 \end{figure}
 
-This method (used in this thesis as well), proceeds
-depending upon a monotonicity assumption: the attacker never moves ``backwards''.
-That is, once an exploit is realized, even though the attacker may have the capability
-of undoing it, he does not do so. A maximum attack graph ``depth'' (really 
+A maximum attack graph ``depth'' (really 
 maximum permitted shortest path length from the
 node representing the initial state) is selected before generation begins, and
 no self loops are permitted, though loops in general are allowed.
 
-As this work's specific algorithm is a contribution of this thesis, it is given
+As this work's specific algorithm is a contribution, it is given
 more detailed treatment in chapter 3.
 
 \TUsection{Case Studies}
-Throughout this thesis, two examples of attacks are used to illustrate the models presented.
+Two major realistic attack examples appear in this work.
 The first is on a traditional information system, based upon an offensive educational exercise
-deployed at the University of Tulsa involving several chained attacks. The second is the 
+deployed at the University of Tulsa. The second is the 
 denial of service through battery exhaustion of a simple
 cyber-physical system of active radio frequency identification (RFID) tags and readers.
 \TUsubsection{Blunderdome}
@@ -622,7 +609,7 @@ Stage & Precondition	&	Attack	&	Postcondition \\ \hline \hline
 \end{table}
 \TUsubsection{RFID Denial of Sleep}
 \label{sec:bg:rfid}
-The second case study used throughout this work is a denial of service attack
+The second case study is a denial of service attack
 on the ISO 18000-7 RFID tag inventory system similar to those used by the United States
 Department of Defense for shipping tracking and the Department of Energy for tracking spent
 fuel containers~\cite{chen2009radiofrequency}. The attack
@@ -636,32 +623,32 @@ the location and seal status of
 radioactive material containers, greatly reducing workers' radiation exposure. 
 The batteries on the tags should last as long as
 possible in order to limit radiation exposure to maintenance workers, and
-the loss of power to these devices has severe safety and security consequences.
+the loss of power to these devices has safety consequences.
 An energy draining attack to deplete the tags' batteries could significantly
 speed this loss of power.
 
 The ISO 18000-7 tags have two modes: an active mode, and a sleep mode in which their
 power consumption is significantly reduced. The active mode has a 30 second timeout,
-which will cause them to sleep unless the timer is reset by the receipt of a valid
-command from the reader or a wake-up signal. In sleep mode, the tags will only respond to a
+which causes them to sleep unless the timer is reset by a valid
+command from the reader or a wake-up signal. In sleep mode, the tags only respond to a
 wake-up command, which causes them to enter active mode.
 A denial of sleep attack occurs when the tag is not permitted to enter sleep mode or is
 awoken more frequently than normal.
 
-This attack can be realized in two ways. The first is that a second, rogue 
-RFID reader is placed by the attacker within range of some or all of the active tags. The
+This attack can be realized in two ways. The first is for a second, rogue 
+RFID reader to be placed by the attacker within range of active tags. The
 second is for the attacker to compromise an existing reader by hacking into a computer
-system connected to it via a network. This presupposes that the reader is connected
-to the Internet or some private network into which the attacker can intrude.
+system connected to it via a network.
 
 Hybrid automata serve to represent the behavior of the devices themselves quite well.
 Fig.~\ref{fig:readerha} represents the reader (legitimate or rogue), which does nothing but 
 transmit commands and
-wake-up signals, which can come at any time with no restrictions. Under ordinary operating
-conditions this might be a few times per day over the course of several years before the
-batteries in the tags are drained~\cite{chen2009radiofrequency}.
+wake-up signals, which can come at any time with no restrictions. Under
+ordinary occasional operating conditions this might take place over the course 
+of as many as ten years before the batteries in the tags are 
+drained~\cite{chen2009radiofrequency}.
 
-Fig.~\ref{fig:tagha} depicts a model of the tags. For simplicity, they are shown as starting in
+Fig.~\ref{fig:tagha} depicts a model of a tag. For simplicity, it is shown as starting in
 the active mode. It has two state variables: $c$, which represents the active mode timeout
 clock, and $B$ represents the capacity of the battery. In active mode, the battery drains at
 a rate of -50 per second, a rate chosen arbitrarily for illustrative purposes only. In sleep mode,

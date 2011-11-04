@@ -1,9 +1,8 @@
 \TUchapter{Attack Graph Generation}
 \TUsection{Introduction}
-Attack graph generation requires a variety of tradeoffs in terms of performance,
-storage, time, expressiveness, and comprehensiveness of output. Development and
-improvement of the generation methodology is a research area all to itself, one
-that is not the goal of this thesis. This work is concerned with generation only
+Attack graph generation is a research area all to itself,
+involving tradeoffs in performance, storage, time, and expressiveness.
+This work is concerned with generation only
 in terms of building an effective research platform from which hybrid systems
 modeling can proceed.
 
@@ -18,12 +17,14 @@ state of the art in attack graph generation performance and represents a
 contribution only in its explicitness.
 \TUsection{Generation Algorithm and Pseudocode}
 \TUsubsection{Description}
-Attack graph generation proceeds in the following stages. The input to this
+The input to this
 process is a network model specification (assets and initial fact base),
 exploit pattern specification, and maximum allowed depth (actually maximum
 allowed shortest path from starting state) of the constructed attack graph.
 
-In sections where it is applicable, pseudocode is provided. As the reference
+Attack graph generation proceeds in the following stages, separated by
+section below. In sections where it is applicable, pseudocode is provided. 
+As the reference
 implementation is written in Python, this pseudocode uses some common Python
 idioms, such as a heavy reliance upon maps (dictionaries).
 \TUsubsection{Network model parsing}
@@ -37,7 +38,7 @@ and for topologies, \texttt{('topology', source asset, destination asset,
 topology name)}. These are stored in per-state unordered collections without duplicates
 (sets) usually denoted \texttt{factbase}.
 
-An example network model (also called network state) data model is shown in
+An example network model (also called network state) data structure is shown in
 Fig.~\ref{fig:netstate_pc}.
 
 \begin{figure}
@@ -57,7 +58,7 @@ type network_state:
 The exploit pattern specification is parsed into a set of exploits, each
 containing a set of precondition facts and a set of postcondition operations.
 
-An example exploit data model is shown in
+An example exploit data type is shown in
 Fig.~\ref{fig:exploit_pc}.
 
 \begin{figure}
@@ -119,7 +120,6 @@ Pseudocode for these two functions is provided in Fig.~\ref{fig:get_attacks_pc}.
 \begin{lstlisting}
 def get_attacks(network_state, attack_bindings):
  valid_attacks = []
- 
  for attack in attack_bindings:
   if validate_attack(network_state.factbase, attack):
    valid_attacks.append(attack)
@@ -129,7 +129,6 @@ def validate_attack(factbase, attack):
  # Recall: attack is of the form (exploit, binding map)
  exploit = attack[0]
  binding_dict = attack[1]
- 
  for precondition in exploit.preconditions:
   if precondition.type == 'quality':
    if ('quality', binding_dict[precondition.asset], 
@@ -150,7 +149,7 @@ def validate_attack(factbase, attack):
 Successor state computation is the second component of attack application;
 it comprises postcondition processing. Its functionality is straightforward.
 Given a network state and an attack binding, it first copies the network state's
-component pieces. Next, it loops through the attack's
+assets and facts. Next, it loops through the attack's
 postconditions, binds parameters to assets, and removes or adds new facts
 in accordance with the postcondition operation. Lastly, the network state's
 components are used to construct a new network state model, the successor
@@ -278,7 +277,7 @@ sample attack graph generation process using an example. The reader is warned to
 avoid searching for meaning or design in the selection of these assets, qualities,
 and topologies; they are intended to be illustrative only, and any relation to 
 real world networks, problems, attacks, or situations is purely coincidental.
-This section will use the network model specification in Fig.~\ref{fig:ill_nm}
+This section uses the network model specification in Fig.~\ref{fig:ill_nm}
 and the exploit patterns in Fig.~\ref{fig:ill_xp}.
 \begin{figure}
 \begin{lstlisting}
@@ -334,7 +333,8 @@ Likewise, the edges that represent topologies
 are labeled with the topology name they represent.
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/nm_state0}
+\centering
+\includegraphics[width=\textwidth]{ag_illustrative_simple/nm_state0}
 \caption{State 0 of the illustrative discrete example}
 \label{fig:ill_topology_0}
 \end{figure}
@@ -354,19 +354,22 @@ Fig.~\ref{fig:ill_ag_depth1}. Both of these states are added to the
 successor state list.
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/nm_state1}
+\centering
+\includegraphics[height=0.4\textheight]{ag_illustrative_simple/nm_state1}
 \caption{State 1 of the illustrative discrete example}
 \label{fig:ill_topology_1}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/nm_state2}
+\centering
+\includegraphics[height=0.4\textheight]{ag_illustrative_simple/nm_state2}
 \caption{State 2 of the illustrative discrete example}
 \label{fig:ill_topology_2}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/ag_depth1}
+\centering
+\includegraphics[width=\textwidth]{ag_illustrative_simple/ag_depth1}
 \caption{Attack graph after first iteration}
 \label{fig:ill_ag_depth1}
 \end{figure}
@@ -382,13 +385,15 @@ states, and they are added to the attack graph with the appropriate edges, as
 well as to the successor state list.
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/nm_state3}
+\centering
+\includegraphics[width=\textwidth]{ag_illustrative_simple/nm_state3}
 \caption{State 3 of the illustrative discrete example}
 \label{fig:ill_topology_3}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/nm_state4}
+\centering
+\includegraphics[height=0.4\textheight]{ag_illustrative_simple/nm_state4}
 \caption{State 4 of the illustrative discrete example}
 \label{fig:ill_topology_4}
 \end{figure}
@@ -403,26 +408,29 @@ only an edge is drawn. The second attack generates State 5
 and the successor state list.
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/nm_state5}
+\centering
+\includegraphics[height=0.4\textheight]{ag_illustrative_simple/nm_state5}
 \caption{State 5 of the illustrative discrete example}
 \label{fig:ill_topology_5}
 \end{figure}
 
-For the next invocation, the successor state list becomes the analysis state
-list, and the depth is reduced to 0.  Although there are more successor states,
+For the next invocation, the contents of the successor state list become the new
+analysis states, and the depth is reduced to 0.  Although there are more successor states,
 the depth limit has been reached. Therefore, generation halts. The final product
 attack graph is illustrated in Fig.~\ref{fig:ill_ag_depth2}. Incidentally, if
 execution had been allowed to continue until there were no more successor states,
 the generated attack graph would be the one in Fig.~\ref{fig:ill_ag_depth5}.
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/ag_depth2}
+\centering
+\includegraphics[width=\textwidth]{ag_illustrative_simple/ag_depth2}
 \caption{Attack graph after first iteration}
 \label{fig:ill_ag_depth2}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=4in]{ag_illustrative_simple/ag_depth5}
+\centering
+\includegraphics[width=\textwidth]{ag_illustrative_simple/ag_depth5}
 \caption{Complete illustrative attack graph}
 \label{fig:ill_ag_depth5}
 \end{figure}
