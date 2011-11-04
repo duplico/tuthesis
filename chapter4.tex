@@ -152,7 +152,7 @@ Additionally, \texttt{delete} operations in postconditions take only a quality
 name, with no value required (eliminating the confusing possibility of a
 command to \texttt{delete quality:a,q!=5}, one of several deletion commands
 that has little meaning).
-\TUsubsection{Host Declaration and Status Proprocessing}
+\TUsubsection{Host Declaration and Status Preprocessing}
 To support the use of status properties of host assets, a set of shorthand
 syntax is now provided for denoting which assets represent hosts. In practice,
 this has been observed to be the majority of modeled assets, so the shorthand
@@ -271,12 +271,12 @@ def has_platform(factbase_platformlist, platform):
 On the other hand, quality precondition matching must become
 somewhat more complicated with the addition of the not-equal relational
 operator. Merely building a fact and checking for its membership in the
-factbase data structure is no longer sufficient. 
+fact base data structure is no longer sufficient. 
 
 Although the not-equal relational operator \emph{could} be implemented
 similarly to the equality relational operator, by building a fact from the
 given name and value and checking for its exclusion from (instead of inclusion 
-in) the factbase, a more advanced fact checking method is provided in order 
+in) the fact base, a more advanced fact checking method is provided in order 
 to ease the transition to permitting real values for qualities.
 
 The fact base data structure is updated to include maps from quality names to
@@ -299,7 +299,7 @@ type network_state:
     qualities : map (keys=assets, vals=map(keys=quality_name,
                                            vals=quality_value))
 \end{lstlisting}
-\caption{Updated discrete network state datatype pseudocode}
+\caption{Updated discrete network state data type pseudocode}
 \label{fig:netstate_map_pc}
 \end{figure}
 
@@ -318,7 +318,7 @@ Fig.~\ref{fig:cpe_glgr_precondition_pc}.
 
 The reference implementation uses a two-pass algorithm over the set of
 valid attacks (selected using the existing precondition processing method).
-First, a trio of mappings are instanciated to store the attack data structures.
+First, a trio of mappings are instantiated to store the attack data structures.
 The ``grouped global'' map is keyed on group names and has as values a list of every
 valid binding to all the attacks in the group.
 The ``non-global group'' mapping is also keyed on group names and has as values more maps, which are

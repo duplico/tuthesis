@@ -29,8 +29,8 @@ the types of systems with which this work is concerned: a subset of hybrid
 systems that incorporate a significant computer and networking component.
 
 Nevertheless, the modeling of hybrid systems is well studied and provides a sufficient body
-of relevent work from which to draw to warrant its inclusion. This chapter includes
-background on a particularly relevent modeling framework for hybrid systems called the
+of relevant work from which to draw to warrant its inclusion. This chapter includes
+background on a particularly relevant modeling framework for hybrid systems called the
 hybrid automaton, which is used in this thesis as the standard benchmark against which to
 compare hybrid modeling techniques.
 \TUsubsection{Definition}
@@ -138,7 +138,7 @@ Attempts have been made to improve the hybrid automaton's network modeling
 capability. The designation of shared
 actions and shared variables as ``input'' or ``output'' is a popular tactic, 
 as in the powerful hybrid I/O 
-automaton~\cite{lynch1996hybrid}~\cite{lynch2001hybrid}, its descendent the
+automaton~\cite{lynch1996hybrid}~\cite{lynch2001hybrid}, its descendant the
 timed I/O automaton~\cite{kaynar2010theory}, and in the PHAVer model 
 checker~\cite{frehse2005phaver}.
 
@@ -255,7 +255,7 @@ its prerequisites. For example, consider the goal of
 stealing a car, which is modeled in a simple attack tree in Fig.~\ref{fig:attacktree}.
 
 The attacker must start the car and drive away; this could be accomplished either by breaking
-in and hotwiring the car, or by stealing the owner's key and using it to subsequently steal the
+in and hot wiring the car, or by stealing the owner's key and using it to subsequently steal the
 car. The root of the tree represents the final goal of the theft, with prerequisite goals
 flowing upward from the leaf nodes.
 \begin{figure}
@@ -328,7 +328,7 @@ into the continuous domain.
 
 The alternative is domain-driven, confining the modeler to
 terms that impose explicit computer networking 
-comcepts onto the model~\cite{templeton2001requires}.
+concepts onto the model~\cite{templeton2001requires}.
 This permits generation and analysis to take a
 more nuanced view of a network state, including reachability analysis to determine whether a
 given topology permits communication between two hosts~\cite{ingols2009modeling}. This approach
@@ -630,8 +630,8 @@ speed this loss of power.
 The ISO 18000-7 tags have two modes: an active mode, and a sleep mode in which their
 power consumption is significantly reduced. The active mode has a 30 second timeout,
 which causes them to sleep unless the timer is reset by a valid
-command from the reader or a wake-up signal. In sleep mode, the tags only respond to a
-wake-up command, which causes them to enter active mode.
+command from the reader or a wake-up signal. In sleep mode, the tags can only
+be awoken by a wake-up command.
 A denial of sleep attack occurs when the tag is not permitted to enter sleep mode or is
 awoken more frequently than normal.
 
@@ -643,18 +643,10 @@ system connected to it via a network.
 Hybrid automata serve to represent the behavior of the devices themselves quite well.
 Fig.~\ref{fig:readerha} represents the reader (legitimate or rogue), which does nothing but 
 transmit commands and
-wake-up signals, which can come at any time with no restrictions. Under
-ordinary occasional operating conditions this might take place over the course 
-of as many as ten years before the batteries in the tags are 
+wake-up signals, which can come at any time. Under
+ordinary conditions this might take place over the course 
+of several years before the batteries in the tags are 
 drained~\cite{chen2009radiofrequency}.
-
-Fig.~\ref{fig:tagha} depicts a model of a tag. For simplicity, it is shown as starting in
-the active mode. It has two state variables: $c$, which represents the active mode timeout
-clock, and $B$ represents the capacity of the battery. In active mode, the battery drains at
-a rate of -50 per second, a rate chosen arbitrarily for illustrative purposes only. In sleep mode,
-the battery drains at a rate of -1 per second. No restrictions are placed on the starting condition
-of the battery. The two automata are composed using two shared actions: \emph{WakeUp} and \emph{Command}, which
-synchronize the switches they decorate between the automata.
 
 \begin{figure}
 \centering
@@ -669,6 +661,16 @@ digraph G {
 \caption{Hybrid automaton model of the RFID reader}
 \label{fig:readerha}
 \end{figure}
+
+Fig.~\ref{fig:tagha} depicts a model of a tag.
+It has two state variables: $c$, which represents the active mode timeout
+clock, and $B$, which represents battery capacity. 
+When active, the battery drains at the arbitrarily chosen rate of -50 
+units per second. In sleep mode,
+the battery drains at a rate of -1 per second. No restrictions are placed on the starting condition
+of the battery. The two automata are composed using two shared 
+actions: \emph{WakeUp} and \emph{Command}, which
+synchronize the switches they decorate between the automata.
 
 \begin{figure}
 \centering
