@@ -17,7 +17,7 @@ performance for attack graph generation.
 \TUsubsubsection{Model acquisition}
 Although this thesis takes great strides forward in the articulation of a
 language and framework that will be well suited to a wide variety of networks,
-a significant roadblock to its use is in network model and exploit pattern
+a significant roadblock to its wide use is in network model and exploit pattern
 acquisition: although their formats are convenient, they must be automated
 before large scale adoption is possible.
 \TUsubsubsection{Performance}
@@ -26,8 +26,8 @@ graph generator scales factorially with input assets and exponentially with
 maximum depth. This is exacerbated by the tendency of time group exploits to
 bind with large numbers of assets in nearly exhaustive combinations, behavior
 that can be seen in the automotive attack graph examples. Using this tool,
-generation of attack graphs from nontrivial simulations (on the order of tens
-of hybrid assets) in acceptable amounts of time is not likely.
+generation of attack graphs from nontrivial scenarios (with tens
+of hybrid assets) in acceptable time is not likely.
 
 Fortunately, the addition of these hybrid extensions does not qualitatively
 affect the complexity of attack graph generation. For this reason, existing
@@ -47,6 +47,7 @@ unsatisfying. Although it was not stated initially, it is
 clear that separating concerns---keeping network model and behavior in the
 network model and attacker actions in the exploit patterns---is a useful
 design goal especially for the benefit of a modeler.
+\pagebreak[0]
 \TUsection{Future Work}
 \TUsubsection{Network Model}
 \TUsubsubsection{First and third person modeling}
@@ -77,9 +78,9 @@ There would be value in automated classification of exploit postconditions.
 That is, there is a limited number of possible security consequence
 classifications of any attack. The National Vulnerability Database contains a
 partial attempt to enumerate them. Microsoft makes a similar attempt with
-STRIDE. If an exploit can be automatically (or even manually by its source
+STRIDE~\cite{shostack2008experiences}. If an exploit can be automatically (or even manually by its source
 prior to acquisition for use in the attack graph generator) tagged with its
-consequences or potential consequences, this can (1) ease automated creation of
+consequences or potential consequences, this could (1) ease automated creation of
 a general exploit pattern and its postconditions, and (2) aid in analysis by
 flagging possible consequences of reaching a particular node. 
 \TUsubsection{Exploit Pattern Enhancement}
@@ -111,14 +112,14 @@ affect, for example, Linux version 2.6.33.19, 2.6.34.10, and 2.6.38.8.
 Currently, the right hand side of exploit conditions must be literals. If they
 could be expressions involving variables loaded from the fact base, this would 
 satisfy the required conditions for linear hybrid automata equivalence (see
-Section~\ref{sec:hag_ha}.
+Section~\ref{sec:hag_ha}).
 \TUsubsection{Hybrid Modeling challenges}
 Time is difficult to model and interpret when implemented in this way. One
-alternative may be to look again to the hybrid automata for inspiration and
-adopt a type of transition similar to its \emph{time-abstract} semantics,
+alternative may be to again to hybrid automata for inspiration and
+adopt a strategy similar to its \emph{time-abstract} semantics,
 which indicate \emph{that} time has passed, but not precisely \emph{how much}
-has passed. This kind of implementation would eliminate much of the size and,
-potentially, generation scaling issues with this proposed framework.
+has passed. This kind of implementation would mitigate issues of size and,
+potentially, scaling.
 \TUsubsection{Generation}
 \TUsubsubsection{Performance}
 The generation performance of the hybrid attack graph generation needs to be
