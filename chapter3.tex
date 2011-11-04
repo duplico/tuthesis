@@ -164,12 +164,10 @@ network state data in a per-state map that is used only for quality lookups.
 \begin{figure}
 \begin{lstlisting}
 def get_successor_state(network_state, attack):
-
  successor_assets = deep copy of network_state.assets
  successor_facts = deep copy of network_state.factbase
  
- # Recall: attack is of the form (exploit, binding map)
- exploit = attack[0]
+ exploit = attack[0] # (exploit, binding map)
  binding_dict = attack[1]
  
  for postcondition in exploit.postconditions:
@@ -179,10 +177,11 @@ def get_successor_state(network_state, attack):
         binding_dict[postcondition.source],
         binding_dict[postcondition.dest],
         postcondition.name,
-        value=postcondition.value)
+        postcondition.value)
    else if postcondition.type == 'quality':
-    old_value = get_quality_value(binding_dict[postcondition.asset], 
-                                  postcondition.name)
+    old_value = get_quality_value(
+        binding_dict[postcondition.asset], 
+        postcondition.name)
     successor_facts.remove(('quality',
                             binding_dict[postcondition.asset],
                             postcondition.name,
@@ -198,8 +197,9 @@ def get_successor_state(network_state, attack):
                             binding_dict[postcondition.dest],
                             postcondition.name))
    elif postcondition.type == 'quality':
-    old_value = get_quality_value(binding_dict[postcondition.asset], 
-                                  postcondition.name)
+    old_value = get_quality_value(
+        binding_dict[postcondition.asset], 
+        postcondition.name)
     successor_facts.remove(('quality',
                             binding_dict[postcondition.asset],
                             postcondition.name,
@@ -238,7 +238,8 @@ Pseudocode for this process is provided in Fig.~\ref{fig:ag_generation_pc}.
 
 \begin{figure}
 \begin{lstlisting}
-def generate_attack_graph(analysis_states, depth, attack_bindings,
+def generate_attack_graph(analysis_states, depth, 
+                          attack_bindings,
                           attack_graph):
  if len(analysis_states) == 0 or depth == 0:
   return attack_graph
@@ -393,8 +394,8 @@ well as to the successor state list.
 \end{figure}
 
 Generation continues by addressing State 2. In State 2, two possible attacks
-are returned: \texttt{exploit\_1 (asset\_1, asset\_2)} and 
-\texttt{exploit\_2 (asset\_2, asset\_3)}. The first attack generates State 3,
+are returned: \texttt{exploit\_1} on \texttt{(asset\_1, asset\_2)} and 
+\texttt{exploit\_2} on \texttt{(asset\_2, asset\_3)}. The first attack generates State 3,
 an existing state. Since that state is already in the attack graph, it is
 not added to the successor state list or to the attack graph again; instead,
 only an edge is drawn. The second attack generates State 5 

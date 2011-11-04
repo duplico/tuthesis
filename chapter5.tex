@@ -208,11 +208,13 @@ fact-tuple = ('quality', asset, name, value) or
 type network_state:
     assets : set of strings;
     factbase : set of fact-tuples;
-    qualities : map (keys=assets, vals=map(keys=quality_name,
-                                           vals=quality_value))
-    topologies : map (keys=src_assets, vals=map(keys=dest_asset,
-                                                vals=map(keys=topology,
-                                                         vals=values))
+    qualities : map (keys=assets, 
+                     vals=map(keys=quality_name,
+                              vals=quality_value))
+    topologies : map (keys=src_assets, 
+                      vals=map(keys=dest_asset,
+                               vals=map(keys=topology,
+                                        vals=values))
 \end{lstlisting}
 \caption{Updated hybrid network state datatype pseudocode}
 \label{fig:netstate_map_hybrid_pc}
@@ -233,11 +235,12 @@ remainder of the generation process.
 
 \begin{figure}
 \begin{lstlisting}
-RELOPS = map(keys = ('==', '<>', '>=', '<=', '<', '>', '=', '!=',
+RELOPS = map(keys = ('==', '<>', '>=', '<=',
+                     '<', '>', '=', '!='),
              vals = (associated functions))
              
-def matches_topology(source, dest, name, value=True, op='==',
-                     check_reverse=False):
+def matches_topology(source, dest, name, value=True, 
+                     op='==', check_reverse=False):
     if source in factbase.topologies and
       dest in factbase.topologies[source] and
       name in factbase.topologies[source][dest]:
@@ -250,8 +253,8 @@ def matches_topology(source, dest, name, value=True, op='==',
     
     if check_reverse:
         return RELOPS[op](my_value, value) and
-               matches_topology(dest, source, name, value=value,
-                                op=op)
+               matches_topology(dest, source, name, 
+                                value=value, op=op)
     else:
         return RELOPS[op](my_value, value)
 
@@ -292,7 +295,8 @@ def set_quality(factbase, asset, name, value, op='='):
     update factbase with:
         factbase.qualities[asset][name] = new_value
 
-def set_topology(factbase, source, dest, name, value=True, op=None):
+def set_topology(factbase, source, dest, name, 
+                 value=True, op=None):
     if not op: # Token
         update factbase with:
             factbase.topologies[source][dest][name] = value
@@ -300,7 +304,9 @@ def set_topology(factbase, source, dest, name, value=True, op=None):
         if source in factbase.topologies and
           dest in factbase.topologies[source] and
           name in factbase.topologies[source][dest]:
-            my_value = self.assets[source].get_topology(dest, name)
+            my_value = self.assets[source].get_topology(
+                dest, name
+              )
         else:
             my_value = 0
         new_value = ASSIGNOPS[op](my_value, new_value)
@@ -321,6 +327,7 @@ both of which are collected into a group called ``time'', signifying that
 they represent time steps. The global and grouping mechanisms, however, only 
 truly become dramatic once combined with discrete exploits causing mode % TODO: describe
 transitions, and even moreso once multiple assets are involved.
+\label{sec:car}
 
 \begin{figure}
 \includegraphics[height=3in]{ag_car/simple/full_bunny_1_ag_5}
@@ -391,7 +398,7 @@ this case, the evolution of time is clearly denoted by the transitions labeled
 \texttt{group(time)}.
 
 \begin{figure}
-\includegraphics[width=6in]{ag_car/onecar/full_bunny_onecar_ag_5}
+\includegraphics[height=0.9\textheight]{ag_car/onecar/full_bunny_onecar_ag_5}
 \caption{One-car automotive attack graph}
 \label{fig:fullbunny_one_ag}
 \end{figure}
@@ -438,11 +445,12 @@ the crashing of the Civic has the discrete consequence of placing it into a
 mode in which it no longer changes state with time.
 
 \begin{figure}
-\includegraphics[width=6in]{ag_car/twocar/full_bunny_twocar_ag_5}
+\includegraphics[angle=90,width=0.9\textwidth]{ag_car/twocar/full_bunny_twocar_ag_5}
 \caption{Two-car automotive attack graph}
 \label{fig:fullbunny_two_ag}
 \end{figure}
 \TUsubsection{Denial of Sleep}
+\label{sec:rfid}
 The final example serves to demonstrate further the interaction of discrete
 attacks with time; it is also used later to discuss scaling behavior. The network
 model given in Fig.~\ref{fig:rfid1_nm} describes a system of a single
@@ -578,13 +586,13 @@ has executed the denial of sleep attack to the demise of the tag, and state
 40, in which the tag has died on its own.
 
 \begin{figure}
-\includegraphics[width=6in]{ag_dash7/sleep_ag_6}
+\includegraphics[width=\textwidth]{ag_dash7/sleep_ag_6}
 \caption{One tag RFID system attack graph (depth of 6)}
 \label{fig:rfid1_ag6}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=6in]{ag_dash7/sleep_ag_11}
+\includegraphics[width=\textwidth]{ag_dash7/sleep_ag_11}
 \caption{One tag RFID system attack graph (full depth)}
 \label{fig:rfid1_ag11}
 \end{figure}
