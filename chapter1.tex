@@ -1,20 +1,22 @@
 \TUchapter{Introduction}
 \TUsection{Introduction}
-As computer systems become pervasive across a variety of domains, not only are their interactions
-with people becoming more frequent; computer systems are also increasingly interacting with the 
-physical world and with each other.
+As computer systems become pervasive, not only are 
+their interactions with people becoming more frequent; they are also
+increasingly interacting with the physical world and with each other. These
+systems sometimes bridge the divide between the computational and the physical,
+blending discrete and continuous elements into a single system.
 
-Systems that include both continuous and discrete components are termed \emph{hybrid systems}.
-When linked together with a significant network component, these systems are sometimes called
-\emph{cyber physical systems}. They have been targeted as a key area of research by the National
-Science Foundation because they
-are becoming pervasive in safety-critical domains such as medical, critical infrastructure, and
-automotive equipment. This thesis is concerned with modeling the security of these systems and
-their interactions with each other and the physical world.
+Such systems are termed \emph{hybrid systems}. When linked together with a 
+significant network component, these systems are sometimes called
+\emph{cyber-physical systems}. They have been targeted as a key area of 
+research by the National Science Foundation because they are pervasive in 
+safety-critical applications such as medical, critical infrastructure, and
+automotive equipment. This thesis is concerned with modeling
+these systems, their security, and the manner in which their components
+interact with each other and the physical world.
 \TUsection{Modeling Frameworks}
-An excellent argument for the need for new research in modeling cyber physical systems
-is due to Lee in a 2006 position paper in the National Science Foundation Workshop on Cyber-Physical Systems,
-a prelude to the NSF's research initiative on cyber physical systems:
+An excellent argument for the need for new research in modeling cyber-physical 
+systems is due to Lee:
 \begin{quote}
 Cyber-Physical Systems (CPS) are integrations of computation with physical
 processes. Embedded computers and networks monitor and control the physical
@@ -24,25 +26,27 @@ and concurrency is intrinsic. Neither of these properties is present in today's
 computing and networking abstractions~\cite{lee2006cyber}.
 \end{quote}
 
-Existing frameworks for modeling and analysis of purely discrete computer networks are inappropriate for use in
+This still holds true today. Existing frameworks---abstractions---for modeling 
+and analysis of purely discrete computer networks are inappropriate for use in
 these systems because of their inability to capture the continuous domain; they
-also lack a robust, let alone ``inexorable'' notion of time. Likewise, existing
-methods for studying hybrid systems fall short when it comes to modeling the complex distributed
-networks that are often the hallmarks of cyber physical systems.
-\TUsection{Scope}
-This thesis presents an extension of the attack graph modeling framework, 
-a discrete domain formalism for studying network security, into the 
-continuous domain to enable it to model cyber
-physical systems. The goal is to combine aspects of both hybrid systems
-modeling frameworks, particularly hybrid automata, which best describe systems in 
-relative isolation; and computer network security modeling frameworks, particularly attack graphs,
-which excel at capturing the complex interrelationships and interdependencies among assets and
-attacks.
+also lack a robust, let alone ``inexorable'' notion of time. Likewise, 
+modeling methods from the world of isolated control systems cannot model the
+complex distributed networks that are the hallmark of cyber-physical systems.
 
-The remainder of this thesis is structured as follows. Chapter 2 provides background in hybrid systems
-and their modeling methods, introduces past work in attack graphs, and presents a set of case studies
-in both the hybrid and discrete domains to be used throughout this work. Chapter 3
-contributes a specification for the generation process. Chapter 4 introduces in detail
-the improved attack graph framework to be used as the basis for the hybrid extensions. Chapter 5
-introduces the extensions themselves. Chapter 6 delivers some results from this modeling methodology,
-and Chapter 7 draws conclusions and suggests further work.
+\TUsection{Scope}
+This thesis presents an extension of the attack graph into the 
+continuous domain. 
+The goal is to incorporate aspects of hybrid systems
+modeling (e.g. hybrid automata), which best describe systems in 
+relative isolation into attack graphs, which excel at capturing complex 
+interrelationships and interdependencies among systems and attacks.
+
+The remainder of this thesis is structured as follows. Chapter 2 provides 
+background in hybrid systems and their modeling, introduces past work in attack 
+graphs, and presents a set of case studies in both the hybrid and discrete 
+domains used throughout this work. Chapter 3 contributes a specification for 
+the generation process. Chapter 4 introduces in detail an expanded attack graph 
+model to be used as the basis for the hybrid extensions. Chapter 5
+introduces those extensions themselves. Chapter 6 delivers some results from 
+this modeling methodology, and Chapter 7 draws conclusions and suggests 
+further work.

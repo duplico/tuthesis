@@ -21,7 +21,18 @@ a significant roadblock to its use is in network model and exploit pattern
 acquisition: although their formats are convenient, they must be automated
 before large scale adoption is possible.
 \TUsubsubsection{Performance}
-It's definitely exponential. More once I've done more science.
+The worst-case execution time of the reference implementation of the attack 
+graph generator scales factorially with input assets and exponentially with
+maximum depth. This is exacerbated by the tendency of time group exploits to
+bind with large numbers of assets in nearly exhaustive combinations, behavior
+that can be seen in the automotive attack graph examples. Using this tool,
+generation of attack graphs from nontrivial simulations (on the order of tens
+of hybrid assets) in acceptable amounts of time is not likely.
+
+Fortunately, the addition of these hybrid extensions does not qualitatively
+affect the complexity of attack graph generation. For this reason, existing
+research into improvement of generation performance is expected to be
+equally applicable to hybrid attack graphs.
 \TUsubsubsection{Cognitive scalability}
 Perhaps the most severe difficulty with attack graphs is their size and visual
 complexity. On their face, they are valuable tools for applying human intuition
@@ -91,12 +102,12 @@ This exploit permits an attacker with certain access to one asset to ``pivot''
 from that asset onto all the assets that are connected to it. Specification of
 these generic pivot exploits, possibly supported by wildcards in the generator,
 would greatly ease the task of a modeler.
-\TUsubsubsection{Boolean exploit conditions}
+\TUsubsubsection{Boolean preconditions}
 Permitting boolean operators in exploit preconditions would be valuable, as
 otherwise (currently) multiple exploits with the same sets of postconditions but
 slightly varied preconditions must be used to represent exploits that may
 affect, for example, Linux version 2.6.33.19, 2.6.34.10, and 2.6.38.8.
-\TUsubsubsection{Variable exploit conditions}
+\TUsubsubsection{Variable conditions}
 Currently, the right hand side of exploit conditions must be literals. If they
 could be expressions involving variables loaded from the fact base, this would 
 satisfy the required conditions for linear hybrid automata equivalence (see
@@ -134,4 +145,5 @@ generate, easing performance concerns. Furthermore, the hybrid versions proposed
 in a University of Tulsa abstract~\cite{louthan2011toward} exhibit the
 desired time abstract behavior and separation of concerns mentioned above. These
 may very well be the best direction for future work in hybrid attack graph
-study to proceed.
+study to proceed, and much of the work presented in this thesis is applicable to
+hybrid attack dependency graphs.
