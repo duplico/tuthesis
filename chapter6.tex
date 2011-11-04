@@ -10,13 +10,13 @@ a discussion of its performance) and its capabilities (articulating its
 contribution to the hybrid systems modeler), as well as a discussion of the
 network and system analysis that it enables.
 \TUsection{Discrete Capabilities}
-Enough space has already been dedicated to specific additions: platform
+Enough space has already been dedicated to some additions: platform
 facts, host processing, and the standard lexicon. These provide enhancements
 to the modeler and ease model acquisition from a standard network 
 representation. However, further discussion is warranted of the power added
 by global exploits and grouping exploits.
 
-Recall that, in short, globalness applies one exploit to multiple asset 
+In short, globalness applies one exploit to multiple asset 
 bindings, whereas grouping applies multiple exploits to the same asset binding.
 Consider the goal of modeling a fuzzer or automated attack script that
 simultaneously attempts to exploit a variety of common web vulnerabilities on
@@ -66,7 +66,7 @@ hybrid automata, and the requirement that the time domain be discretized.
 
 \TUsubsection{Classes of hybrid systems modeled by hybrid attack graphs}
 \label{sec:hag_ha}
-Happily, Henzinger and others have articulated a special case of the
+Henzinger and others have articulated a special case of the
 hybrid automaton called the linear hybrid automaton~\cite{henzinger1996theory}.
 The linear hybrid automaton is a hybrid automaton in which (1) all conditions
 in the automaton are boolean combinations of linear inequalities, and (2) all
@@ -74,42 +74,42 @@ flow conditions use only free variables from $\dot{X}$. In this case, a linear
 inequality is an inequality on linear terms, or linear combinations of
 integer constants with real valued variables.
 
-Clearly restriction (1) does not hold, because of the lack of variables
+Clearly condition (1) does not hold, because of the lack of variables
 on the right hand side of the operators in the attack graph language. However,
 the subcase in which the left hand side is the variable in question, and the
 right hand side is the constant $k_0$ does.
 
-Restriction (2) is more subtle but less restricting. As it permits free
+Condition (2) is more subtle but less restricting. As it permits free
 variables only from $\dot{X}$, so long as only one free variable from $\dot{X}$ is
 used this is exactly equivalent to the behavior permitted in time evolution
 exploit patterns. In the less deterministic (and less common) case in which
 multiple free variables from $\dot{X}$ are involved in a flow condition,
 the hybrid attack graph language permits an execution that conforms to the
 hybrid system specification, but not one that explores all possibilities.
-
 \TUsubsection{Hybrid systems to hybrid attack graph mapping}
 The hybrid attack graph permits discrete time
-simulation of a small, very well behaved subclass of linear hybrid automata. 
-Informally, this can be accomplished by the following general mapping:
+simulation of a small, very well behaved subclass of linear hybrid automata.
+Nevertheless, this provides sufficient power to capture a wide variety of
+systems. Informally, including a HA in a hybrid attack graph can be 
+accomplished using the following general mapping:
 \begin{description}
-\item[Hybrid automata onto assets] The asset itself represents the automaton.
+\item[Hybrid automata onto assets] The automaton is represented by an asset.
     Therefore its variables take the form of facts on that asset, its
     conditions take the form of preconditions and postconditions on exploits,
     and events, jumps, and time evolution are done on the exploits.
-\item[Control modes onto qualities] The control mode itself is selected based
+\item[Control modes onto qualities] The control mode is selected based
     upon a quality on the asset. The mode is implemented by the time
     evolution exploit responsible for that particular asset in that
     particular mode. Control switches are not explicitly encoded but can be
-    thought of as part of the discrete exploits that serve to change the
-    exploit's mode.
+    thought of as part of the exploits that change the asset's mode.
 \item[State variables onto qualities] The state variables are encoded
     explicitly as qualities about the asset in the fact base.
 \item[Initial conditions onto network model] The initial conditions are
     implemented in the network model initial state.
 \item[Jump conditions onto non-time exploits] Jump conditions,
     which select when a mode transition \emph{may} occur, are mapped onto
-    the conditions of a non-time exploit. This is because, although these
-    conditions may 
+    the conditions of a non-time exploit, so that they may be fired, but not as
+    part of the time stepping.
 \item[Invariant conditions onto time exploits] Invariant conditions indicate
     when a mode \emph{must} change in order for the inexorable passage of time
     to proceed. Therefore, these conditions are placed explicitly into time 
@@ -118,7 +118,7 @@ Informally, this can be accomplished by the following general mapping:
 \item[Flow conditions onto time exploits] Flow conditions, which dictate the
     continuous evolution of the system over time, are implemented as rates of
     change in time exploit postconditions (e.g. \texttt{temp-=5}). Their
-    repeated application over the discretized time intervals cause the
+    repeated application over discretized time intervals cause the
     simulation of continuous time evolution.
 \item[Events onto global groupings] Event labels, which are used to synchronize
     mode transitions between multiple automata, are implemented as global group
@@ -132,10 +132,10 @@ zeno} behavior and \emph{isolated zeno} behavior.
 
 Globally zeno behavior occurs in a hybrid attack graph when the
 repeated application of non-timed exploits is capable of providing an infinite
-transition path (infinite connected subgraph) in which there are no time 
-evolution attacks. That is, a model exhibiting globally Zeno behavior not only
+transition path in which there are no time 
+evolution attacks. That is, a model exhibiting globally zeno behavior not only
 generates an infinitely large attack graph, but it also generates one that is
-capable of causing the \emph{convergence of time}, which obviously fails to
+capable of causing the convergence of time, which obviously fails to
 capture real world behavior.
 
 Such models are probably (but
@@ -157,12 +157,12 @@ should be given that it is not an oversight on the part of the modeler.
 \TUsection{Performance}
 \TUsubsection{Introduction}
 Although the purpose of this work is not focused upon the performance of the
-generation process itself, a discussion of the performance of the reference
-implementation of the attack graph generator is warranted. This section first
+generation process, a discussion of the performance of the reference
+generator is warranted. This section first
 provides an outline of the execution of the generation program, decorated with
 the order of magnitude of the asymptotic bound of the execution time at
 each step. This is used to provide a bound on the scaling of the generator as
-a whole. The next section demonstrates the imperical results of a performance
+a whole. The next subsection demonstrates the imperical results of a performance
 analysis, providing graphical scaling data from code profiling
 to confirm the predictions of the outline.
 
@@ -201,7 +201,7 @@ Possible asset bindings & $B$ \\
 
 \TUsubsection{Program Outline and Asymptotic Analysis}
 The following outline articulates the order of execution steps in the reference
-generator. Each bold statement is decorated with the order of the number of
+generator. Each bolded step is decorated with the order of the number of
 times that piece of code is executed. Indented steps are substeps, which are
 executed on the order of their own decorated order, multiplied by the orders of
 each of their parent steps. The outline uses the symbols defined in 
@@ -244,7 +244,7 @@ Table~\ref{table:onotation}.
 There are two non-obvious variables included here. One is 
 $B$, the possible binding combinations value, which is
 actually the result of a permutation operation. This is bounded loosely by
-by $O(A!)$ and more tightly for a given scenario by 
+by $O(A!)$ (or $O(A^A)$) and more tightly for a given scenario by 
 $O\left(\frac{A!}{(A-a)!}\right)$ (alternatively $O(A^a)$),
 where $a$ is the length of the longest parameter list on any exploit pattern.
 
@@ -259,10 +259,10 @@ the number of states in the attack graph. Because a scenario is not guaranteed
 to converge to a closed attack graph, this is necessarily a function of the
 maximum depth. Each state may produce up to $B \cdot
 E$ new states. This may happen up to $d$ (generation depth) times. Using the
-derivation of binding\_combinations from earlier in this section, this means 
-that the number of states produced is at worst $(A!)^{D}$.
+derivation of $B$ from earlier in this section, this means 
+that the number of states produced is at worst $(A!E)^{D}$.
 More tightly, this is in 
-$O\left(\left(\frac{A!}{(A-a)!}\right)^{d}\right)$.
+$O\left(\left(\left(\frac{A!}{(A-a)!}\right)E\right)^{d}\right)$.
 This controls the scaling behavior of the recursive generator function.
 
 Furthermore, the fact ``count'' should actually be broken up into qualities and
@@ -285,32 +285,34 @@ section to simplify some notation.
 
 
 
-Using a shorthand of $B$ to refer to binding combinations, the outline
+The outline
 reveals the following bound on the generation process:
 
-$O((B^d)((A+F) + BEp + BE(A+F+P)))$.
+$O((EB)^d((A+F) + BEp + BE(A+F+P)))$.
 
 Recall that $B = \frac{A!}{(A-a)!}$, so is in $O(\frac{A!}{(A-a)!})$ 
 (more loosely, $O(A^a)$ or $O(A!)$ or
 even $O(A^A)$ are also valid), and that $F = AQ + A^2T$ (More loosely, $A^2f$). 
 Then the generation process is more precisely in:
 
-$O(((\frac{A!}{(A-a)!})^d)((A+AQ + A^2T) + \frac{A!}{(A-a)!}Ep + \frac{A!}{(A-a)!}E(A+AQ + A^2T+P)))$
+$O(((\frac{A!}{(A-a)!}E)^d)((A+AQ + A^2T) + \frac{A!}{(A-a)!}Ep + \frac{A!}{(A-a)!}E(A+AQ + A^2T+P)))$
 
-Switching to the looser bounds of $A$ for $p$ and $P$, and $A^A$ for $B$ 
-(thereby eliminating $a$) 
+Switching to the looser bounds of $A$ for $p$ and $P$, $A^A$ for $B$ 
+(thereby eliminating $a$), and $A^2f$ for $F$
 simplifies the presentation of this expression to a function only of $f$,
 $E$, $A$, and $d$. It is already clear that execution time is controlled almost
 completely by the growth of $A$ and $d$, but this resultant asymptotic bound for
 execution time of the (hybrid) attack graph generation process presents that 
 fact quite dramatically:
 
-$O((A^Ad)((A+A^2f) + A^AEA + A^AE(A+A^2f+A)))$
+$O((A^AE)^d((A+A^2f) + A^AEA + A^AE(A+A^2f+A)))$
 
 = $O(fEA^{Ad+A+2})$
+= $O(E^{d+1}fA^{A(d+1)+2})$
+\approx $O(O(E^{d+1}fA!^{d}))$ (in a mild abuse of notation)
 
-Worst case generation time, then, is expected to grow linearly with fact names 
-and exploit patterns, exponentially with generation depth (for divergent 
+Worst case generation time, then, is expected to grow linearly with fact names, 
+polynomially with exploit patterns, exponentially with generation depth (for divergent 
 graphs), and factorially with assets. The next sections demonstrate imperically
 the effects of generation depth and asset growth on execution time.
 \TUsubsection{Execution Time Results}
@@ -338,19 +340,22 @@ bindings of the time group exploits to car assets in
 Fig.~\ref{fig:5car_ag_shallow}.
 
 \begin{figure}
-\includegraphics[width=5in]{perf/asset_time}
+\centering
+\includegraphics[width=\textwidth]{perf/asset_time}
 \caption{Execution time vs. number of assets}
 \label{fig:assetperf}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=5in]{perf/asset_time_log}
+\centering
+\includegraphics[width=\textwidth]{perf/asset_time_log}
 \caption{Execution time vs. number of assets (log scale)}
 \label{fig:assetperflog}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=5in]{fullbunny_s5_d2}
+\centering
+\includegraphics[angle=90,height=0.9\textheight]{fullbunny_s5_d2}
 \caption{5-car hybrid attack graph to depth 2}
 \label{fig:5car_ag_shallow}
 \end{figure}
@@ -365,13 +370,15 @@ Fig.~\ref{fig:depthperf} and on a logarithmic scale in
 Fig.~\ref{fig:depthperflog}.
 
 \begin{figure}
-\includegraphics[width=5in]{perf/depth_time}
+\centering
+\includegraphics[width=\textwidth]{perf/depth_time}
 \caption{Execution time vs. generation depth}
 \label{fig:depthperf}
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=5in]{perf/depth_time_log}
+\centering
+\includegraphics[width=\textwidth]{perf/depth_time_log}
 \caption{Execution time vs. generation depth (log scale)}
 \label{fig:depthperflog}
 \end{figure}
