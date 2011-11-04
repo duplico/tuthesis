@@ -23,26 +23,20 @@ at the heart of this new model.
 
 The second contribution is modeling the progression
 of time; as implemented in this thesis, time progression does not require any
-new syntactic elements as compared to those provided in the discrete 
-enhancements in the preceding chapter; those syntactic elements, however, are
-used in a novel fashion to specify the
-time evolution of quality and topology values.
+new syntactic elements except those provided in the 
+preceding chapter; those syntactic elements, however, are
+used in a novel fashion to specify time evolution of facts.
 
 The remainder of this chapter is structured as follows. First, the new
 syntactic elements are introduced. Second, the semantic changes that these new
-elements impose upon the generation process are described. Then the current
-convention for the specification of time evolution is described. Next, 
-time state aggregation, an enhancement for cognitive scalability purposes,
-is introduced along with its semantic changes to the generation process.
-Finally, a pair of examples are provided illustrating the ability of the
-hybrid attack graph not only to capture cyber physical systems, but also to
-enhanc the modeling capabilities of attack graphs for traditional information
-systems.
+elements impose upon the generation process are described. Then the
+convention for the specification of time evolution is described. 
+Finally, a pair of examples is provided.
 \TUsection{Definition of New Syntax}
 \TUsubsection{Terminology}
 First and foremost, a discussion of the new terminology involved in the
 transition to hybrid attack graphs is required. This is mostly concerned with
-facts, as the movement to hybrid attack graphs is mostly concerned with changes
+facts, as the transition to hybrid attack graphs is consists mostly of changes
 to the fact system.
 
 Until now, qualities have had only string type values, and
@@ -57,7 +51,7 @@ As the hybrid attack graph introduced by this thesis is a strict superset
 of the University of Tulsa style discrete attack graph, the existing style
 of quality and topology facts remains valid in the new language and therefore
 must be distinguished from the new type of fact in some way. The discrete
-only facts, therefore, are called \emph{token valued} (or \emph{token facts},
+only facts, therefore, are called \emph{token valued} (or \emph{token facts}),
 whereas the new continuous facts are called \emph{real valued} (or \emph{real
 facts}).
 
@@ -107,16 +101,18 @@ are their evolution over time. Another goal is to avoid introducing additional
 special cases. To that end, this section introduces a method for handling time
 using only previously introduced attack graph functionality.
 \TUsubsection{Time exploits}
-Exploits are not just for adversary actions anymore. Time is implemented using
+Exploits are not just for adversary actions in hybrid attack graphs. Time is 
+implemented using
 a single group of global exploits, each of which increments a class of assets'
-position in time depending upon its particular state. The global status
-causes them to trigger on all assets simultaneously, while the grouping causes
-all the time exploits to trigger in concert with each other. As before,
+position in time depending upon its particular state. Their globalness
+triggers on all assets simultaneously, while the grouping causes
+all the time exploits to trigger in concert. As before,
 an important requirement is that the sets of facts affected by time exploits
 be disjoint over all grouped time exploits to avoid indeterminate behavior.
 
 A selection of time exploits is provided in Fig.~\ref{fig:illustrative_time_xp}
-of time exploits that might simplistically model
+that might, when paired with the network model in 
+Fig.~\ref{fig:illustrative_time_nm}, simplistically model
 a car driving away from a wall unless somehow compromised by an attacker,
 who causes the car to drive toward the wall at a constant rate.
 
@@ -187,8 +183,9 @@ behavior to be used.
 Even without concern for real types, the move to hybrid attack graphs 
 introduces a new, more basic requirement for the processing of preconditions
 and postconditions: topology values. The topology fact handling is updated
-to parallel the handling of qualities. In fact, in the hybrid attack graph
-reference implementation, every topology, even token topologies, have values:
+to be virtually identical to the handling of qualities. In fact, in the hybrid 
+attack graph
+reference implementation, every topology, even token topologies, has a value:
 real topologies have floating-point values, and token topologies have boolean
 values.
 
@@ -229,7 +226,8 @@ software.
 
 As illustrated in the pseudocode in Fig.~\ref{fig:hybrid-matching}, this is
 done in the reference implementation by maintaining a map from the string
-representations of the relational operators onto boolean functions that apply
+representations of the relational operators onto (pointers to) boolean 
+functions that apply
 them. The new relational operator precondition processing does not impact the
 remainder of the generation process.
 
@@ -322,21 +320,22 @@ A useful preliminary example is the scenario involving a car as described in
 Figs.~\ref{fig:illustrative_time_xp} and \ref{fig:illustrative_time_nm}. The
 corresponding attack graph for that scenario is given in 
 Fig.~\ref{fig:fullbunny_simple_ag}. As the car is compromised from the start,
-it only has three states. Of especial note is are the exploit transitions,
+it only has three states. Note the exploit transitions,
 both of which are collected into a group called ``time'', signifying that
 they represent time steps. The global and grouping mechanisms, however, only 
-truly become dramatic once combined with discrete exploits causing mode % TODO: describe
-transitions, and even moreso once multiple assets are involved.
+truly become dramatic once combined with discrete exploits causing mode
+transitions, and even more so once multiple assets are involved.
 \label{sec:car}
 
 \begin{figure}
+\centering
 \includegraphics[height=3in]{ag_car/simple/full_bunny_1_ag_5}
 \caption{Simple car attack graph}
 \label{fig:fullbunny_simple_ag}
 \end{figure}
 
 Suppose the initial conditions were changed so that the \texttt{compromised}
-quality began as \texttt{false}, and an additional exploit called \texttt{own}
+quality began as \texttt{false}, and an additional exploit called \texttt{own_civic}
 were added so as to match the patterns given in Fig.~\ref{fig:fullbunny_one_xp}.
 
 \begin{figure}
@@ -398,6 +397,7 @@ this case, the evolution of time is clearly denoted by the transitions labeled
 \texttt{group(time)}.
 
 \begin{figure}
+\centering
 \includegraphics[height=0.9\textheight]{ag_car/onecar/full_bunny_onecar_ag_5}
 \caption{One-car automotive attack graph}
 \label{fig:fullbunny_one_ag}
@@ -405,11 +405,11 @@ this case, the evolution of time is clearly denoted by the transitions labeled
 
 One final automobile example serves to illustrate the behavior of the
 combined global and grouped exploits and their use in implementing
-timing behavior. Consider the case in which, while the exploits remain
-as in the previous example's definition in Fig.~\ref{fig:fullbunny_one_xp},
-an additional nearby car is introduced that seeks to drive away from the wall
-at the same rate as \texttt{civic} but that is \emph{not} vulnerable to the 
-discrete \texttt{own} exploit. This network model is provided in 
+timing behavior. Consider the case that, while keeping the exploits
+as in Fig.~\ref{fig:fullbunny_one_xp}, introduces an additional car
+that drives away from the wall
+at the same rate as \texttt{civic} but is \emph{not} vulnerable to the 
+\texttt{own_civic} exploit. This network model is provided in 
 Fig.~\ref{fig:fullbunny_two_nm}.
 
 \begin{figure}
@@ -445,6 +445,7 @@ the crashing of the Civic has the discrete consequence of placing it into a
 mode in which it no longer changes state with time.
 
 \begin{figure}
+\centering
 \includegraphics[angle=90,width=0.9\textwidth]{ag_car/twocar/full_bunny_twocar_ag_5}
 \caption{Two-car automotive attack graph}
 \label{fig:fullbunny_two_ag}
@@ -455,13 +456,13 @@ The final example serves to demonstrate further the interaction of discrete
 attacks with time; it is also used later to discuss scaling behavior. The network
 model given in Fig.~\ref{fig:rfid1_nm} describes a system of a single
 RFID reader with a single RFID tag, in the ISO 18000-7 system as described 
-in section~\ref{sec:bg:rfid}. The tag begins with a battery life of 100, which
+in Section~\ref{sec:bg:rfid}. The tag begins with a battery life of 100, which
 is drained at a rate of 25 per time step if the sleep denial attack is being
 executed, and at a rate of 10 per time step if not. This behavior is shown in
-the exploit patterns in Fig.~\ref{fig:rfid1_xp2}, along with
-the discrete attacks \texttt{own\_reader} (which gives the attacker control of
+the exploit patterns in Fig.~\ref{fig:rfid1_real_xp}. The scenario's discrete
+attacks \texttt{own\_reader} (which gives the attacker control of
 the reader) and \texttt{deny\_sleep} (which causes a tag to enter the
-denial of sleep mode) in Fig.~\ref{fig:rfid1_xp1}.
+denial of sleep mode) are shown in Fig.~\ref{fig:rfid1_token_xp}.
 
 \begin{figure}
 \begin{lstlisting}
@@ -490,38 +491,6 @@ network model =
 \caption{One tag RFID system network model}
 \label{fig:rfid1_nm}
 \end{figure}
-
-\begin{figure}
-\begin{lstlisting}
-exploit own_reader(a, r)=
-    preconditions:
-        platform:r,cpe:/h::VulnerableReader;
-        quality:r,status=up;
-        topology:a->r,connected_network;
-    postconditions:
-        insert topology:a->r,access_admin;
-.
-
-exploit deny_sleep(a, r, t)=
-    preconditions:
-        platform:r,cpe:/h::VulnerableReader;
-        quality:r,status=up;
-        
-        platform:t,cpe:/h::Tag;
-        quality:t,status=up;
-        quality:t,mode=sleep;
-        
-        topology:a->r,access_admin;
-        topology:r->t,connected_rfid;
-    postconditions:
-        update quality:t,mode=wake;
-.
-\end{lstlisting}
-\caption{One tag RFID system discrete exploit patterns}
-\label{fig:rfid1_xp1}
-\end{figure}
-
-
 
 \begin{figure}
 \begin{lstlisting}
@@ -568,7 +537,37 @@ global group(time) exploit sleep_power_die(t)=
 .
 \end{lstlisting}
 \caption{One tag RFID system continuous exploit patterns}
-\label{fig:rfid1_xp2}
+\label{fig:rfid1_real_xp}
+\end{figure}
+
+\begin{figure}
+\begin{lstlisting}
+exploit own_reader(a, r)=
+    preconditions:
+        platform:r,cpe:/h::VulnerableReader;
+        quality:r,status=up;
+        topology:a->r,connected_network;
+    postconditions:
+        insert topology:a->r,access_admin;
+.
+
+exploit deny_sleep(a, r, t)=
+    preconditions:
+        platform:r,cpe:/h::VulnerableReader;
+        quality:r,status=up;
+        
+        platform:t,cpe:/h::Tag;
+        quality:t,status=up;
+        quality:t,mode=sleep;
+        
+        topology:a->r,access_admin;
+        topology:r->t,connected_rfid;
+    postconditions:
+        update quality:t,mode=wake;
+.
+\end{lstlisting}
+\caption{One tag RFID system discrete exploit patterns}
+\label{fig:rfid1_token_xp}
 \end{figure}
 
 Two attack graphs help to demonstrate the execution of this model. The first is
@@ -576,7 +575,7 @@ given in Fig.~\ref{fig:rfid1_ag6}, which is the attack graph generated to a
 depth of 6. Observe that the leftmost set of edges is the worst case
 scenario: the attacker immediately takes control of the network and kills
 the tags in only 4 timesteps. The rightmost edge, then, is the best case
-scenario: in this situation, the attacker never (at least to a generation
+scenario: in this situation, the attacker never (to a
 depth of 6) acts. The only transitions are those caused by the normal
 time evolution of the system.
 
@@ -586,7 +585,8 @@ has executed the denial of sleep attack to the demise of the tag, and state
 40, in which the tag has died on its own.
 
 \begin{figure}
-\includegraphics[width=\textwidth]{ag_dash7/sleep_ag_6}
+\centering
+\includegraphics[angle=90,height=0.9\textheight]{ag_dash7/sleep_ag_6}
 \caption{One tag RFID system attack graph (depth of 6)}
 \label{fig:rfid1_ag6}
 \end{figure}
