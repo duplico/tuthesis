@@ -13,8 +13,8 @@ generation algorithm used in this work. Of course, as a main goal of this
 thesis is to expand on the formalism, the process evolves throughout this
 work. As expansions are made, effort is given to note the changes to the
 generation algorithm. Furthermore, the algorithm presented here lags behind the
-state of the art in attack graph generation performance and represents a
-contribution only in its explicitness.
+state of the art in attack graph generation performance; the contribution lies
+in articulating such an algorithm explicitly.
 \TUsection{Generation Algorithm and Pseudocode}
 \TUsubsection{Description}
 The input to this
@@ -33,10 +33,11 @@ parsed into a set of assets and a set of facts (the fact base).
 
 For the purposes
 of this section, consider network state facts to be represented as ordered
-tuples: for qualities, \texttt{('quality', asset, quality name, quality value)};
+tuples: for qualities, \texttt{('quality'}, \texttt {asset}, \texttt {quality} 
+\texttt{name}, \texttt{quality} \texttt{value)};
 and for topologies, \texttt{('topology', source asset, destination asset,
 topology name)}. These are stored in per-state unordered collections without duplicates
-(sets) usually denoted \texttt{fact base}.
+(sets) usually denoted \texttt{factbase}.
 
 An example network model (also called network state) data structure is shown in
 Fig.~\ref{fig:netstate_pc}.
@@ -335,12 +336,12 @@ are labeled with the topology name they represent.
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{ag_illustrative_simple/nm_state0}
-\caption{State 0 of the illustrative discrete example}
+\caption{State 0 of the illustrative example}
 \label{fig:ill_topology_0}
 \end{figure}
 
 Execution of the generation process begins by specifying a maximum ``depth''
-of generation, which will be 2 for the purposes of this exercise, and by creating
+of generation, which is 2 for the purposes of this exercise, and by creating
 an initial list of states for analysis, which contains only State 0.
 
 Generation proceeds by examining each analysis state, in this case only State 0.
@@ -356,14 +357,14 @@ successor state list.
 \begin{figure}
 \centering
 \includegraphics[height=0.4\textheight]{ag_illustrative_simple/nm_state1}
-\caption{State 1 of the illustrative discrete example}
+\caption{State 1 of the illustrative  example}
 \label{fig:ill_topology_1}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[height=0.4\textheight]{ag_illustrative_simple/nm_state2}
-\caption{State 2 of the illustrative discrete example}
+\caption{State 2 of the illustrative example}
 \label{fig:ill_topology_2}
 \end{figure}
 
@@ -387,14 +388,14 @@ well as to the successor state list.
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{ag_illustrative_simple/nm_state3}
-\caption{State 3 of the illustrative discrete example}
+\caption{State 3 of the illustrative example}
 \label{fig:ill_topology_3}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[height=0.4\textheight]{ag_illustrative_simple/nm_state4}
-\caption{State 4 of the illustrative discrete example}
+\caption{State 4 of the illustrative example}
 \label{fig:ill_topology_4}
 \end{figure}
 
@@ -410,7 +411,7 @@ and the successor state list.
 \begin{figure}
 \centering
 \includegraphics[height=0.4\textheight]{ag_illustrative_simple/nm_state5}
-\caption{State 5 of the illustrative discrete example}
+\caption{State 5 of the illustrative example}
 \label{fig:ill_topology_5}
 \end{figure}
 
@@ -435,7 +436,6 @@ the generated attack graph would be the one in Fig.~\ref{fig:ill_ag_depth5}.
 \label{fig:ill_ag_depth5}
 \end{figure}
 
-This concludes the description of the basic attack graph modeling framework 
-employed at 
-the University of Tulsa. The chapters following this one are devoted to
+This concludes the description of the basic attack graph model. 
+The chapters that follow are devoted to
 this framework's expansion and analysis.

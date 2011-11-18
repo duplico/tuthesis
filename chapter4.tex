@@ -8,7 +8,7 @@ contains a number of enhancements to discrete system modeling.
 
 This chapter introduces these enhancements, which include a working lexicon of
 standard terms for topologies and qualities based upon the Common Vulnerability
-Enumeration and National Vulnerability Database; some syntactic
+Enumeration and National Vulnerability Database~\cite{nvdhome}; some syntactic
 changes to ease the modeling of information systems;
 mechanisms for grouping attacks; and a scheme for integrating with
 the Common Platform Enumeration~\cite{buttner2009common}.
@@ -21,7 +21,7 @@ thesis recommends
 a set of conventions designed to ease automated exploit pattern extraction
 from the National Vulnerability Database (NVD) maintained by the 
 National Institute of Standards and Technology (NIST), which among other roles
-indexes MITRE's Common Vulnerability Enumeration (CVE)~\cite{nvdhome}.
+indexes MITRE's Common Vulnerability Enumeration (CVE).
 \TUsubsection{National Vulnerability Database}
 Two vulnerability properties catalogued by the NVD inform this lexicon:
 \emph{access vector} and \emph{impact type}.
@@ -143,10 +143,9 @@ be removed without affecting its reverse.
 \TUsubsection{Value Assignment}
 In preparation for the introduction of real-valued facts, the existing discrete
 qualities, henceforth called ``token valued'', are given a special
-assignment operator. Simply put, token values are assigned with the~\texttt{=}
-operator and tested with the~\texttt{=} and~\texttt{!=} operators. This
-enables a robust distinction between assignment operators and relational
-operators.
+assignment operator. Simply put, token values are both assigned and tested
+for equality using the~\texttt{=} operator; they may also be tested 
+for inequality with the~\texttt{!=} operator.
 
 Additionally, \texttt{delete} operations in postconditions take only a quality
 name, with no value required (eliminating the confusing possibility of a
