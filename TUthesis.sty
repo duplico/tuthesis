@@ -84,11 +84,22 @@
 % Redefine the table of contents command to make it use single spacing.
 %
 \renewcommand\tableofcontents{%
-    \chapter*{\contentsname}
+    \chapter*{TABLE OF CONTENTS}
     \singlespace
     \@starttoc{toc}%
     \doublespace
-    }
+}
+
+\renewcommand\listoffigures{%
+    \chapter*{\listfigurename}%
+    \@starttoc{lof}%
+}
+
+\renewcommand\listoftables{%
+    \chapter*{\listtablename}%
+    \@starttoc{lot}%
+}
+
 
 %
 % Definitions for the title page, the signature page
@@ -128,9 +139,9 @@
 % was originally defined elsewhere.  In this document, most if not
 % all of these were defined in the report.cls document.
 %
-\renewcommand\contentsname{\centerline{\rm TABLE OF CONTENTS}}
-\renewcommand\listfigurename{\centerline{\rm LIST OF FIGURES}}
-\renewcommand\listtablename{\centerline{\rm LIST OF TABLES}}
+\renewcommand\contentsname{TABLE OF CONTENTS}
+\renewcommand\listfigurename{LIST OF FIGURES}
+\renewcommand\listtablename{LIST OF TABLES}
 \renewcommand\bibname{\centerline{BIBLIOGRAPHY}}
 \renewcommand \thechapter {\@arabic\c@chapter}
 \renewcommand\chaptername{CHAPTER}
@@ -249,7 +260,7 @@
 \def\signaturep{%
         \doublespace
         \makechapterpagespace 
-        \begin{center}
+        \begin{center} % TODO: one option is to make a new env that can have a \hrul for debugging
             T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A \\
             THE GRADUATE SCHOOL
         \end{center}
