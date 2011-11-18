@@ -121,7 +121,7 @@
 }
 
 % To debug chapter spacing, give this hrule a width:
-\def\makechapterpagespace{\null\vspace{.5truein}\null\hrule width 0pt\nobreak}
+\def\makechapterpagespace{\null\vspace{0.4375truein}} %\null\hrule width 0pt\nobreak}
 
 %
 % Note that the use of renewcommand implies that the command
@@ -186,9 +186,11 @@
 
 \def\titlep{%
         \thispagestyle{empty}%
-        \makechapterpagespace 
-        \centerline{T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A}
-        \centerline{THE GRADUATE SCHOOL}
+        \makechapterpagespace
+        \begin{center}
+            T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A \\
+            THE GRADUATE SCHOOL
+        \end{center}
         \vfill
         \begin{center}
                 \uppercase\expandafter{\@title}
@@ -247,8 +249,10 @@
 \def\signaturep{%
         \doublespace
         \makechapterpagespace 
-        \centerline{T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A}
-        \centerline{THE GRADUATE SCHOOL}
+        \begin{center}
+            T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A \\
+            THE GRADUATE SCHOOL
+        \end{center}
         \vfill\vfill
         \begin{center}
                 \uppercase\expandafter{\@title}
@@ -482,7 +486,7 @@
 %
  \def\@makechapterhead#1{%
   \makechapterpagespace
-  {\parindent \z@ \centering \normalfont
+  {\parindent \z@ \center \normalfont
     \ifnum \c@secnumdepth >\m@ne
         \@chapapp\space \thechapter
         \par\nobreak
@@ -498,7 +502,7 @@
   {\parindent \z@ \raggedright
     \normalfont
     \interlinepenalty\@M
-    \centerline {#1}\par\nobreak
+    \begin{center}{#1}\end{center}\par\nobreak
     \vskip 10\p@
   }}
 
