@@ -18,15 +18,15 @@ domains of the two examples used throughout this thesis.
 \TUsubsection{Hybrid Systems}
 A system with both continuous (frequently physical) components and discrete (frequently digital)
 components is said to be a \emph{hybrid system}, named for its characteristic blending of the
-two domains. Examples abound in industrial controls, for example,
+two domains. Examples abound in industrial controls,
 although hybrid systems may also be fully physical (e.g., a bouncing ball that experiences continuous
 behavior when rising and falling and discrete behavior when colliding with a surface).
 
 The term hybrid system is an older one that was coined as researchers began to study the newly
 pervasive reactive systems that arose as programmed control of the physical world became 
 widespread ~\cite{alur1993hybrid}. It does not suffice to describe precisely
-the types of systems with which this work is concerned: a subset of hybrid
-systems that incorporate a significant computer and networking component.
+the types of systems with which this work is concerned: the subset of hybrid
+systems that incorporate significant computer and networking components.
 
 Nevertheless, the modeling of hybrid systems is well studied and provides a sufficient body
 of relevant work from which to draw to warrant its inclusion. This chapter includes
@@ -56,7 +56,7 @@ data collection, and their pervasiveness~\cite{crenshaw2010upbot}.
 \TUsubsection{Hybrid Automata}
 \TUsubsubsection{Definition}
 A valuable formalism for modeling hybrid systems in isolation and with limited 
-interconnection is the hybrid automaton (HA) of Alur, et al.~\cite{alur1993hybrid}. 
+interconnection is the hybrid automaton (HA) of Alur, \emph{et al.}~\cite{alur1993hybrid}. 
 This section introduces the version of the formalism described in 1996 by 
 Henzinger~\cite{henzinger1996theory}, to which a reader interested in more 
 than a superficial understanding is referred. 
@@ -124,7 +124,7 @@ A hybrid automaton is not guaranteed to
 have a valid execution, and computing whether it does or not is 
 non-trivial~\cite{lygeros1999existence}.
 Model checking has been developed for only some subclasses of 
-automata~\cite{henzinger1997hytech}~\cite{frehse2005phaver}, and many useful
+automata~\cite{henzinger1997hytech, frehse2005phaver}, and many useful
 properties of them are undecidable~\cite{henzinger1998s}.
 
 However, there are further issues when considering hybrid automata
@@ -138,7 +138,7 @@ Attempts have been made to improve the hybrid automaton's network modeling
 capability. The designation of shared
 actions and shared variables as ``input'' or ``output'' is a popular tactic, 
 as in the powerful hybrid I/O 
-automaton~\cite{lynch1996hybrid}~\cite{lynch2001hybrid}, its descendant the
+automaton~\cite{lynch1996hybrid, lynch2001hybrid}, its descendant the
 timed I/O automaton~\cite{kaynar2010theory}, and in the PHAVer model 
 checker~\cite{frehse2005phaver}.
 
@@ -236,8 +236,8 @@ digraph G {
 
 Although the hybrid automaton is the gold standard for modeling hybrid systems, 
 other frameworks do exist such as hybrid process 
-algebras~\cite{cuijpers2005hybrid}~\cite{bergstra2005process},
-an entirely symbolic system with many of the same properties and drawbacks as
+algebras~\cite{cuijpers2005hybrid, bergstra2005process},
+entirely symbolic systems with many of the same properties and drawbacks as
 hybrid automata. Hybrid Petri nets are similar to hybrid automata in that they
 pair a standard discrete model (in this case, Petri nets instead of finite state
 automata) with differential equations to model the continuous side of the
@@ -299,7 +299,7 @@ Attack graphs do exactly that.
 \TUsubsection{Attack Graphs}
 \TUsubsubsection{Introduction}
 In contrast to attack trees, attack graphs permit a topology-aware exploration
-of the state space of a system. It is a graph theoretic model in which 
+of the state space of a system. They engage a graph theoretic model in which 
 vertices represent individual system states, and edges represent state 
 transitions caused by an adversary. The concept as originally introduced 
 shares with all modern incarnations notions of attack patterns to be bound to state 
@@ -322,7 +322,7 @@ network model over which network states and transitions are computed.
 Specification of the underlying network model may be done with only very loose
 restrictions, allowing arbitrary keywords as named qualities and topologies of 
 network objects, as is favored for example in the work of George Mason 
-University~\cite{ammann2002scalable}~\cite{wang2006minimum}.
+University~\cite{ammann2002scalable, wang2006minimum}.
 This thesis employs this method, permitting more straightforward adaptation 
 into the continuous domain.
 
@@ -331,8 +331,7 @@ terms that impose explicit computer networking
 concepts onto the model~\cite{templeton2001requires}.
 This permits generation and analysis to take a
 more nuanced view of a network state, including reachability analysis to determine whether a
-given topology permits communication between two hosts~\cite{ingols2009modeling}. This approach
-is favored in the work of MIT Lincoln Laboratory and the University of California, Davis.
+given topology permits communication between two hosts~\cite{ingols2009modeling}.
 
 Another variant of the attack graph, representing a fairly significant departure
 from the original formalism, is the exploit dependency graph (or attack
@@ -424,7 +423,7 @@ The primitive domains describe the atomic units of
 the formalism: assets, properties (qualities), values (qualities), relationships (topologies),
 vulnerabilities (exploit pattern identifiers), parameters (free asset variables in the attack
 patterns), and operations (used in postconditions representing insert or delete actions).
-See Fig.~\ref{fig:primitivedomains} these elements' formal notation.
+See Fig.~\ref{fig:primitivedomains} for these elements' formal notation.
 
 \begin{figure}
 \begin{align*}
@@ -571,8 +570,9 @@ As this work's specific algorithm is a contribution, it is given
 more detailed treatment in chapter 3.
 
 \TUsection{Case Studies}
-Two major realistic attack examples appear in this work.
-The first is on a traditional information system, based upon an offensive educational exercise
+Among the examples appearing in this work, two are based on specific real world
+scenarios.
+The first is an attack on a traditional information system, based upon an offensive educational exercise
 deployed at the University of Tulsa. The second is the 
 denial of service through battery exhaustion of a simple
 cyber-physical system of active radio frequency identification (RFID) tags and readers.
@@ -585,7 +585,7 @@ their preconditions and results. The attacker was required to log into a server 
 its weak SSH key (due to an operating system vulnerability), execute an elevation of privilege (due
 to a Linux kernel vulnerability), log into the web server, and execute a SQL injection attack to
 change a simulated grade. The architecture from the exercise is provided in 
-Fig.~\ref{fig:blunderarch}, previously published in~\cite{louthan2010blunderdome}.
+Fig.~\ref{fig:blunderarch}, published in~\cite{louthan2010blunderdome}.
 
 \begin{figure}
 \centering
@@ -611,7 +611,7 @@ Stage & Precondition	&	Attack	&	Postcondition \\ \hline \hline
 \label{sec:bg:rfid}
 The second case study is a denial of service attack
 on the ISO 18000-7 RFID tag inventory system similar to those used by the United States
-Department of Defense for shipping tracking and the Department of Energy for tracking spent
+Department of Defense for freight tracking and the Department of Energy for tracking spent
 fuel containers~\cite{chen2009radiofrequency}. The attack
 is similar to the ones described by Buennemeyer, \emph{et al.}~\cite{buennemeyer2006battery},
 and is of a newly distinguished class of attacks sometimes termed \emph{denial

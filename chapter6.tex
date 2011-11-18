@@ -10,8 +10,8 @@ a discussion of its performance) and its capabilities (articulating its
 contribution to the hybrid systems modeler), as well as a discussion of the
 network and system analysis that it enables.
 \TUsection{Discrete Capabilities}
-Enough space has already been dedicated to some additions: platform
-facts, host processing, and the standard lexicon. These provide enhancements
+Previous chapters articulate the enhancements provided by platform
+facts, host processing, and the standard lexicon, which provide conveniences
 to the modeler and ease model acquisition from a standard network 
 representation. However, further discussion is warranted of the power added
 by global exploits and grouping exploits.
@@ -25,7 +25,7 @@ login access to the server; successful cross-site scripting may give the
 attacker the ability to spoof messages to users; and a successful SQL injection
 attack may give the attacker access to sensitive information. Grouping these
 automated attacks together enables the modeler to better capture the behavior
-of such a ``script kiddie''.
+of such a ``script kiddie.''
 
 Consider also the case of executing a denial of service attack on a single
 network of arbitrary size by disabling a perimeter device. Such an attack would
@@ -155,7 +155,6 @@ car crash example pictured in Fig.~\ref{fig:fullbunny_two_ag}) the asset is
 no longer an active part of the simulation. If this behavior appears, care 
 should be given that it is not an oversight on the part of the modeler.
 \TUsection{Performance}
-\TUsubsection{Introduction}
 Although the purpose of this work is not focused upon the performance of the
 generation process, a discussion of the performance of the reference
 generator is warranted. This section first
@@ -248,11 +247,11 @@ by $O(A!)$ (or $O(A^A)$) and more tightly for a given scenario by
 $O\left(\frac{A!}{(A-a)!}\right)$ (alternatively $O(A^a)$),
 where $a$ is the length of the longest parameter list on any exploit pattern.
 
-The other is ``states''. In this case, it refers to the number of ``analysis states''
+The other is ``states.'' In this case, it refers to the number of ``analysis states''
 in an iteration of the generation function, which is actually defined in terms
 of the previous iteration's states. Luckily, we can avoid having to solve for
 this quantity by combining the sections ``Generate attack graph (recursive)''
-with ``For each analysis state''. Using the knowledge that the body of that for
+with ``For each analysis state.'' Using the knowledge that the body of that for
 loop is reached once and only once for each state generated, the bound for the
 number of executions of the combined structure is equivalent to the bound on
 the number of states in the attack graph. Because a scenario is not guaranteed
@@ -315,7 +314,7 @@ $\approx O(E^{d+1}fA!^{d})$ (in a mild abuse of notation)
 
 Worst case generation time, then, is expected to grow linearly with fact names, 
 polynomially with exploit patterns, exponentially with generation depth (for divergent 
-graphs), and factorially with assets. The next sections demonstrate imperically
+graphs), and factorially with assets. The next sections demonstrate empirically
 the effects of generation depth and asset growth on execution time.
 \TUsubsection{Execution Time Results}
 Two sets of trials serve to demonstrate the scaling behavior of execution time:
