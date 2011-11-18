@@ -34,6 +34,10 @@
 %          for the toc, list of figures and list of tables.
 %
 
+\RequirePackage{setspace}
+\RequirePackage{ifpdf}
+\RequirePackage[noframe]{showframe}
+
 %
 % Turn on doublespace and set the paragraph indentation
 %
@@ -48,13 +52,23 @@
 % We need to use one value for the margins if we are using PDFTeX 
 % and a different set of values if we want to generate a dvi file
 % and then convert it to PDF.  Use 
+%
+% 17-Nov-2011 - I don't know where all those wacky numbers came from; probably
+% to try to adjust for the fact that TeX's default positioning for the 
+% variables that were not set here is in points. I've set everything that
+% should affect the positioning of the margins to the proper numbers in the
+% PDF block. The DVI block is as it came to me. NOTE: THIS MAY BREAK SPACING
+% FOR ANYTHING THAT IS SET IN THE MARGIN NOTES REGION. Eliminating that
+% area was easier as I don't use it in my thesis. -GL
+% 
 
 \ifpdf
    \def\amhere{The template is currently set to generate PDF directly.}
-   \oddsidemargin 0.575truein \evensidemargin 0.575truein
-   \textheight 9.0truein \textwidth 5.8875truein
-   \topmargin -0.55truein \headsep .04truein
-   
+   \marginparwidth 0.0truein \marginparsep 0.0truein
+   \oddsidemargin 0.5truein \evensidemargin 0.5truein
+   \textheight 9.0truein \textwidth 6truein
+   \topmargin 0.0truein \headheight 0.0truein \headsep 0.0truein
+   \footskip 0.5truein
 \else
    \def\amhere{The template is currently set for you to generate PDF from Postscript.}
    \oddsidemargin 0.4truein \evensidemargin -0.225truein
@@ -62,7 +76,19 @@
    \topmargin 0.10truein \headsep .0truein
 \fi
 
-\def\contentsadj{\hspace{-\parindent}} %table of contents adjustment
+% Adjustment for table of contents top-level front matter entries to
+%  de-indent them:
+\def\contentsadj{\hspace{-\parindent}}
+
+%
+% Redefine the table of contents command to make it use single spacing.
+%
+\renewcommand\tableofcontents{%
+    \chapter*{\contentsname}
+    \singlespace
+    \@starttoc{toc}%
+    \doublespace
+    }
 
 %
 % Definitions for the title page, the signature page
@@ -93,6 +119,9 @@
     \else Dissertation
     \fi
 }
+
+% To debug chapter spacing, give this hrule a width:
+\def\makechapterpagespace{\null\vspace{.5truein}\null\hrule width 0pt\nobreak}
 
 %
 % Note that the use of renewcommand implies that the command
@@ -157,12 +186,10 @@
 
 \def\titlep{%
         \thispagestyle{empty}%
-        \null\vspace{.3truein}%
-        \begin{center}
-                T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A\\
-                THE GRADUATE SCHOOL
-        \end{center}
-        \vfill\vfill
+        \makechapterpagespace 
+        \centerline{T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A}
+        \centerline{THE GRADUATE SCHOOL}
+        \vfill
         \begin{center}
                 \uppercase\expandafter{\@title}
         \end{center}
@@ -219,11 +246,9 @@
 %
 \def\signaturep{%
         \doublespace
-        \null\vspace{.625truein}%
-        \begin{center}
-                T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A\\
-                THE GRADUATE SCHOOL
-        \end{center}
+        \makechapterpagespace 
+        \centerline{T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A}
+        \centerline{THE GRADUATE SCHOOL}
         \vfill\vfill
         \begin{center}
                 \uppercase\expandafter{\@title}
@@ -303,13 +328,10 @@
 %%%%%%%%%%%%%%%%%%%%%
         
 \def\copyrightp{%                
+    \chapter*{COPYRIGHT STATEMENT}
     \addcontentsline{toc}{section}{\contentsadj COPYRIGHT}
     \addtocontents{toc}{\protect{\hfill \ }}
     \doublespace
-    \null\vspace{.625truein}%
-    \begin{center}
-        {COPYRIGHT STATEMENT}
-    \end{center}
     \begin{center}
         \noindent Copyright \copyright\ \@submityear \  by \@author
     \end{center} \par\par
@@ -326,14 +348,11 @@
 % Abstract page def
 %%%%%%%%%%%%%%%%%%%%
 
-\def\abstractp{%              
+\def\abstractp{%
+    \chapter*{ABSTRACT}
     \addcontentsline{toc}{section}{\contentsadj ABSTRACT}
     \addtocontents{toc}{\protect{\hfill \ }}
-    \null\vspace{.625truein}%
-    \begin{center}
-        ABSTRACT
-    \end{center}
-    \expandafter{\@author}\ \ (\expandafter{\@degreename} in \expandafter{\@dept})\\
+    \noindent \expandafter{\@author}\ \ (\expandafter{\@degreename} in \expandafter{\@dept})\\
     \expandafter{\@titleoneline}\\
     Directed by \ifcoadvisor \expandafter{\@advisor} and \expandafter{\@secondmember}
                 \else
@@ -352,13 +371,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \def\acknowledgementsp{% 
-    \clearpage             
+    \chapter*{ACKNOWLEDGEMENTS}
     \addcontentsline{toc}{section}{\contentsadj ACKNOWLEDGEMENTS}
     \addtocontents{toc}{\protect{\hfill \ }}
-    \null\vspace{.625truein}%
-    \begin{center}
-        ACKNOWLEDGEMENTS
-    \end{center}\par\par
+    \par\par
 }
 
 % 
@@ -370,33 +386,24 @@
 \def\beforeabstract{
         \titlep
         \signaturep
-        \addtocontents{toc}{\protect{\vspace{10pt}}}
-        \addtocontents{toc}{\protect{\hfill Page}}
-        \addtocontents{toc}{\protect{\vspace{10pt}}}
+        \addtocontents{toc}{\protect{\hfill Page \\}}
+        %\addtocontents{toc}{\protect{\hfill \ }}
         \ifcopyright\copyrightp\fi
         \cleardoublepage
 }
         
 \def\afteracknowledgementsp{
-    % This command is dumb, but necessary.
-    % Because the table of contents command creates its own page which is single 
-    % spaced the header gets pushed up a quarter inch. This pushes it back down.
-    \renewcommand\contentsname{\begin{center}\vspace{.05truein}TABLE OF CONTENTS\end{center}}
-    \singlespace
     \tableofcontents
-    \doublespace
     \addcontentsline{toc}{section}{\contentsadj TABLE OF CONTENTS}
     \iftablespage
         \listoftables
         \addtocontents{toc}{\protect{\hfill \ }}
-        %\addtocontents{toc}{\protect{\vspace{10pt}}}
         \addtocontents{lot}{\protect{\hfill Page}}
         \addcontentsline{toc}{section}{\contentsadj LIST OF TABLES}
     \fi
     \iffigurespage
         \listoffigures
         \addtocontents{toc}{\protect{\hfill \ }}
-        %\addtocontents{toc}{\protect{\vspace{10pt}}}
         \addtocontents{lof}{\protect{\hfill Page}}
         \addcontentsline{toc}{section}{\contentsadj LIST OF FIGURES}
     \fi
@@ -446,7 +453,7 @@
     \refstepcounter{appendixno}
     \centerline{APPENDIX \theappendix}
     \centerline{\bf \uppercase\expandafter{#1}}
-    %\vspace{\baselineskip}
+    \vspace{\baselineskip}
     \addcontentsline{toc}{section}{\contentsadj APPENDIX \theappendix:\ \ 
     {\bf \uppercase\expandafter{#1}}
     }
@@ -474,8 +481,8 @@
 % for the chapters, sections etc. and list of figures and tables, etc.
 %
  \def\@makechapterhead#1{%
-  \vspace*{50\p@}%
-  {\parindent \z@ \center \normalfont
+  \makechapterpagespace
+  {\parindent \z@ \centering \normalfont
     \ifnum \c@secnumdepth >\m@ne
         \@chapapp\space \thechapter
         \par\nobreak
@@ -486,32 +493,17 @@
     \vskip 10\p@
   }}
   
-\def\@makeschapterhead#1{%
-  \vspace*{50\p@}%
+ \def\@makeschapterhead#1{%
+  \makechapterpagespace
   {\parindent \z@ \raggedright
     \normalfont
     \interlinepenalty\@M
-    \rm  #1\par\nobreak
+    \centerline {#1}\par\nobreak
     \vskip 10\p@
   }}
 
-%\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
-% \refstepcounter{chapter}
-% \typeout{\@chapapp\space\arabic{chapter}.}
-% \addcontentsline{toc}{chapter}{CHAPTER \protect
-% \numberline{\arabic{chapter}:}#1}\else
-% \addcontentsline{toc}{chapter}{#1}\fi
-% \chaptermark{#1}
-%%\addtocontents{lof}{\protect\addvspace{.10pt}}
-%%\addtocontents{lot}{\protect\addvspace{.10pt}} 
-%\if@twocolumn
-%\@topnewpage[\@makechapterhead{#2}] 
-% \else \@makechapterhead{#2}
-% \@afterheading \fi} 
-%\def\@schapter#1{\if@twocolumn \@topnewpage[\@makeschapterhead{#1}]
-% \else \@makeschapterhead{#1} 
-% \@afterheading\fi}
- 
+
+
  \def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
  \refstepcounter{chapter}
  \typeout{\@chapapp\space\arabic{chapter}.}
@@ -521,30 +513,13 @@
   \numberline{CHAPTER \arabic{chapter}: }#1}\else%%%%%%%%%%%%%%%%%
  \addcontentsline{toc}{chapter}{#1}\fi
  \chaptermark{#1}
-%\addtocontents{lof}{\protect\addvspace{.10pt}}
-%\addtocontents{lot}{\protect\addvspace{.10pt}} 
 \if@twocolumn
 \@topnewpage[\@makechapterhead{#2}] 
  \else \@makechapterhead{#2}
- \@afterheading \fi} 
-\def\@schapter#1{\if@twocolumn \@topnewpage[\@makeschapterhead{#1}]
- \else \@makeschapterhead{#1} 
- \@afterheading\fi}
-%\renewcommand*\l@chapter[2]{%
-%  \ifnum \c@tocdepth >\m@ne
-%    \addpenalty{-\@highpenalty}%
-%    \vskip 1.0em \@plus\p@
-%    \setlength\@tempdima{1.5em}%
-%    \begingroup
-%      \parindent \z@ \rightskip \@pnumwidth
-%      \parfillskip -\@pnumwidth
-%      \leavevmode %\bfseries
-%      \advance\leftskip\@tempdima
-%      \hskip -\leftskip
-%      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
-%      \penalty\@highpenalty
-%    \endgroup
-%  \fi}
+ \@afterheading \fi} % End \def\@chapter[#1]#2
+
+\def\@schapter#1{\@makeschapterhead{#1} 
+ \@afterheading} % End \def\@schapter#1
   
   \renewcommand*\l@chapter[2]{%
   \ifnum \c@tocdepth >\m@ne

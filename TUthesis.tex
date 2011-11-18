@@ -69,54 +69,23 @@
 
 \documentclass[12pt,letterpaper]{report}
 
-\RequirePackage{setspace}
-\usepackage{listings}
-\lstset{basicstyle=\small}
+\usepackage{TUthesis}
+
+\usepackage{listings} \lstset{basicstyle=\small}
 \usepackage{lastpage}
 \usepackage{url}
 \usepackage{microtype} % Provides margin kerning, font expansion, etc.
-
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
-%
-% Use \pdftrue if your are using PDFLaTeX and
-% use \pdffalse if your are using LaTeX
-%
-\newif\ifpdf
-\pdftrue %\pdffalse
-
-%
-% At some point in time you will want to verify
-% that the margins are correct. They should be
-% 1 inch all the way around, except for the left
-% margin, which is 1.5 inches. Select \testboxtrue
-% and the template will generate a test page.
-%
-\newif\iftestbox
-\testboxfalse 
-%\testboxtrue
-
-% These should conventionally be usepackage macros, 
-% since this is not a .sty or .cls file. But I'm not going to change it. -GL
-\RequirePackage{setspace}
-\RequirePackage{TUthesis}
-
-% Local package imports
 \usepackage{amsmath}
-\usepackage[debug]{dot2texi}
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows}
+\usepackage{dot2texi}
+\usepackage{tikz} \usetikzlibrary{shapes,arrows}
 
 \includeonly{chapter1,chapter2,chapter3,chapter4,chapter5,chapter6,chapter7} %
 
 \begin{document}
 
-
-
-\iftestbox \testboxex \fi
-
-%
 % Enter the information for the title page,
 % signature page and abstract.
 %
