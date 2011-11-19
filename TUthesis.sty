@@ -84,22 +84,11 @@
 % Redefine the table of contents command to make it use single spacing.
 %
 \renewcommand\tableofcontents{%
-    \chapter*{TABLE OF CONTENTS}
+    \chapter*{\contentsname}
     \singlespace
     \@starttoc{toc}%
     \doublespace
-}
-
-\renewcommand\listoffigures{%
-    \chapter*{\listfigurename}%
-    \@starttoc{lof}%
-}
-
-\renewcommand\listoftables{%
-    \chapter*{\listtablename}%
-    \@starttoc{lot}%
-}
-
+    }
 
 %
 % Definitions for the title page, the signature page
@@ -132,16 +121,17 @@
 }
 
 % To debug chapter spacing, give this hrule a width:
-\def\makechapterpagespace{\null\vspace{0.4375truein}} %\null\hrule width 0pt\nobreak}
+\def\makechapterpagespace{\null\vspace{.5truein}\null\hrule width 0pt\nobreak}
+\def\makechapterparspace{\null\vspace{0.4375truein}}
 
 %
 % Note that the use of renewcommand implies that the command
 % was originally defined elsewhere.  In this document, most if not
 % all of these were defined in the report.cls document.
 %
-\renewcommand\contentsname{TABLE OF CONTENTS}
-\renewcommand\listfigurename{LIST OF FIGURES}
-\renewcommand\listtablename{LIST OF TABLES}
+\renewcommand\contentsname{\centerline{\rm TABLE OF CONTENTS}}
+\renewcommand\listfigurename{\centerline{\rm LIST OF FIGURES}}
+\renewcommand\listtablename{\centerline{\rm LIST OF TABLES}}
 \renewcommand\bibname{\centerline{BIBLIOGRAPHY}}
 \renewcommand \thechapter {\@arabic\c@chapter}
 \renewcommand\chaptername{CHAPTER}
@@ -197,15 +187,11 @@
 
 \def\titlep{%
         \thispagestyle{empty}%
-        \makechapterpagespace
-        \begin{center}
-            T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A \\
-            THE GRADUATE SCHOOL
-        \end{center}
+        \makechapterpagespace 
+        \centerline{T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A}
+        \centerline{THE GRADUATE SCHOOL}
         \vfill
-        \begin{center}
-                \uppercase\expandafter{\@title}
-        \end{center}
+        \centerline{\uppercase\expandafter{\@title}}
         \vfill
         \singlespace
         \centerline{by}
@@ -213,18 +199,16 @@
         \doublespace
         \vspace{.2truein}
         \vfill
-        \begin{center}
-                A\thds submitted in partial fulfillment of\\
-                the requirements for the degree of \@degreename\\
-                in the Discipline of \expandafter{\@dept}\\
-                \vspace{.5truein}
-                The Graduate School\\
-                The University of Tulsa\\
-        \end{center}
+        \centerline{A\thds submitted in partial fulfillment of}
+        \centerline{the requirements for the degree of \@degreename}
+        \centerline{in the Discipline of \expandafter{\@dept}}
+        \vspace{.5truein}
+        \centerline{The Graduate School}
+        \centerline{The University of Tulsa}
         \vspace{.1truein}
-        \begin{center}
-                \@submityear\\
-        \end{center}\vskip1in
+        \centerline{
+                \@submityear
+        }\vskip1in
         \newpage}
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -259,8 +243,9 @@
 %
 \def\signaturep{%
         \doublespace
-        \makechapterpagespace 
-        \begin{center} % TODO: one option is to make a new env that can have a \hrul for debugging
+        \makechapterparspace
+        
+        \begin{center}
             T H E\ \ \ U N I V E R S I T Y\ \ \ O F\ \ \ T U L S A \\
             THE GRADUATE SCHOOL
         \end{center}
@@ -497,7 +482,7 @@
 %
  \def\@makechapterhead#1{%
   \makechapterpagespace
-  {\parindent \z@ \center \normalfont
+  {\parindent \z@ \centering \normalfont
     \ifnum \c@secnumdepth >\m@ne
         \@chapapp\space \thechapter
         \par\nobreak
@@ -513,7 +498,7 @@
   {\parindent \z@ \raggedright
     \normalfont
     \interlinepenalty\@M
-    \begin{center}{#1}\end{center}\par\nobreak
+    \centerline {#1}\par\nobreak
     \vskip 10\p@
   }}
 
