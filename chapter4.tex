@@ -116,11 +116,10 @@ lexicon, namely a simple ``status'' type of property to be used in determining
 whether an asset is enabled or disabled.
 \TUsubsubsection{Status}
 The status property is simple but powerful. Each asset that represents a host has a
-quality named \texttt{status}. It may take the value \texttt{up} or \texttt{down}.
-This allows exploits against or involving the host in question to require that it
-be online as a precondition, and it provides a simple mechanism of action for
-denial of service attacks to be modeled -- they simply have the postcondition of
-a \texttt{status = down} quality fact.
+quality named \texttt{status} with the value \texttt{up} or \texttt{down}.
+This allows exploits to require that an asset
+be online as a precondition or to implement denial of service attacks with
+\texttt{status = down} quality postconditions.
 
 \TUsection{Syntactic Sugar}
 \TUsubsection{Directional Topologies}
